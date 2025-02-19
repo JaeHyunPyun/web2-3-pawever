@@ -1,4 +1,4 @@
-package com.example.pawever.domain.user.dto;
+package com.pawever.server.domain.user.dto;
 
 public class UserTO {
 }

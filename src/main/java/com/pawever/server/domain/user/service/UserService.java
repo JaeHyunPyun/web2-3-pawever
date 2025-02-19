@@ -1,4 +1,4 @@
-package com.example.pawever.domain.user.service;
+package com.pawever.server.domain.user.service;
 
 public class UserService {
 }
