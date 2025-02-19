@@ -1,4 +1,4 @@
-package com.example.pawever.domain.user.controller;
+package com.pawever.server.domain.user.controller;
 
 public class UserController {
 }
