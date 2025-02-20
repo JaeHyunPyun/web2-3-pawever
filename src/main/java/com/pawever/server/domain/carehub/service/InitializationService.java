@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class InitializationService {
 
     private final CityCodeService cityCodeService;
-//    private final ShelterService shelterService;
+    private final DistrictCodeService districtCodeService;
 
     @Value("${openapi.service-key}")
     private String serviceKey;
@@ -18,6 +18,6 @@ public class InitializationService {
     @PostConstruct  // 서버 시작 시 자동 실행
     public void initializeData() {
         cityCodeService.fetchAndSaveCityCodes(serviceKey);
-//        shelterService.fetchAndSaveShelters(serviceKey);
+        districtCodeService.fetchAndSaveDistrictCodes(serviceKey);
     }
 }

@@ -27,10 +27,10 @@ public class Shelter {
     @Column(name = "name", nullable = false, length = 255)
     private String name;  // 보호소 이름
 
-    @Column(name = "center_phone_number", nullable = false, length = 255)
+    @Column(name = "center_phone_number", nullable = true, length = 255)
     private String centerPhoneNumber;  // 보호소 전화번호
 
-    @Column(name = "manager_phone_number", nullable = false, length = 255)
+    @Column(name = "manager_phone_number", nullable = true, length = 255)
     private String managerPhoneNumber;  // 보호소 담당자 전화번호
 
     @Column(name = "operation_start_time", nullable = false)
@@ -41,21 +41,29 @@ public class Shelter {
     @Builder.Default
     private LocalTime operationEndTime = LocalTime.of(18, 0);  // 보호소 운영 끝 시간 (기본값 18:00:00)
 
-    @Column(name = "sido", nullable = false, length = 50)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_code_id", nullable = false)
+    private CityCode cityCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_code_id", nullable = false)
+    private DistrictCode districtCode;
+
+    @Column(name = "sido", nullable = true, length = 50)
     private String sido;  // 시/도
 
-    @Column(name = "sigungu", nullable = false, length = 50)
+    @Column(name = "sigungu", nullable = true, length = 50)
     private String sigungu;  // 시/군/구
 
-    @Column(name = "eupmyeondong", nullable = false, length = 50)
+    @Column(name = "eupmyeondong", nullable = true, length = 50)
     private String eupmyeondong;  // 읍/면/동
 
-    @Column(name = "road_address", nullable = false, length = 255)
+    @Column(name = "road_address", nullable = true, length = 255)
     private String roadAddress;  // 상세주소
 
-    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
+    @Column(name = "latitude", nullable = true, precision = 10, scale = 7)
     private BigDecimal latitude;  // 위도
 
-    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
+    @Column(name = "longitude", nullable = true, precision = 10, scale = 7)
     private BigDecimal longitude;  // 경도
 }
