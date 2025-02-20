@@ -26,7 +26,7 @@ public class DistrictCodeService {
 
     public void fetchAndSaveDistrictCodes(String serviceKey) {
         if (districtCodeRepository.count() > 0) {
-            log.info("시군구 코드가 이미 데이터베이스에 존재 => API 호출 생략");
+            log.info("시군구 데이터가 이미 데이터베이스에 존재 => API 호출 생략");
             return;
         }
 

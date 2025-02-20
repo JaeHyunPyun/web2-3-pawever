@@ -41,13 +41,11 @@ public class Shelter {
     @Builder.Default
     private LocalTime operationEndTime = LocalTime.of(18, 0);  // 보호소 운영 끝 시간 (기본값 18:00:00)
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_code_id", nullable = false)
-    private CityCode cityCode;
+    @Column(name = "city_code", nullable = false)
+    private String cityCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_code_id", nullable = false)
-    private DistrictCode districtCode;
+    @Column(name = "district_code", nullable = false)
+    private String districtCode;
 
     @Column(name = "sido", nullable = true, length = 50)
     private String sido;  // 시/도

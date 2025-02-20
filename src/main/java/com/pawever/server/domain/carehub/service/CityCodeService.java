@@ -24,7 +24,7 @@ public class CityCodeService {
 
     public void fetchAndSaveCityCodes(String serviceKey) {
         if (cityCodeRepository.count() > 0) {
-            log.info("시도 코드가 이미 데이터베이스에 존재 => API 호출 생략");
+            log.info("시도 데이터가 이미 데이터베이스에 존재 => API 호출 생략");
             return;
         }  // 시도 코드가 존재하면 중단
 
