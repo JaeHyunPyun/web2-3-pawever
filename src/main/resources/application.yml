@@ -3,6 +3,10 @@ spring:
     name: pawEver
   profiles:
     active: local
+  task:
+    scheduling:
+      pool:
+        size: 5
 logging:
   config: classpath:logback-spring.xml
 springdoc:
