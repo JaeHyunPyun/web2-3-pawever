@@ -64,4 +64,13 @@ public class Shelter {
 
     @Column(name = "longitude", nullable = true, precision = 10, scale = 7)
     private BigDecimal longitude;  // 경도
+
+    public void updateInfo(String managerPhoneNumber, String centerPhoneNumber, String sido, String sigungu, String eupmyeondong, String roadAddress) {
+        this.managerPhoneNumber = managerPhoneNumber;
+        this.centerPhoneNumber = centerPhoneNumber;
+        this.sido = sido;
+        this.sigungu = sigungu;
+        this.eupmyeondong = eupmyeondong;
+        this.roadAddress = roadAddress;
+    }
 }

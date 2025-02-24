@@ -1,5 +1,6 @@
 package com.pawever.server.domain.carehub.entity;
 
+import com.pawever.server.domain.carehub.dto.response.AbandonedPetApiResponse;
 import com.pawever.server.domain.carehub.enums.NeuteredStatus;
 import com.pawever.server.domain.carehub.enums.Sex;
 import com.pawever.server.domain.carehub.enums.Species;
@@ -16,9 +17,8 @@ import lombok.*;
 public class AbandonedPet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;  // 유기동물ID (api 제공 고유 유기 번호)
+    private Long id;  // desertion_no (API 제공 고유 유기 번호)
 
     @Column(name = "provider_shelter_id", nullable = false)
     private Long providerShelterId;  // API에서 제공하는 보호소 고유 ID
@@ -44,14 +44,14 @@ public class AbandonedPet {
     @Column(name = "sex", nullable = false, length = 10)
     private Sex sex;  // 성별
 
-    @Column(name = "age", nullable = false)
-    private Integer age;  // 연생
+    @Column(name = "age", nullable = false, length = 50)
+    private String age;  // 연생
 
     @Column(name = "found_location", nullable = false, length = 255)
     private String foundLocation;  // 발견장소
 
-    @Column(name = "weight", nullable = false)
-    private Integer weight;  // 체중
+    @Column(name = "weight", nullable = false, length = 50)
+    private String weight;  // 체중
 
     @Column(name = "color", nullable = false, length = 255)
     private String color;  // 색
