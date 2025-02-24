@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   checks: write
+  issues: write
 
 jobs:
   # build(test포함) 진행
