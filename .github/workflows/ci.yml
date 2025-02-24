@@ -6,6 +6,11 @@ on:
       - develop
       - main
 
+permissions:
+  contents: read
+  checks: write
+  issues: write
+
 jobs:
   # build(test포함) 진행
   build:
@@ -28,6 +33,17 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and run tests
         run: ./gradlew clean build -Dspring.profiles.active=test
+      - name: 테스트 결과를 PR에 코멘트로 등록
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: '**/build/test-results/test/TEST-*.xml'
+      - name: 테스트 실패 시, 실패한 코드 라인에 Check 코멘트를 등록
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          token: ${{ github.token }}
 
   close_pr:
     runs-on: ubuntu-latest
