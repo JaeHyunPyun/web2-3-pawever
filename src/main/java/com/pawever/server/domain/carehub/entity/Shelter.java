@@ -59,9 +59,11 @@ public class Shelter {
     @Column(name = "road_address", nullable = true, length = 255)
     private String roadAddress;  // 상세주소
 
+    @Setter
     @Column(name = "latitude", nullable = true, precision = 10, scale = 7)
     private BigDecimal latitude;  // 위도
 
+    @Setter
     @Column(name = "longitude", nullable = true, precision = 10, scale = 7)
     private BigDecimal longitude;  // 경도
 
@@ -73,4 +75,5 @@ public class Shelter {
         this.eupmyeondong = eupmyeondong;
         this.roadAddress = roadAddress;
     }
+
 }

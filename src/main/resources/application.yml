@@ -16,5 +16,8 @@ springdoc:
     path: /swagger-ui
 openapi:
   service-key: ${OPENAPI_SERVICE_KEY}
+kakao:
+  api:
+    key: ${KAKAO_REST_API_KEY}
 
 

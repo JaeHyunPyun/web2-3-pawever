@@ -1,6 +1,8 @@
 package com.pawever.server.domain.carehub.service;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.pawever.server.domain.carehub.config.KakaoApiProperties;
 import com.pawever.server.domain.carehub.dto.response.AbandonedPetApiResponse;
 import com.pawever.server.domain.carehub.entity.AbandonedPetTemp;
 import com.pawever.server.domain.carehub.entity.DistrictCode;
@@ -19,13 +21,17 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +47,7 @@ public class AbandonedPetService {
     private final DistrictCodeRepository districtCodeRepository;
     private final WebClient webClient = WebClient.builder().build();
     private final JdbcTemplate jdbcTemplate;
+    private final KakaoApiProperties kakaoApiProperties;
 
     private static final int MAX_CONCURRENT_REQUESTS = 20;
     private static final int NUM_OF_ROWS = 1000; //한 페이지에 보여줄 응답 수 (페이지 네이션 제거)
@@ -159,6 +166,7 @@ public class AbandonedPetService {
         }
     }
 
+    @Transactional
     public void updateShelter(AbandonedPetApiResponse.Item item, String uprCd, String orgCd) {
         shelterRepository.findByNameAndCityCodeAndDistrictCode(item.getCareNm(), uprCd, orgCd).ifPresent(shelter -> {
             if (shelter.getCenterPhoneNumber() == null) {
@@ -174,6 +182,39 @@ public class AbandonedPetService {
 
                 shelterRepository.save(shelter);
                 log.info("보호소 정보 업데이트 완료 - 보호소명: {}, 시도 코드: {}, 시군구 코드: {}", item.getCareNm(), uprCd, orgCd);
+            }
+
+            if (shelter.getLatitude().compareTo(BigDecimal.ZERO) == 0 || shelter.getLongitude().compareTo(BigDecimal.ZERO) == 0) {
+                webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .scheme("https")
+                                .host("dapi.kakao.com")
+                                .path("/v2/local/search/address.json")
+                                .queryParam("query", cleanAddress(item.getCareAddr()))
+                                .build())
+                        .header("Authorization", "KakaoAK " + kakaoApiProperties.getKey())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .retrieve()
+                        .bodyToMono(JsonNode.class)
+                        .flatMap(response -> {
+                            if (response != null && response.has("documents") && !response.get("documents").isEmpty()) {
+                                JsonNode firstDocument = response.get("documents").get(0);
+                                BigDecimal latitude = new BigDecimal(firstDocument.get("y").asText());
+                                BigDecimal longitude = new BigDecimal(firstDocument.get("x").asText());
+
+                                shelter.setLatitude(latitude);
+                                shelter.setLongitude(longitude);
+                                shelterRepository.saveAndFlush(shelter);
+
+
+                                log.info("위도/경도 업데이트 완료 - 보호소명: {}, 위도: {}, 경도: {}", item.getCareNm(), latitude, longitude);
+                            } else {
+                                log.warn("위도/경도 정보 없음 - 보호소명: {}, 주소: {} res: {}", item.getCareNm(), cleanAddress(item.getCareAddr()), response);
+                            }
+                            return Mono.empty();
+                        })
+                        .doOnError(e -> log.error("위도/경도 업데이트 실패 - 보호소명: {}, 이유: {}", item.getCareNm(), e.getMessage()))
+                        .subscribe(); // 비동기 흐름 실행
             }
         });
     }
@@ -237,4 +278,19 @@ public class AbandonedPetService {
     private String getServiceKey() {
         return System.getenv("OPENAPI_SERVICE_KEY");
     }
+
+    public static String cleanAddress(String address) {
+        if (address == null || address.isBlank()) {
+            return "";
+        }
+
+        //첫 번째 괄호 이후 모든 내용 제거
+        String cleanedAddress = address.split("\\(")[0].trim();
+
+        //공백 정리
+        cleanedAddress = cleanedAddress.replaceAll("\\s+", " ");
+
+        return cleanedAddress;
+    }
+
 }
