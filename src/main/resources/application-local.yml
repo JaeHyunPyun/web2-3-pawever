@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DB_HOST}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mariadb://localhost:3306/paw_ever
+    username: root
+    password: root
   sql:
     init:
       mode : never

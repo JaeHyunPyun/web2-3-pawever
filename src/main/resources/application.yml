@@ -3,6 +3,10 @@ spring:
     name: pawEver
   profiles:
     default: local
+  task:
+    scheduling:
+      pool:
+        size: 5
 logging:
   config: classpath:logback-spring.xml
 springdoc:
@@ -10,3 +14,10 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui
+openapi:
+  service-key: ${OPENAPI_SERVICE_KEY}
+kakao:
+  api:
+    key: ${KAKAO_REST_API_KEY}
+
+
