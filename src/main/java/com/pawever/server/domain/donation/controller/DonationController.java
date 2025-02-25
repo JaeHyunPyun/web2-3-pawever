@@ -26,8 +26,8 @@ public class DonationController {
     }
 
     @GetMapping("api/users/staff/donations")
-    public ResponseEntity<ApiResponse> getAllDonation() {
-        List<DonationTO> donations = donationService.getAllDonation();
+    public ResponseEntity<ApiResponse> getAllDonations() {
+        List<DonationTO> donations = donationService.getAllDonations();
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donations));
     }
 }

@@ -27,7 +27,7 @@ public class DonationService {
         donationRepository.save(donation);
     }
 
-    public List<DonationTO> getAllDonation() {
+    public List<DonationTO> getAllDonations() {
         List<Donation> donations = donationRepository.findAll();
 
         return donations.stream().map(donation -> {
