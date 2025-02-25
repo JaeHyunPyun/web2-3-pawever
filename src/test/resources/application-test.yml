@@ -1,4 +1,10 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+  data:
+    redis:
+      host: ${REDIS_HOST_NAME}
+      port: ${REDIS_PORT}
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect #추가
     show-sql: true
@@ -20,5 +26,5 @@ spring:
     console:
       settings:
         web-allow-others: true
-      enabled : true
-      path : /h2
+      enabled: true
+      path: /h2

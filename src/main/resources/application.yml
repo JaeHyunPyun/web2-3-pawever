@@ -2,7 +2,7 @@ spring:
   application:
     name: pawEver
   profiles:
-    active: local
+    default: local
   task:
     scheduling:
       pool:
