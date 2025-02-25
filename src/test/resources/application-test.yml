@@ -20,5 +20,5 @@ spring:
     console:
       settings:
         web-allow-others: true
-      enbaled : true
+      enabled : true
       path : /h2
