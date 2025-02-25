@@ -74,6 +74,10 @@ dependencies {
 tasks.named('test') {
     delete file('build/generated-snippets')
     useJUnitPlatform()
+    systemProperty 'spring.profiles.active', 'test'
+//    testLogging {
+//        showStandardStreams = true
+//    }
 }
 
 tasks.register('copyDocument', Copy){
@@ -130,3 +134,4 @@ tasks.withType(GenerateSwaggerUI) {
         swaggerUIFile.append securitySchemesContent
    }
 }
+
