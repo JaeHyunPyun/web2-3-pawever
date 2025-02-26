@@ -33,4 +33,10 @@ public class DonationController {
         List<DonationTO> donationsByUser = donationService.getDonationByUser(user_id);
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationsByUser));
     }
+
+    @GetMapping("api/donations/amount")
+    public ResponseEntity<ApiResponse> getTotalDonationAmount() {
+        double totalDonationAmount = donationService.getTotalDonationAmount();
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, totalDonationAmount));
+    }
 }

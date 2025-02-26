@@ -64,4 +64,9 @@ public class DonationService {
                 .collect(Collectors.toList());
     }
 
+    public double getTotalDonationAmount() {
+        return donationRepository.calculateTotalAmount()
+                .orElse(0.0);
+    }
+
 }
