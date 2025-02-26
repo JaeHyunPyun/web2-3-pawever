@@ -1,5 +1,6 @@
 package com.pawever.server.domain.donation.dto;
 
+import com.pawever.server.domain.user.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 public class DonationTO {
+    private User userId;
     private String donorName;
     private String donorMessage;
     private Long donationAmount;
