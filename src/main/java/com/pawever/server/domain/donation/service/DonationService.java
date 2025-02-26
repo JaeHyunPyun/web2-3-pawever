@@ -5,8 +5,6 @@ import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.repository.DonationRepository;
 import com.pawever.server.domain.user.entity.User;
 import com.pawever.server.domain.user.repository.UserRepository;
-import com.pawever.server.domain.user.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,26 +40,27 @@ public class DonationService {
 
     public List<DonationTO> getAllDonations() {
         List<Donation> donations = donationRepository.findAll();
-
-        return donations.stream().map(donation -> {
-            DonationTO donationTO = new DonationTO();
-            donationTO.setUserId(donation.getUserId());
-            donationTO.setDonorName(donation.getDonorName());
-            donationTO.setDonorMessage(donation.getDonorMessage());
-            donationTO.setDonationAmount(donation.getDonationAmount());
-            donationTO.setCreatedAt(donation.getCreatedAt());
-            return donationTO;
-        }).collect(Collectors.toList());
+        return getDonationTO(donations);
     }
 
     public List<DonationTO> getDonationByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         List<Donation> donations = donationRepository.findByUserId(user);
-        ModelMapper modelMapper = new ModelMapper();
-        return donations.stream()
-                .map(donation -> modelMapper.map(donation, DonationTO.class))
-                .collect(Collectors.toList());
+        return getDonationTO(donations);
+
+    }
+
+    public List<DonationTO> getDonationTO(List<Donation> donations) {
+        return donations.stream().map(donation -> {
+            DonationTO donationTO = new DonationTO();
+            donationTO.setUserId(donation.getUserId().getUserId());
+            donationTO.setDonorName(donation.getDonorName());
+            donationTO.setDonorMessage(donation.getDonorMessage());
+            donationTO.setDonationAmount(donation.getDonationAmount());
+            donationTO.setCreatedAt(donation.getCreatedAt());
+            return donationTO;
+        }).collect(Collectors.toList());
     }
 
     public double getTotalDonationAmount() {

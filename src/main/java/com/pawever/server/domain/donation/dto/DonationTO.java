@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 public class DonationTO {
-    private User userId;
+    private Long userId;
     private String donorName;
     private String donorMessage;
     private Long donationAmount;
