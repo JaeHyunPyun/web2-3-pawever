@@ -39,7 +39,7 @@ public class DonationController {
     public ResponseEntity<ApiResponse> getTotalDonationAmount() {
         double totalDonationAmount = donationService.getTotalDonationAmount();
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("donorAmount", totalDonationAmount);
+        responseData.put("totalAmount", totalDonationAmount);
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, responseData));
     }
 }
