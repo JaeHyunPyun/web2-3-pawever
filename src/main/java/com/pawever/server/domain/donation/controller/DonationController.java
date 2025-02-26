@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,8 @@ public class DonationController {
     @GetMapping("api/donations/amount")
     public ResponseEntity<ApiResponse> getTotalDonationAmount() {
         double totalDonationAmount = donationService.getTotalDonationAmount();
-        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, totalDonationAmount));
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("donorAmount", totalDonationAmount);
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, responseData));
     }
 }
