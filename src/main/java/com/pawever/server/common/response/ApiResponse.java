@@ -10,10 +10,11 @@ public class ApiResponse {
     private Boolean isSuccess;
     private String status;
     private String code;
+    private String message;
     private Object data;
 
     public static ApiResponse success(ResponseCodeEnum responseCodeEnum, Object data){
-        return  new ApiResponse(true,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),data);
+        return  new ApiResponse(true,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),responseCodeEnum.getMessage(),data);
     }
     public static ApiResponse success(ResponseCodeEnum responseCodeEnum){
         return success(responseCodeEnum,null);
@@ -23,7 +24,7 @@ public class ApiResponse {
     }
 
     public static ApiResponse fail(ResponseCodeEnum responseCodeEnum, Object data){
-        return new ApiResponse(false,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),data);
+        return new ApiResponse(false,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),responseCodeEnum.getMessage(),data);
     }
 
 
