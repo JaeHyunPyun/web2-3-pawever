@@ -17,7 +17,7 @@ public class Donation {
     private Long donationId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User userId;
 
     @Column(length = 50)
