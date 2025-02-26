@@ -31,7 +31,7 @@ public class DonationService {
         donation.setUserId(user);
         donation.setDonorName((String) request.get("donorName"));
         donation.setDonorMessage((String) request.get("donorMessage"));
-        donation.setDonationAmount(((Number) request.get("amount")).longValue());
+        donation.setDonationAmount(((Number) request.get("donationAmount")).longValue());
         donation.setCreatedAt(LocalDateTime.now());
         donation.setUpdatedAt(LocalDateTime.now());
 
