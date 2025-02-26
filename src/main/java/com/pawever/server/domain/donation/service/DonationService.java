@@ -6,6 +6,7 @@ import com.pawever.server.domain.donation.repository.DonationRepository;
 import com.pawever.server.domain.user.entity.User;
 import com.pawever.server.domain.user.repository.UserRepository;
 import com.pawever.server.domain.user.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,16 @@ public class DonationService {
             donationTO.setCreatedAt(donation.getCreatedAt());
             return donationTO;
         }).collect(Collectors.toList());
+    }
+
+    public List<DonationTO> getDonationByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Donation> donations = donationRepository.findByUserId(user);
+        ModelMapper modelMapper = new ModelMapper();
+        return donations.stream()
+                .map(donation -> modelMapper.map(donation, DonationTO.class))
+                .collect(Collectors.toList());
     }
 
 }

@@ -6,10 +6,7 @@ import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.service.DonationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,5 +26,11 @@ public class DonationController {
     public ResponseEntity<ApiResponse> getAllDonations() {
         List<DonationTO> donations = donationService.getAllDonations();
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donations));
+    }
+
+    @GetMapping("api/users/donations/{user_id}")
+    public ResponseEntity<ApiResponse> getDonationByUser(@PathVariable Long user_id) {
+        List<DonationTO> donationsByUser = donationService.getDonationByUser(user_id);
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationsByUser));
     }
 }
