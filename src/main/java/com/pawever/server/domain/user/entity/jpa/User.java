@@ -1,4 +1,4 @@
-package com.pawever.server.domain.user.entity;
+package com.pawever.server.domain.user.entity.jpa;
 
 import com.pawever.server.common.entity.BaseEntity;
 import com.pawever.server.domain.user.converter.BooleanToYNConverter;
@@ -20,11 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Entity
 @Getter

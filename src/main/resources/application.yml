@@ -9,8 +9,8 @@ spring:
         size: 5
   jwt:
     secret: ${JWT_SECRET_KEY}
-    accessToken_expiration_time: ${accessToken_expiration_time}   #테스트용 : 3분(180000)
-    refreshToken_expiration_time: ${refreshToken_expiration_time} #테스트용 : 5분(300000)
+    accessTokenExpirationTime: ${accessToken_expiration_time}   #테스트용 : 3분(180000)
+    refreshTokenExpirationTime: ${refreshToken_expiration_time} #테스트용 : 5분(300000)
 logging:
   config: classpath:logback-spring.xml
 springdoc:

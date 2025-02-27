@@ -1,6 +1,6 @@
-package com.pawever.server.domain.user.repository;
+package com.pawever.server.domain.user.repository.jpa;
 
-import com.pawever.server.domain.user.entity.User;
+import com.pawever.server.domain.user.entity.jpa.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

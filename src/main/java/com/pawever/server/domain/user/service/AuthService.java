@@ -1,8 +1,10 @@
 package com.pawever.server.domain.user.service;
 
+import com.pawever.server.domain.cicd.service.RedisService;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.jwt.JWTUtil;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,12 @@ public class AuthService {
 
     private final JWTUtil jwtUtil;
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
-    @Value("${spring.jwt.accessToken_expiration_time}")
+    @Value("${spring.jwt.accessTokenExpirationTime}")
     private Long accessTokenExpiredMs;
 
-    @Value("${spring.jwt.refreshToken_expiration_time}")
+    @Value("${spring.jwt.refreshTokenExpirationTime}")
     private Long refreshTokenExpiredMs;
 
     @Transactional
@@ -42,7 +45,7 @@ public class AuthService {
         String refreshToken = jwtUtil.createJwt("refresh", userResponseDto, refreshTokenExpiredMs);
 
         // 4. Refresh토큰 Redis에 저장
-        // 별도 메서드로 만들기
+        refreshTokenService.saveRefreshToken(refreshToken, userResponseDto.getName());
 
         // 5. 컨트롤러로 반환
         return createHttpHeader(accessToken, refreshToken);
