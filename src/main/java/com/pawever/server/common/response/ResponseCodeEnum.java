@@ -23,6 +23,18 @@ public enum ResponseCodeEnum {
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
 
+    // S3 이미지 관련 에러
+    UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_0", "이미지 업로드 중 오류가 발생했습니다."),
+    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_1", "AWS S3 업로드에 실패했습니다."),
+    FILE_READ_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_2", "이미지 파일을 읽는 중 오류가 발생했습니다."),
+    S3_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_3", "AWS S3 이미지 삭제에 실패했습니다."),
+    IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_4", "DB 이미지 삭제에 실패했습니다."),
+
+    // 게시글 관련 에러
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post404_0", "게시글이 존재하지 않습니다."),
+    UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "Post403_0", "이 게시글을 수정할 권한이 없습니다."),
+    UNAUTHORIZED_DELETE_ACTION(HttpStatus.FORBIDDEN, "Post403_1", "이 게시글을 삭제할 권한이 없습니다."),
+
 
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");
