@@ -24,7 +24,7 @@ public class SecurityConfig {
         // 경로별 인가 처리
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/login", "/", "/join").permitAll()
+                .requestMatchers("/api/auth/tokens", "/").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
         //인증 실패 시 401 Unauthorized 응답을 반환

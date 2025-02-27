@@ -1,7 +1,10 @@
 package com.pawever.server.domain.user.entity;
 
+import com.pawever.server.common.entity.BaseEntity;
+import com.pawever.server.domain.user.converter.BooleanToYNConverter;
 import com.pawever.server.domain.user.enums.Role;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,8 +20,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Entity
 @Getter
@@ -26,7 +32,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Table(name = "user")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +48,7 @@ public class User {
     @Column(name= "profile_image_url", length=255)
     private String profileImageUrl; // 유저 profile image
 
-    @Column(name= "social_login_uuid", nullable = false, length=36)
+    @Column(name= "social_login_uuid", nullable = false, unique = true, length=36)
     private String socialLoginUuid; // 카카오, 구글 제공 uuid
 
     @Column(name = "social_login_provider", nullable = false, length=10)
@@ -60,17 +66,18 @@ public class User {
     @Column(name = "role", nullable = false, length = 10)
     private Role role = Role.ROLE_USER; // 유저 권한
 
-    @CreatedDate
-    @Column(name="created_at", nullable= false, updatable = false)
-    private LocalDateTime created_at;   // 최초 생성 시각(자동 업데이트)
-
-    @LastModifiedDate
-    @Column(name="updated_at")
-    private LocalDateTime updated_at;  // 마지막 수정 시각(자동 업데이트)
+//    @CreatedDate
+//    @Column(name="created_at", nullable= false, updatable = false)
+//    private LocalDateTime created_at;   // 최초 생성 시각(자동 업데이트)
+//
+//    @LastModifiedDate
+//    @Column(name="updated_at")
+//    private LocalDateTime updated_at;  // 마지막 수정 시각(자동 업데이트)
 
     @Column(name="deleted_at")
     private LocalDateTime deleted_at; // 삭제시각(수동 업데이트)
 
     @Column(name="is_deleted", nullable = false)
-    private Boolean isDeleted = false; // 삭제 여부
+    @Convert(converter = BooleanToYNConverter.class)
+    private Boolean isDeleted; // 삭제 여부, 기본값 false(N)
 }
