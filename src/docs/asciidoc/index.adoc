@@ -5,7 +5,7 @@
 :source-highlighter: highlightjs
 :sectlinks:
 
-= **GreenRoom API Document**
+= **PawEver API Document**
 
 
 == 문서
@@ -100,4 +100,12 @@ Content-Type: application/json
 | 공통 | 400 | BAD_REQUEST | REQUEST_0 | 부적절한 request argument가 전달됨
 | 공통 | 404 | NOT FOUND | USER_0 | access token에 포함된 user 정보를 서버에서 찾지 못하는 경우 공통적으로 반환됨
 |===
+
+== 커뮤니티 게시글 API
+
+=== 게시글 생성
+include::build/generated-snippets/community/post/create/http-request.adoc[]
+include::build/generated-snippets/community/post/create/request-body.adoc[]
+include::build/generated-snippets/community/post/create/http-response.adoc[]
+include::build/generated-snippets/community/post/create/response-body.adoc[]
 
