@@ -31,8 +31,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        return path.equals("/api/auth/tokens") &&
+        // 🔹 기존 인증 제외 조건: POST, PUT /api/auth/tokens
+        boolean isAuthTokenRequest = path.equals("/api/auth/tokens") &&
             (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT"));
+        return isAuthTokenRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로
