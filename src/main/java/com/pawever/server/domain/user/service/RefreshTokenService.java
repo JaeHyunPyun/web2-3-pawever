@@ -22,7 +22,7 @@ public class RefreshTokenService {
         RefreshToken token = RefreshToken.builder()
             .refreshToken(refreshToken)
             .name(name)
-            .ttl(jwtProperties.getRefreshTokenExpirationTime())
+            .ttl(jwtProperties.getRefreshTokenExpirationTime()/1000)
             .build();
         refreshTokenRepository.save(token);
         log.info("Refresh token saved: token - {}, username - {}", refreshToken, name);
