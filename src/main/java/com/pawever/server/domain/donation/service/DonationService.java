@@ -1,18 +1,15 @@
 package com.pawever.server.domain.donation.service;
 
-import com.pawever.server.common.response.ApiResponse;
-import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.repository.DonationRepository;
 import com.pawever.server.domain.user.entity.User;
 import com.pawever.server.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,9 +22,10 @@ public class DonationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public void createDonation(Map<String, Object> request) {
         try {
-            if (!request.containsKey("donationAmount")) { // 요청 값의 donationAmount 값 누락 여부 검사
+            if (!request.containsKey("donationAmount") || ((Number) request.get("donationAmount")).longValue() < 0L) { // 요청 값의 donationAmount 값 누락 여부 검사
                 throw new IllegalArgumentException("Invalid donationAmount format");
             }
 
