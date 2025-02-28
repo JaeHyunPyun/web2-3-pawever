@@ -30,35 +30,61 @@ public class PostService {
     @Transactional
     public PostResponseDTO.PostResponse createPost(PostRequestDTO.CreatePostRequest request, Long userId, List<MultipartFile> images) {
 
-        // 게시글 엔티티 생성
-        Post post = Post.builder()
-                .userId(userId)
-                .title(request.title())
-                .content(request.content())
-                .build();
-
-        // 저장
-        postRepository.save(post);
-
-        // 이미지가 있는 경우 업로드
-        List<String> imageUrls = null;
-        if (images != null && !images.isEmpty()) {
-            imageUrls = imageService.uploadImages(images);
+        // 요청값 검증
+        if (request == null) {
+            throw new CustomException(ResponseCodeEnum.NO_REQUEST_ARGUMENT);
+        }
+        if (request.title() == null || request.title().trim().isEmpty()) {
+            throw new CustomException(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT);
+        }
+        if (request.content() == null || request.content().trim().isEmpty()) {
+            throw new CustomException(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT);
         }
 
-        //이미지도 PostImagesRepository 에 저장
-        if (imageUrls != null && !imageUrls.isEmpty()) {
-            for (String image : imageUrls) {
-                PostImages postImages = PostImages.builder()
-                        .post(post)
-                        .imageUrl(image)
-                        .build();
-                postImagesRepository.save(postImages);
+        try {
+            // 게시글 엔티티 생성
+            Post post = Post.builder()
+                    .userId(userId)
+                    .title(request.title())
+                    .content(request.content())
+                    .build();
+
+            // 저장
+            postRepository.save(post);
+            // 이미지가 있는 경우 업로드
+            List<String> imageUrls = null;
+            if (images != null && !images.isEmpty()) {
+                try {
+                    imageUrls = imageService.uploadImages(images);
+                } catch (Exception e) {
+                    throw new CustomException(ResponseCodeEnum.UPLOAD_FAILED);
+                }
             }
-        }
 
-        // 저장 후 반환
-        return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            // 이미지 저장
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                for (String image : imageUrls) {
+                    try {
+                        PostImages postImages = PostImages.builder()
+                                .post(post)
+                                .imageUrl(image)
+                                .build();
+                        postImagesRepository.save(postImages);
+                    } catch (Exception e) {
+                        throw new CustomException(ResponseCodeEnum.IMAGE_DELETE_FAILED);
+                    }
+                }
+            }
+
+            return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+
+    } catch (CustomException e) {
+        throw e; // 이미 처리된 예외는 그대로 던짐
+    } catch (Exception e) {
+        throw new CustomException(ResponseCodeEnum.UNKNOWN_SERVER_ERROR);
+    }
+
+
     }
 
     //게시글 단건 조회
@@ -112,6 +138,7 @@ public class PostService {
         }).toList();
     }
 
+    //게시글 수정
     @Transactional
     public PostResponseDTO.PostResponse updatePost(Long postId, Long userId, PostRequestDTO.UpdatePostRequest request, List<MultipartFile> images) {
         // 게시글 조회

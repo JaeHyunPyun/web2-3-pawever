@@ -23,7 +23,7 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse> createPost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestPart PostRequestDTO.CreatePostRequest request) {
+            @RequestPart(value = "request", required = true) PostRequestDTO.CreatePostRequest request) {
 
         //멤버 아이디 임의 설정
         Long userId = 1L;

@@ -13,6 +13,7 @@ public enum ResponseCodeEnum {
 
     //요청관련 에러
     INVALID_REQUEST_ARGUMENT(HttpStatus.BAD_REQUEST,"REQUEST_0","부적절한 request argument가 전달됨"),
+    NO_REQUEST_ARGUMENT(HttpStatus.BAD_REQUEST,"REQUEST_1","request가 요청에 포함되지 않았습니다."),
 
 
     // 인증 관련 에러
