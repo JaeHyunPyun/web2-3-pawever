@@ -1,16 +1,24 @@
 package com.pawever.server.domain.user.config;
 
+import com.pawever.server.domain.user.jwt.JwtFilter;
+import com.pawever.server.domain.user.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -24,9 +32,11 @@ public class SecurityConfig {
         // 경로별 인가 처리
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/api/auth/tokens", "/").permitAll()
-                .requestMatchers("/admin").hasRole("ADMIN")
-                .anyRequest().authenticated());
+                .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
+                .requestMatchers("/").permitAll()  // 🔹 루트 경로는 모든 요청 허용
+                .requestMatchers("/admin").hasRole("ADMIN")  // 🔹 "/admin"은 ADMIN 권한 필요
+                .anyRequest().authenticated()  // 🔹 그 외 모든 요청은 인증 필요
+            );
         //인증 실패 시 401 Unauthorized 응답을 반환
         //접근 권한이 없을 때 403 Forbidden 응답을 반환
 //        http
@@ -37,6 +47,9 @@ public class SecurityConfig {
         http
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http
+            .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
