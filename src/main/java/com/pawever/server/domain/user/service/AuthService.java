@@ -3,7 +3,6 @@ package com.pawever.server.domain.user.service;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.jwt.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,7 @@ public class AuthService {
     private Long refreshTokenExpiredMs;
 
     @Transactional
-    public HttpHeaders login(AuthRequestDto authRequestDto, HttpServletResponse response) {
+    public HttpHeaders login(AuthRequestDto authRequestDto) {
 
         // 1. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
         UserResponseDto userResponseDto = userService.getUserInfoByUuid(authRequestDto.getSocialLoginUuid());
