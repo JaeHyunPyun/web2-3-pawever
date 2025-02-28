@@ -15,7 +15,6 @@ import org.springframework.data.redis.core.index.Indexed;
 public class RefreshToken {
 
     @Id
-    @Indexed
     private String refreshToken;    // 리프레시 토큰
 
     private String name;            // 유저 이름
