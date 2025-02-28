@@ -1,10 +1,8 @@
 package com.pawever.server.domain.user.service;
 
-import com.pawever.server.domain.cicd.service.RedisService;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
-import com.pawever.server.domain.user.jwt.JWTUtil;
-import com.pawever.server.domain.user.repository.jpa.UserRepository;
+import com.pawever.server.domain.user.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
 
@@ -54,7 +52,7 @@ public class AuthService {
 
     private HttpHeaders createHttpHeader(String accessToken, String refreshToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("access", accessToken); // 헤더에 access 토큰 추가
+        httpHeaders.set("Authorization", "Bearer " + accessToken); // 헤더에 access 토큰 추가
         httpHeaders.set(HttpHeaders.SET_COOKIE, createCookieHeader("refresh", refreshToken)); // 쿠키 추가
         return httpHeaders;
     }
