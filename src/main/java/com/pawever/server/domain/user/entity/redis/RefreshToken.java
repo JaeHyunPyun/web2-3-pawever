@@ -3,14 +3,11 @@ package com.pawever.server.domain.user.entity.redis;
 import com.pawever.server.domain.user.jwt.JwtProperties;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
-import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
-@NoArgsConstructor
 @RedisHash(value = "refreshToken")
 public class RefreshToken {
 
