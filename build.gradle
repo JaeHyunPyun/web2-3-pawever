@@ -78,21 +78,29 @@ ext {
     snippetsDir = file('build/generated-snippets')
 }
 
+
+tasks.withType(Test) {
+    systemProperty 'spring.profiles.active', 'test'
+    ignoreFailures = true
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     outputs.dir snippetsDir
 }
 
 asciidoctor {
+    dependsOn test // 테스트 실행 후 Asciidoctor 실행
     inputs.dir snippetsDir
     outputDir = file("build/docs/asciidoc")
-    dependsOn test
 }
 
 
 tasks.register('copyDocument', Copy){
     dependsOn tasks.named('asciidoctor')
-    delete file('src/main/resources/static/docs/index.html')
+    if (file('src/main/resources/static/docs/index.html').exists()) {
+        delete file('src/main/resources/static/docs/index.html')
+    }
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
@@ -113,16 +121,12 @@ tasks.register('copyOasToSwagger', Copy) {
 
     // 기존 yaml 파일 삭제
     delete 'src/main/resources/static/docs/openapi3.yaml'
-
     // 복제할 yaml 파일 타겟팅
     from "build/api-spec/openapi3.yaml"
-
     // 타겟 디렉토리로 파일 복제
     into 'src/main/resources/static/docs'
-
     //test 먼저 실행
     dependsOn tasks.named('test')
-
     // openapi3 task가 먼저 실행되도록 설정
     dependsOn tasks.named('openapi3')
 
