@@ -13,7 +13,10 @@ springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
-    path: /swagger-ui
+    path: /swagger-ui.html
+    urls:
+        - name: PAWEVER API
+          url: /docs/openapi3.yaml
 openapi:
   service-key: ${OPENAPI_SERVICE_KEY}
 kakao:
