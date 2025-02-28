@@ -25,7 +25,7 @@ public class DonationController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 
@@ -35,7 +35,7 @@ public class DonationController {
             List<DonationTO> donations = donationService.getAllDonations();
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donations));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 
@@ -45,9 +45,9 @@ public class DonationController {
             List<DonationTO> donationsByUser = donationService.getDonationByUser(user_id);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationsByUser));
         } catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.USER_NOT_FOUND, e.getMessage()));
+            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.USER_NOT_FOUND));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 
@@ -59,7 +59,7 @@ public class DonationController {
             responseData.put("totalAmount", totalDonationAmount);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, responseData));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 }
