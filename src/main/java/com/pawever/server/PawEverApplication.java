@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableScheduling //스케줄링 활성화
 @EnableConfigurationProperties(JwtProperties.class)
-@EnableRedisRepositories
 public class PawEverApplication {
 
     public static void main(String[] args) {
