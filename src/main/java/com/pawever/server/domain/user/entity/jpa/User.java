@@ -61,6 +61,9 @@ public class User extends BaseEntity {
     @Column(name = "role", nullable = false, length = 10)
     private Role role = Role.ROLE_USER; // 유저 권한
 
+    @Column(name="introduction", length=255)
+    private String introduction;        // 유저 자기소개
+
     @Column(name="deleted_at")
     private LocalDateTime deleted_at; // 삭제시각(수동 업데이트)
 
