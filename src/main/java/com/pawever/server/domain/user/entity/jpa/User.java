@@ -61,18 +61,10 @@ public class User extends BaseEntity {
     @Column(name = "role", nullable = false, length = 10)
     private Role role = Role.ROLE_USER; // 유저 권한
 
-//    @CreatedDate
-//    @Column(name="created_at", nullable= false, updatable = false)
-//    private LocalDateTime created_at;   // 최초 생성 시각(자동 업데이트)
-//
-//    @LastModifiedDate
-//    @Column(name="updated_at")
-//    private LocalDateTime updated_at;  // 마지막 수정 시각(자동 업데이트)
-
     @Column(name="deleted_at")
     private LocalDateTime deleted_at; // 삭제시각(수동 업데이트)
 
-    @Column(name="is_deleted", nullable = false)
+    @Column(name="is_deleted", nullable = false, length = 10)
     @Convert(converter = BooleanToYNConverter.class)
     private Boolean isDeleted; // 삭제 여부, 기본값 false(N)
 }
