@@ -74,9 +74,14 @@ dependencies {
 
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 tasks.named('test') {
-    delete file('build/generated-snippets')
+//    delete file('build/generated-snippets')
     useJUnitPlatform()
+    outputs.dir snippetsDir
     systemProperty 'spring.profiles.active', 'test'
 //    testLogging {
 //        showStandardStreams = true
