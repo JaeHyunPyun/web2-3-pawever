@@ -1,5 +1,7 @@
 package com.pawever.server.domain.user.controller;
 
+import com.pawever.server.common.response.ApiResponse;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,9 @@ public class AuthController {
     @PostMapping("/tokens")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto) {
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(ResponseCodeEnum.NO_CONTENT.getStatus())
             .headers(authService.login(authRequestDto))
             .build();
+
     }
 }
