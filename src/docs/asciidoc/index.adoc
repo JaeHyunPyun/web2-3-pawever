@@ -5,7 +5,7 @@
 :source-highlighter: highlightjs
 :sectlinks:
 
-= **GreenRoom API Document**
+= **PawEver API Document**
 
 
 == 문서
@@ -101,3 +101,20 @@ Content-Type: application/json
 | 공통 | 404 | NOT FOUND | USER_0 | access token에 포함된 user 정보를 서버에서 찾지 못하는 경우 공통적으로 반환됨
 |===
 
+== 회원 관리
+
+=== **1. 로그인 (POST /api/auth/tokens)**
+프론트에서 소셜로그인 이후 유저정보를 보내주면 로그인 및 회원가입을 진행하는 API입니다. +
+기존 서버 DB에 유저정보가 존재하면 단순 로그인 진행, 존재하지 않으면 회원가입(서버 DB에 저장)후 로그인 진행합니다.
+
+==== Request
+include::build/generated-snippets/api/auth/login/success/curl-request.adoc[]
+
+==== Request fields
+include::build/generated-snippets/api/auth/login/success/request-fields.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/auth/login/success/http-response.adoc[]
+
+==== 실패 Response
+include::build/generated-snippets/api/auth/login/failure-missing-fields/http-response.adoc[]
