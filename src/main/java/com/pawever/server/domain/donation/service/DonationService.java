@@ -23,7 +23,7 @@ public class DonationService {
     private UserRepository userRepository;
 
     @Transactional
-    public void createDonation(Map<String, Object> request) {
+    public Long createDonation(Map<String, Object> request) {
         try {
             if (!request.containsKey("donationAmount") || ((Number) request.get("donationAmount")).longValue() < 0L) { // 요청 값의 donationAmount 값 누락 여부 검사
                 throw new IllegalArgumentException("Invalid donationAmount format");
@@ -43,6 +43,7 @@ public class DonationService {
             donation.setCreatedAt(LocalDateTime.now());
             donation.setUpdatedAt(LocalDateTime.now());
             donationRepository.save(donation);
+            return donation.getDonationId();
         }  catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         } catch(Exception e) {

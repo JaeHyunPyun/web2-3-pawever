@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Setter
 public class DonationTO {
     private Long userId;
+    private Long donationId;
     private String donorName;
     private String donorMessage;
     private Long donationAmount;

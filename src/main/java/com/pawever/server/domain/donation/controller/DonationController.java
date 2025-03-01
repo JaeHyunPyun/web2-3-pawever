@@ -20,8 +20,8 @@ public class DonationController {
     @PostMapping("api/donations")
     public ResponseEntity<ApiResponse> createDonation(@RequestBody Map<String, Object> request) {
         try {
-            donationService.createDonation(request);
-            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+            long donationId = donationService.createDonation(request);
+            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationId));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
         } catch (Exception e) {
