@@ -22,18 +22,13 @@ public class RefreshTokenService {
 
     @Transactional
     public void saveRefreshToken(String refreshToken, String name) {
-        try {
-            RefreshToken token = RefreshToken.builder()
-                .refreshToken(refreshToken)
-                .name(name)
-                .ttl(jwtProperties.getRefreshTokenExpirationTime()/1000)
-                .build();
-            refreshTokenRepository.save(token);
-            log.info("리프레시 토큰 저장: 토큰 - {}, 유저명 - {}", refreshToken, name);
-        } catch (PersistenceException e) {
-            log.error("리프레시 토큰 저장 실패 : 토큰 - {}, 유저명 - {} 이유 - {}", refreshToken, name, e.getMessage());
-            throw new CustomException(ResponseCodeEnum.DATA_PERSISTENCE_ERROR);
-        }
+        RefreshToken token = RefreshToken.builder()
+            .refreshToken(refreshToken)
+            .name(name)
+            .ttl(jwtProperties.getRefreshTokenExpirationTime()/1000)
+            .build();
+        refreshTokenRepository.save(token);
+        log.info("리프레시 토큰 저장: 토큰 - {}, 유저명 - {}", refreshToken, name);
     }
 
     @Transactional

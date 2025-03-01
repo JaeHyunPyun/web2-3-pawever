@@ -67,13 +67,6 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             log.error("회원가입실패 : 회원ID - {}, 이유 - {}", user.getUserId(), e.getMessage());
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
-
-        } catch (PersistenceException e) {
-            log.error("회원가입실패 : 회원ID - {}, 이유 - {}", user.getUserId(), e.getMessage());
-            throw new CustomException(ResponseCodeEnum.DATA_PERSISTENCE_ERROR);
         }
     }
-
-
-
 }
