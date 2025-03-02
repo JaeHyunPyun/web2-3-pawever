@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({CustomException.class})
     public ResponseEntity<ApiResponse> handleCustomException(CustomException e){
         log.error("[{}] code:{} / code message:{}", e.getResponseCodeEnum().name(),e.getResponseCodeEnum().getCode(), e.getMessage());
+        System.out.println("e.getResponseCodeEnum().name() = " + e.getResponseCodeEnum().name());
         return ResponseEntity.status(e.getResponseCodeEnum().getStatus()).body(ApiResponse.fail(e.getResponseCodeEnum()));
 
     }
