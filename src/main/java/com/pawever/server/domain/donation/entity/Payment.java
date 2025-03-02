@@ -1,6 +1,7 @@
 package com.pawever.server.domain.donation.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "payment")
 @Setter
+@Getter
 public class Payment {
     @Id
     @Column(name = "payment_id")
@@ -23,7 +25,7 @@ public class Payment {
     @Column(name = "payment_amount", nullable = false)
     private Long paymentAmount;
 
-    @Column(name = "pg_tid", length = 255, nullable = false)
+    @Column(name = "pg_tid", length = 255)
     private String pgTid;
 
     @Column(name = "requested_at", nullable = false)

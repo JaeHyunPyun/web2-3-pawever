@@ -16,15 +16,27 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping("api/payments")
-    public ResponseEntity<ApiResponse> getPaymentsInfo(@RequestParam String paymentKey,
-                                                       @RequestParam String orderId,
+    public ResponseEntity<ApiResponse> getPaymentsInfo(@RequestParam String orderId,
                                                        @RequestParam long paymentAmount,
                                                        @RequestParam long donationId) {
         try {
-            paymentService.getPaymentsInfo(paymentKey, orderId, paymentAmount, donationId);
+            paymentService.getPaymentsInfo(orderId, paymentAmount, donationId);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
+
+    @PostMapping("api/payments/confirm")
+    public ResponseEntity<ApiResponse> requestConfirmPayment(@RequestParam String paymentKey,
+                                                             @RequestParam String orderId,
+                                                             @RequestParam long paymentAmount) {
+        try {
+            paymentService.requestConfirmPayment(paymentKey, orderId, paymentAmount);
+            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+        }
+    }
+
 }
