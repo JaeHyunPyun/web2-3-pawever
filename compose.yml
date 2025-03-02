@@ -14,6 +14,7 @@ services:
     #추가
     volumes:
       - /home/ubuntu/compose/propertytransfer/:/app/settings/
+      - /home/ubuntu/compose/springlogs/:/app/logs/
   redis-server:
     image: redis
     container_name: paw-redis
