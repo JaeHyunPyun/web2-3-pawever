@@ -2,8 +2,7 @@ package com.pawever.server.domain.donation.entity;
 
 import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +10,9 @@ import java.time.LocalDateTime;
 @Table(name = "donation")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Donation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
