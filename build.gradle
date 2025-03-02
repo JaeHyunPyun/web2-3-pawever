@@ -95,6 +95,14 @@ tasks.register('copyDocument', Copy){
     into file("src/main/resources/static/docs")
 }
 
+tasks.named('processResources') {
+    mustRunAfter tasks.named('copyDocument')
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('copyDocument')
+}
+
 openapi3 {
     servers = [
             { url = "http://localhost:8080" }
