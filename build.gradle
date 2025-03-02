@@ -88,10 +88,6 @@ tasks.named('test') {
 //    }
 }
 
-tasks.named('asciidoctor') {
-    dependsOn tasks.named('test') // asciidoctor는 test 이후 실행
-}
-
 tasks.register('copyDocument', Copy){
     dependsOn tasks.named('asciidoctor')
     delete file('src/main/resources/static/docs/index.html')
@@ -99,8 +95,12 @@ tasks.register('copyDocument', Copy){
     into file("src/main/resources/static/docs")
 }
 
+tasks.named('processResources') {
+    mustRunAfter tasks.named('copyDocument')
+}
+
 tasks.named('build') {
-    dependsOn tasks.named('copyDocument') // build 실행 시 copyDocument까지 포함
+    dependsOn tasks.named('copyDocument')
 }
 
 openapi3 {
