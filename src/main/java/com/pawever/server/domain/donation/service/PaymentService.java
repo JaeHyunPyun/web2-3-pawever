@@ -1,14 +1,23 @@
 package com.pawever.server.domain.donation.service;
 
+import com.pawever.server.domain.donation.dto.PaymentTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
 import com.pawever.server.domain.donation.repository.DonationRepository;
 import com.pawever.server.domain.donation.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class PaymentService {
@@ -17,6 +26,9 @@ public class PaymentService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Value("${tosspayments.secret-key}")
+    private String tossSecreteKey;
 
     @Transactional
     public void getPaymentsInfo(String orderId, long paymentAmount, long donationId) {
@@ -39,6 +51,39 @@ public class PaymentService {
         if (paymentAmount == payment.getPaymentAmount()) {
             throw new IllegalArgumentException("Invalid amount: " + paymentAmount);
         }
+        PaymentTO response = sendConfirmPaymentRequest(paymentKey, orderId, paymentAmount);
+        updatePaymentStatus(payment, response);
+    }
+
+    private PaymentTO sendConfirmPaymentRequest(String paymentKey, String orderId, long paymentAmount) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(tossSecreteKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("paymentKey", paymentKey);
+        body.put("orderId", orderId);
+        body.put("amount", paymentAmount);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        ResponseEntity<PaymentTO> response = restTemplate.postForEntity(
+                "https://api.tosspayments.com/v1/payments/confirm",
+                request,
+                PaymentTO.class
+        );
+
+        return response.getBody();
+    }
+
+    private void updatePaymentStatus(Payment payment, PaymentTO response) {
+        if ("DONE".equals(response.getPaymentStatus())) {
+            payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
+        } else {
+            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+        }
+        payment.setApprovedAt(LocalDateTime.now());
+        paymentRepository.save(payment);
     }
 
 

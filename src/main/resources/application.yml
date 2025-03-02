@@ -19,5 +19,8 @@ openapi:
 kakao:
   api:
     key: ${KAKAO_REST_API_KEY}
+tosspayments:
+    secret-key: ${TOSSPAYMENTS_SECRET_KEY}
+
 
 

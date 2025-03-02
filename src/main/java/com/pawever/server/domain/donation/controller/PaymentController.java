@@ -34,6 +34,8 @@ public class PaymentController {
         try {
             paymentService.requestConfirmPayment(paymentKey, orderId, paymentAmount);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
