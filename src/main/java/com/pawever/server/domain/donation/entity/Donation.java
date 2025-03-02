@@ -1,6 +1,6 @@
 package com.pawever.server.domain.donation.entity;
 
-import com.pawever.server.domain.user.entity.User;
+import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
