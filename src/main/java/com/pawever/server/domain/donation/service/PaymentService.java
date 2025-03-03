@@ -1,7 +1,6 @@
 package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.PaymentTO;
-import com.pawever.server.domain.donation.dto.TossCancelTO;
 import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -31,32 +31,54 @@ public class PaymentService {
     private String tossSecretKey;
 
     @Transactional
-    public void getPaymentsInfo(String orderId, long paymentAmount, long donationId) {
+    public void createPayment(String orderId, long paymentAmount, long donationId) {
         Payment payment = new Payment();
         payment.setPaymentId(orderId);
 
         Donation donation = donationRepository.findById(donationId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid donation ID: " + donationId));
-        payment.setDonation((donation));
+        payment.setDonation(donation);
         payment.setPgProvider("TossPayments");
         payment.setPaymentAmount(paymentAmount);
         payment.setRequestedAt(LocalDateTime.now());
         payment.setPaymentStatus(Payment.PaymentStatus.PENDING);
 
+        paymentRepository.save(payment);
     }
 
     @Transactional
-    public void requestConfirmPayment(String paymentKey, String orderId, long paymentAmount) {
+    public void verifyPayment(String paymentKey, String orderId, long paymentAmount) {
         Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
         if (paymentAmount != payment.getPaymentAmount()) {
             throw new IllegalArgumentException("Invalid amount: " + paymentAmount);
         }
-        PaymentTO response = sendConfirmPaymentRequest(paymentKey, orderId, paymentAmount);
-        updatePaymentStatus(payment, response, paymentKey);
+        payment.setPgTid(paymentKey);
+        paymentRepository.save(payment);
     }
 
-    private PaymentTO sendConfirmPaymentRequest(String paymentKey, String orderId, long paymentAmount) {
+    @Transactional
+    public void confirmPayment(String paymentKey, String orderId, long paymentAmount) {
+        ResponseEntity<PaymentTO> response = requestConfirm(paymentKey, orderId, paymentAmount);
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            try {
+                Payment payment = paymentRepository.findByPaymentId(orderId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
+
+                payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
+                payment.setApprovedAt(LocalDateTime.now());
+                paymentRepository.save(payment);
+            } catch (Exception e) {
+                cancelPayment(paymentKey, orderId);
+                throw new RuntimeException("결제 정보 저장 실패", e);
+            }
+        } else {
+            throw new RuntimeException("결제 승인 요청 실패: " + response.getStatusCode());
+        }
+    }
+
+    private ResponseEntity<PaymentTO> requestConfirm(String paymentKey, String orderId, long paymentAmount) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         String basicAuthValue = "Basic " + Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
@@ -74,39 +96,27 @@ public class PaymentService {
                 request,
                 PaymentTO.class
         );
-
-        return response.getBody();
-    }
-
-    private void updatePaymentStatus(Payment payment, PaymentTO response, String paymentKey) {
-        if ("DONE".equals(response.getPaymentStatus())) {
-            payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
-        } else {
-            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
-            cancelPayment(paymentKey);
-        }
-        payment.setApprovedAt(LocalDateTime.now());
-        paymentRepository.save(payment);
+        return response;
     }
 
     @Transactional
-    public void cancelPayment(String paymentKey) {
+    public void cancelPayment(String paymentKey, String orderId) {
         String cancelReason = "서버 오류로 결제에 실패했습니다";
-        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+        Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다: " + paymentKey));
 
         if (payment.getPaymentStatus() == Payment.PaymentStatus.CANCELED) {
             throw new IllegalStateException("이미 취소된 결제입니다.");
         }
 
-        TossCancelTO response = sendCancelPaymentRequest(paymentKey, cancelReason);
+        sendCancelPaymentRequest(paymentKey, cancelReason);
 
         payment.setPaymentStatus(Payment.PaymentStatus.CANCELED);
         payment.setCanceledAt(LocalDateTime.now());
         paymentRepository.save(payment);
     }
 
-    private TossCancelTO sendCancelPaymentRequest(String paymentKey, String cancelReason) {
+    private void sendCancelPaymentRequest(String paymentKey, String cancelReason) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 
@@ -120,16 +130,15 @@ public class PaymentService {
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<TossCancelTO> response = restTemplate.exchange(
-                url, HttpMethod.POST, request, TossCancelTO.class);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("토스 결제 취소 요청 실패");
+        try {
+            restTemplate.postForEntity(url, request, Void.class);
+        } catch (RestClientException e) {
+            throw new RuntimeException("결제 취소 요청 중 오류 발생: " + e.getMessage());
         }
 
-        return response.getBody();
     }
 
+    @Transactional
     public void processTossWebhook(TossWebhookTO webhookRequest) {
         String paymentKey = webhookRequest.getPaymentKey();
         String orderId = webhookRequest.getOrderId();
@@ -151,7 +160,7 @@ public class PaymentService {
     }
 
     private void handlePaymentSuccess(String paymentKey, String orderId, TossWebhookTO webhookRequest) {
-        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+        Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
 
         payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
@@ -160,7 +169,7 @@ public class PaymentService {
     }
 
     private void handlePaymentFailure(String paymentKey, String orderId) {
-        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+        Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
 
         payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
@@ -168,7 +177,7 @@ public class PaymentService {
     }
 
     private void handlePaymentExpired(String paymentKey, String orderId) {
-        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+        Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
 
         payment.setPaymentStatus(Payment.PaymentStatus.EXPIRED);

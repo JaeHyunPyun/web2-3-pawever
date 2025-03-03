@@ -18,23 +18,37 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping("api/payments")
-    public ResponseEntity<ApiResponse> getPaymentsInfo(@RequestParam String orderId,
+    public ResponseEntity<ApiResponse> createPayment(@RequestParam String orderId,
                                                        @RequestParam long paymentAmount,
                                                        @RequestParam long donationId) {
         try {
-            paymentService.getPaymentsInfo(orderId, paymentAmount, donationId);
+            paymentService.createPayment(orderId, paymentAmount, donationId);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 
-    @PostMapping("api/payments/confirm")
-    public ResponseEntity<ApiResponse> requestConfirmPayment(@RequestParam String paymentKey,
-                                                             @RequestParam String orderId,
-                                                             @RequestParam long paymentAmount) {
+    @PostMapping("api/payments/verify")
+    public ResponseEntity<ApiResponse> verifyPayment(@RequestParam String paymentKey,
+                                                     @RequestParam String orderId,
+                                                     @RequestParam long paymentAmount) {
         try {
-            paymentService.requestConfirmPayment(paymentKey, orderId, paymentAmount);
+            paymentService.verifyPayment(paymentKey, orderId, paymentAmount);
+            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+        }
+    }
+
+    @PostMapping("api/payments/confirm")
+    public ResponseEntity<ApiResponse> confirmPayment(@RequestParam String paymentKey,
+                                                      @RequestParam String orderId,
+                                                      @RequestParam long paymentAmount) {
+        try {
+            paymentService.confirmPayment(paymentKey, orderId, paymentAmount);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
@@ -52,16 +66,4 @@ public class PaymentController {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
-
-    @PostMapping("api/payments/cancel")
-    public ResponseEntity<ApiResponse> cancelPayment(@RequestParam String paymentKey) {
-        try {
-            paymentService.cancelPayment(paymentKey);
-            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
-        }
-    }
-
-
 }
