@@ -1,0 +1,86 @@
+package com.pawever.server.domain.donation.service;
+
+import com.pawever.server.domain.donation.dto.DonationTO;
+import com.pawever.server.domain.donation.entity.Donation;
+import com.pawever.server.domain.donation.repository.DonationRepository;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class DonationService {
+    @Autowired
+    private DonationRepository donationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public void createDonation(Map<String, Object> request) {
+        try {
+            if (!request.containsKey("donationAmount") || ((Number) request.get("donationAmount")).longValue() < 0L) { // 요청 값의 donationAmount 값 누락 여부 검사
+                throw new IllegalArgumentException("Invalid donationAmount format");
+            }
+
+            Donation donation = new Donation();
+            if (request.get("userId") != null) { // 후원자 익명 여부 검사
+                Long userId = ((Number) request.get("userId")).longValue();
+
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
+                String donorName = (String) request.get("donorName");
+                if (!donorName.equals(user.getName())) { // 후원자 이름 검증
+                    throw new IllegalArgumentException("Provided donorName does not match the registered user name.");
+                }
+                donation.setUserId(user);
+                donation.setDonorName(donorName);
+            }
+            donation.setDonorMessage((String) request.get("donorMessage"));
+            donation.setDonationAmount(((Number) request.get("donationAmount")).longValue());
+            donation.setCreatedAt(LocalDateTime.now());
+            donation.setUpdatedAt(LocalDateTime.now());
+            donationRepository.save(donation);
+        }  catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        } catch(Exception e) {
+            throw new RuntimeException("Error saving donation", e);
+        }
+    }
+
+    public List<DonationTO> getAllDonations() {
+        List<Donation> donations = donationRepository.findAll();
+        return getDonationTO(donations);
+    }
+
+    public List<DonationTO> getDonationByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Donation> donations = donationRepository.findByUserId(user);
+        return getDonationTO(donations);
+
+    }
+
+    public List<DonationTO> getDonationTO(List<Donation> donations) {
+        return donations.stream().map(donation -> {
+            DonationTO donationTO = new DonationTO();
+            donationTO.setUserId(donation.getUserId().getUserId());
+            donationTO.setDonorName(donation.getDonorName());
+            donationTO.setDonorMessage(donation.getDonorMessage());
+            donationTO.setDonationAmount(donation.getDonationAmount());
+            donationTO.setCreatedAt(donation.getCreatedAt());
+            return donationTO;
+        }).collect(Collectors.toList());
+    }
+
+    public double getTotalDonationAmount() {
+        return donationRepository.calculateTotalAmount().orElse(0.0);
+    }
+
+}
