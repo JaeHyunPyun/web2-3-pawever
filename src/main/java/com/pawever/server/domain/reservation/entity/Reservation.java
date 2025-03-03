@@ -2,7 +2,6 @@ package com.pawever.server.domain.reservation.entity;
 
 import com.pawever.server.common.entity.BaseEntity;
 import com.pawever.server.domain.reservation.enums.VisitType;
-import com.pawever.server.domain.user.entity.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;

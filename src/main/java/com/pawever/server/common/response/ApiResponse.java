@@ -19,10 +19,12 @@ public class ApiResponse {
         return success(responseCodeEnum,null);
     }
     public static ApiResponse fail(ResponseCodeEnum responseCodeEnum){
+        System.out.println("ApiResponse fail(ResponseCodeEnum responseCodeEnum)");
         return fail(responseCodeEnum,null);
     }
 
     public static ApiResponse fail(ResponseCodeEnum responseCodeEnum, Object data){
+        System.out.println("ApiResponse fail(ResponseCodeEnum responseCodeEnum, Object data)");
         return new ApiResponse(false,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),data);
     }
 
