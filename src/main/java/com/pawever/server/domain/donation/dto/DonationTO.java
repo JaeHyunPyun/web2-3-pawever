@@ -1,6 +1,5 @@
 package com.pawever.server.domain.donation.dto;
 
-import com.pawever.server.domain.user.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 

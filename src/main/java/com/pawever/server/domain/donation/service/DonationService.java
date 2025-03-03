@@ -3,8 +3,8 @@ package com.pawever.server.domain.donation.service;
 import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.repository.DonationRepository;
-import com.pawever.server.domain.user.entity.User;
-import com.pawever.server.domain.user.repository.UserRepository;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +32,16 @@ public class DonationService {
             Donation donation = new Donation();
             if (request.get("userId") != null) { // 후원자 익명 여부 검사
                 Long userId = ((Number) request.get("userId")).longValue();
-                System.out.println("userId: " + userId);
+
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
+                String donorName = (String) request.get("donorName");
+                if (!donorName.equals(user.getName())) { // 후원자 이름 검증
+                    throw new IllegalArgumentException("Provided donorName does not match the registered user name.");
+                }
                 donation.setUserId(user);
+                donation.setDonorName(donorName);
             }
-            donation.setDonorName((String) request.get("donorName"));
             donation.setDonorMessage((String) request.get("donorMessage"));
             donation.setDonationAmount(((Number) request.get("donationAmount")).longValue());
             donation.setCreatedAt(LocalDateTime.now());

@@ -1,5 +1,7 @@
 package com.pawever.server.domain.user.jwt;
 
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import com.pawever.server.domain.user.dto.response.UserAuthInfoDto;
 import com.pawever.server.domain.user.enums.Role;
@@ -32,10 +34,13 @@ public class JwtFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         // 🔹 기존 인증 제외 조건: POST, PUT /api/auth/tokens
-        boolean isAuthTokenRequest = path.equals("/api/auth/tokens") &&
-            (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT"));
-        boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-        return isAuthTokenRequest || allRequestAllowance;
+        boolean isLoginRequest = path.equals("/api/auth/tokens") &&
+            (method.equalsIgnoreCase("POST"));
+        boolean isTokenRefreshRequest = path.equals("/api/auth/refreshedtokens") &&
+            (method.equalsIgnoreCase("POST"));
+         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
+         return allRequestAllowance;
+//        return isLoginRequest || isTokenRefreshRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로
@@ -59,14 +64,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = accessTokenWithBearer.split(" ")[1];
 
         // 3. 토큰이 있다면 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+        // todo 프론트 측과 만료시 반환하는 응답 코드 및 메세지 조율 필요(400 또는 401)
+        // 토큰 만료시 401(UNAUTHORIZED) 반환
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().print("액세스 토큰이 만료되었습니다.");
             log.error("[JWTFilter] 액세스 토큰이 만료되었습니다.");
-            return;
+            throw new CustomException(ResponseCodeEnum.JWT_TOKEN_EXPIRED);
         }
+
 
         // 4. 토큰 category 가 access인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(accessToken);
