@@ -20,6 +20,11 @@ public enum ResponseCodeEnum {
     JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "AUTH_1", "JWT 토큰이 유효하지 않습니다."),
     INSUFFICIENT_PERMISSIONS(HttpStatus.FORBIDDEN, "AUTH_2", "권한이 부족합니다."),
 
+    COOKIE_NULL(HttpStatus.BAD_REQUEST, "AUTH_3", "Cookie가 존재하지 않습니다."),
+    REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST, "AUTH_4", "Refresh Token이 존재하지 않습니다."),
+    TOKEN_CATEGORY_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH_5", "Token 카테고리가 Refresh와 일치하지 않습니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH_6", "서버에 존재하지 않는 Refresh Token입니다."),
+
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
 

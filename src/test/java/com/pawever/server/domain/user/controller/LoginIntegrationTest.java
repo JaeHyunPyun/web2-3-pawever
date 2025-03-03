@@ -133,7 +133,7 @@ class LoginIntegrationTest {
                     .summary("사용자 로그인 API")
                     .description(
                         "프론트에서 소셜 로그인 후 전달하는 유저 정보를 받아 AccessToken과 RefreshToken을 반환하는 API.\n\n" +
-                            (isSuccess ? "성공 시 응답 본문이 없고, 204 No Content를 반환합니다." :
+                            (isSuccess ? "성공 시 응답 본문이 없고, 204 No Content를 반환합니다.(헤더를 통해 토큰 전달)" :
                                 "실패 시 예외코드와 응답 본문을 반환합니다.")
                     )
                     .responseFields(isSuccess ? Collections.emptyList() : responseFieldDescriptorsForFailure) // 실패 시만 응답 필드 추가

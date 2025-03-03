@@ -36,4 +36,9 @@ public class RefreshTokenService {
         refreshTokenRepository.findRefreshTokenByRefreshToken(refreshToken)
             .ifPresent(token -> refreshTokenRepository.delete(token));
     }
+
+    public RefreshToken getRefreshToken(String refreshToken) {
+        return refreshTokenRepository.findRefreshTokenByRefreshToken(refreshToken)
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.REFRESH_TOKEN_NOT_FOUND));
+    }
 }
