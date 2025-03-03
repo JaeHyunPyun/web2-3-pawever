@@ -4,6 +4,7 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST_NAME}
+      port: ${REDIS_PORT}
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_HOST}

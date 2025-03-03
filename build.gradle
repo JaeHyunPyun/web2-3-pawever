@@ -16,6 +16,21 @@ java {
     }
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+bootJar {
+    dependsOn asciidoctor
+//    copy {
+//        from "build/docs/asciidoc"
+//        into 'static/docs'
+//    }
+    from("${asciidoctor.outputDir}") {
+        into("BOOT-INF/classes/static/docs")
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -74,9 +89,14 @@ dependencies {
 
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
+
+asciidoctor {
+    dependsOn test
+    inputs.dir snippetsDir
 }
+
+
+
 
 tasks.named('test') {
 //    delete file('build/generated-snippets')
@@ -88,13 +108,18 @@ tasks.named('test') {
 //    }
 }
 
+
 tasks.register('copyDocument', Copy){
     dependsOn tasks.named('asciidoctor')
     delete file('src/main/resources/static/docs/index.html')
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
+//    into file("build/resources/main/static/docs")
 }
 
+build {
+    dependsOn copyDocument
+}
 
 openapi3 {
     servers = [
