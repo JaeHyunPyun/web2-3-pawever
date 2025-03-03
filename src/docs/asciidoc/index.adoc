@@ -118,3 +118,25 @@ include::build/generated-snippets/api/auth/login/success/http-response.adoc[]
 
 ==== 실패 Response
 include::build/generated-snippets/api/auth/login/failure-missing-fields/http-response.adoc[]
+
+=== **2. 토큰재발급 (POST /api/auth/refreshedtokens)**
+Request에 포함된 Refresh Token을 검증하고 새로운 Access Token 및 Refresh Token을 발급하는 API입니다. +
+
+==== Request
+include::build/generated-snippets/api/auth/refreshedtokens/success/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/auth/refreshedtokens/success/http-response.adoc[]
+
+==== 실패 Response
+실패1. (Refresh Token 없음)
+include::build/generated-snippets/api/auth/refreshedtokens/failure-null/http-response.adoc[]
+
+실패2. (Refresh Token 만료됨)
+include::build/generated-snippets/api/auth/refreshedtokens/failure-expired/http-response.adoc[]
+
+실패3. (Access Token 전달됨)
+include::build/generated-snippets/api/auth/refreshedtokens/failure-mismatch/http-response.adoc[]
+
+실패4. (서버 저장소에 없는 Refresh Token)
+include::build/generated-snippets/api/auth/refreshedtokens/failure-stolen/http-response.adoc[]
