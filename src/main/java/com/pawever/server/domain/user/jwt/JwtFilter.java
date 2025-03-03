@@ -34,8 +34,9 @@ public class JwtFilter extends OncePerRequestFilter {
         // 🔹 기존 인증 제외 조건: POST, PUT /api/auth/tokens
         boolean isAuthTokenRequest = path.equals("/api/auth/tokens") &&
             (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT"));
-        boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-        return isAuthTokenRequest || allRequestAllowance;
+//        boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
+//        return isAuthTokenRequest || allRequestAllowance;
+        return isAuthTokenRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로
