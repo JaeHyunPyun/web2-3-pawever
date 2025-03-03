@@ -46,7 +46,7 @@ public class Payment {
     private PaymentMethod paymentMethod;
 
     public enum PaymentStatus {
-        PENDING, SUCCESS, FAILED
+        PENDING, SUCCESS, FAILED, EXPIRED, CANCELED
     }
 
     public enum PaymentMethod {

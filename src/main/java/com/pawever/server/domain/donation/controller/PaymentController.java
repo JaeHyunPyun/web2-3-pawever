@@ -2,10 +2,12 @@ package com.pawever.server.domain.donation.controller;
 
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,5 +42,28 @@ public class PaymentController {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
+
+    @PostMapping("api/payments/webhook")
+    public ResponseEntity<ApiResponse> handleTossWebhook(@RequestBody TossWebhookTO webhookRequest) {
+        try {
+            paymentService.processTossWebhook(webhookRequest);
+            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+        }
+    }
+/*
+    @PostMapping("/cancel")
+    public ResponseEntity<ApiResponse> cancelPayment(@RequestParam String paymentKey,
+                                                     @RequestParam String cancelReason) {
+        try {
+            paymentService.cancelPayment(paymentKey, cancelReason);
+            return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
+        }
+    }
+
+ */
 
 }

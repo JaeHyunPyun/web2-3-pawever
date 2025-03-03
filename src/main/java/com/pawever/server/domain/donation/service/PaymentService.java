@@ -1,16 +1,14 @@
 package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.PaymentTO;
+import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
 import com.pawever.server.domain.donation.repository.DonationRepository;
 import com.pawever.server.domain.donation.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -28,7 +26,7 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
 
     @Value("${tosspayments.secret-key}")
-    private String tossSecreteKey;
+    private String tossSecretKey;
 
     @Transactional
     public void getPaymentsInfo(String orderId, long paymentAmount, long donationId) {
@@ -58,7 +56,7 @@ public class PaymentService {
     private PaymentTO sendConfirmPaymentRequest(String paymentKey, String orderId, long paymentAmount) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(tossSecreteKey);
+        headers.setBasicAuth(tossSecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> body = new HashMap<>();
@@ -86,5 +84,91 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
+    public void processTossWebhook(TossWebhookTO webhookRequest) {
+        String paymentKey = webhookRequest.getPaymentKey();
+        String orderId = webhookRequest.getOrderId();
+        String status = webhookRequest.getStatus();
 
+        switch (status) {
+            case "DONE":
+                handlePaymentSuccess(paymentKey, orderId, webhookRequest);
+                break;
+            case "FAILED":
+                handlePaymentFailure(paymentKey, orderId);
+                break;
+            case "EXPIRED":
+                handlePaymentExpired(paymentKey, orderId);
+                break;
+            default:
+                throw new IllegalArgumentException("알 수 없는 결제 상태: " + status);
+        }
+    }
+
+    private void handlePaymentSuccess(String paymentKey, String orderId, TossWebhookTO webhookRequest) {
+        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
+
+        payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
+        payment.setApprovedAt(LocalDateTime.parse(webhookRequest.getApprovedAt()));
+        paymentRepository.save(payment);
+    }
+
+    private void handlePaymentFailure(String paymentKey, String orderId) {
+        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
+
+        payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+        paymentRepository.save(payment);
+    }
+
+    private void handlePaymentExpired(String paymentKey, String orderId) {
+        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
+
+        payment.setPaymentStatus(Payment.PaymentStatus.EXPIRED);
+        paymentRepository.save(payment);
+    }
+/*
+    @Transactional
+    public void cancelPayment(String paymentKey, String cancelReason) {
+        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다: " + paymentKey));
+
+        if (payment.getPaymentStatus() == Payment.PaymentStatus.CANCELED) {
+            throw new IllegalStateException("이미 취소된 결제입니다.");
+        }
+
+        // 토스 API에 결제 취소 요청
+        TossCancelTO response = sendCancelPaymentRequest(paymentKey, cancelReason);
+
+        // 취소가 성공하면 결제 상태 업데이트
+        payment.setPaymentStatus(Payment.PaymentStatus.CANCELED);
+        payment.setCanceledAt(LocalDateTime.now());
+        paymentRepository.save(payment);
+    }
+
+    private TossCancelTO sendCancelPaymentRequest(String paymentKey, String cancelReason) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(tossSecretKey, "");
+
+        Map<String, String> body = new HashMap<>();
+        body.put("cancelReason", cancelReason);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<TossCancelTO> response = restTemplate.exchange(
+                url, HttpMethod.POST, request, TossCancelTO.class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("토스 결제 취소 요청 실패");
+        }
+
+        return response.getBody();
+    }
+
+ */
 }
