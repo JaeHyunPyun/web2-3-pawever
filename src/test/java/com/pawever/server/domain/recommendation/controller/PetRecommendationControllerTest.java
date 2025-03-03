@@ -101,9 +101,6 @@ public class PetRecommendationControllerTest {
             fieldWithPath("data[].precaution").type(JsonFieldType.STRING).description("주의사항")
     );
 
-    // 실제 응답에 나타난 강아지 품종을 확인하기 위한 정보
-    private final String expectedBreed = "Poodle"; // 테스트에서 확인된 품종
-
     // 실제 API 요청 수행
     private ResultActions getResultActionsForRecommendation(RecommendationRequest request) throws Exception {
         return mockMvc.perform(
@@ -173,8 +170,9 @@ public class PetRecommendationControllerTest {
                 .andExpect(jsonPath("status").value(ResponseCodeEnum.SUCCESS.getStatus().name()))
                 .andExpect(jsonPath("code").value(ResponseCodeEnum.SUCCESS.getCode()))
                 .andExpect(jsonPath("data").isArray())
-                .andExpect(jsonPath("data[0].breed").exists()) // 견종명이 존재하는지만 확인
-                .andExpect(jsonPath("data[0].breedKor").exists()); // 한글 견종명이 존재하는지만 확인
+                .andExpect(jsonPath("data[0].breed").exists())
+                .andExpect(jsonPath("data[0].breed").value("Poodle"))
+                .andExpect(jsonPath("data[0].breedKor").exists());
 
         // Documentation
         resultActions.andDo(getDocumentForRecommendation("success"));
@@ -221,6 +219,7 @@ public class PetRecommendationControllerTest {
                 .andExpect(jsonPath("status").value(ResponseCodeEnum.SUCCESS.getStatus().name()))
                 .andExpect(jsonPath("code").value(ResponseCodeEnum.SUCCESS.getCode()))
                 .andExpect(jsonPath("data").isArray())
+                .andExpect(jsonPath("data[0].breed").value("Poodle"))
                 .andExpect(jsonPath("data[0].breed").exists());
 
         // Documentation
@@ -232,7 +231,7 @@ public class PetRecommendationControllerTest {
     void recommendAnimalsWithMissingQuestionsTest() throws Exception {
         // Given - 일부 질문만 포함된 응답
         Map<Integer, Integer> responses = new HashMap<>();
-        // 20개 중 일부만 설정 (예: 5개만)
+
         responses.put(1, 1);
         responses.put(5, 1);
         responses.put(10, 1);
