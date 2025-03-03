@@ -118,3 +118,55 @@ include::build/generated-snippets/api/auth/login/success/http-response.adoc[]
 
 ==== 실패 Response
 include::build/generated-snippets/api/auth/login/failure-missing-fields/http-response.adoc[]
+
+
+
+
+== 반려동물 추천
+
+=== **1. 반려동물 추천 API (POST /api/recommend-animals)**
+20가지 질문에 대한 사용자의 질문 응답을 기반으로 적합한 반려동물 견종을 추천하는 API입니다. +
+사용자의 선호도와 생활 환경에 맞는 최적의 견종을 추천합니다.
+
+
+==== Request
+include::build/generated-snippets/api/recommend-animals/success/curl-request.adoc[]
+
+==== Request fields
+include::build/generated-snippets/api/recommend-animals/success/request-fields.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/recommend-animals/success/http-response.adoc[]
+
+==== Response fields
+include::build/generated-snippets/api/recommend-animals/success/response-fields.adoc[]
+
+==== 비정상적인 입력값 처리 예시
+유효범위를 벗어난 옵션 값(0이나 6)이 포함된 요청도 처리됩니다. +
+유효하지 않은 옵션은 무시되고 나머지 유효한 응답만으로 결과가 계산됩니다.
+
+include::build/generated-snippets/api/recommend-animals/invalid-option-values/curl-request.adoc[]
+
+include::build/generated-snippets/api/recommend-animals/invalid-option-values/http-response.adoc[]
+
+
+=== **2. 주변 추천 동물 조회 API (POST /api/recommend-animals/nearby)**
+사용자 위치와 추천 견종을 기반으로 근처 보호소에 있는 추천 동물 목록을 반환합니다. +
+가장 가까운 보호소부터 최대 4마리의 동물을 반환합니다.
+
+==== Request
+include::build/generated-snippets/api/recommend-animals/nearby/curl-request.adoc[]
+
+==== Request fields
+include::build/generated-snippets/api/recommend-animals/nearby/request-fields.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/recommend-animals/nearby/http-response.adoc[]
+
+==== Response fields
+include::build/generated-snippets/api/recommend-animals/nearby/response-fields.adoc[]
+
+==== 결과 없음 Response
+검색 조건에 맞는 동물이 없는 경우 빈 배열을 반환합니다.
+
+include::build/generated-snippets/api/recommend-animals/nearby-empty/http-response.adoc[]
