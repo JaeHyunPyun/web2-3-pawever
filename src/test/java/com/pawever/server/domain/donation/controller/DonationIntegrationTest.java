@@ -4,19 +4,15 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawever.server.PawEverApplication;
 import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.repository.DonationRepository;
-import com.pawever.server.domain.donation.service.DonationService;
-import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +26,6 @@ import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
@@ -40,14 +35,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -69,18 +59,11 @@ class DonationIntegrationTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-//    @MockitoBean
     @Autowired
     private UserRepository userRepository;
 
-//    @Mock
     @Autowired
     private DonationRepository donationRepository;
-    @Autowired
-    private DonationService donationService;
-
-//    @Mock
-//    private DonationService donationService;
 
     @BeforeEach
     void setup(WebApplicationContext context , RestDocumentationContextProvider restDocumentation) {
@@ -132,7 +115,6 @@ class DonationIntegrationTest {
             fieldWithPath("data.totalAmount").description("전체 후원 금액").type(JsonFieldType.NUMBER).optional()
     );
 
-    //
     private final List<FieldDescriptor> donationRequestDescriptors = List.of(
             fieldWithPath("donationAmount").type(JsonFieldType.NUMBER).description("금액"),
             fieldWithPath("donorName").type(JsonFieldType.STRING).description("후원자명"),
@@ -145,8 +127,6 @@ class DonationIntegrationTest {
             parameterWithName("user_id").description("후원한 사용자 ID")
     );
 
-    //    -----------------------------------------------------------------------------------------------------------
-
     private ResultActions getResultActionsForCreateDonation(Map<String, Object> request) throws Exception {
         return mockMvc.perform(
                 RestDocumentationRequestBuilders
@@ -157,8 +137,8 @@ class DonationIntegrationTest {
         );
     }
 
-    private RestDocumentationResultHandler getDocumentForCreateDonation(){
-        return document("api/donations",
+    private RestDocumentationResultHandler getDocumentForCreateDonation(String identifier){
+        return document("api/donations/createDonations/"+identifier,
                 preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
                 preprocessResponse(prettyPrint(), getModifiedHeader()),
                 requestFields(donationRequestDescriptors),
@@ -195,12 +175,9 @@ class DonationIntegrationTest {
         request.put("donorMessage", "좋은 곳에 써주세요!");
         request.put("userId", userId);
 
-        System.out.println("Request payload: " + mapper.writeValueAsString(request));
         ResultActions resultActions = getResultActionsForCreateDonation(request);
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
-
         resultActions.andExpect(status().isOk());
-        resultActions.andDo(getDocumentForCreateDonation());
+        resultActions.andDo(getDocumentForCreateDonation("success"));
     }
 
     @Test
@@ -228,23 +205,21 @@ class DonationIntegrationTest {
         request.put("userId", userId);
 
         ResultActions resultActions = getResultActionsForCreateDonation(request);
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
         resultActions.andExpect(status().isBadRequest()).andExpect(jsonPath("code").value(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT.getCode()));
-        resultActions.andDo(getDocumentForCreateDonation());
+        resultActions.andDo(getDocumentForCreateDonation("fail"));
     }
 
     @Test
     public void 후원요청_실패2() throws Exception {
         // 존재하지 않은 사용자 ID
         Map<String, Object> request = new HashMap<>();
-        request.put("donationAmount", -10000L);
+        request.put("donationAmount", 10000L);
         request.put("donorName", "김철수");
         request.put("donorMessage", "좋은 곳에 써주세요!");
         request.put("userId", 0L);
         ResultActions resultActions = getResultActionsForCreateDonation(request);
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
         resultActions.andExpect(status().isBadRequest()).andExpect(jsonPath("code").value(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT.getCode()));
-        resultActions.andDo(getDocumentForCreateDonation());
+        resultActions.andDo(getDocumentForCreateDonation("fail"));
     }
 
     @Test
@@ -256,12 +231,10 @@ class DonationIntegrationTest {
         request.put("donorMessage", "좋은 곳에 써주세요!");
         request.put("userId", 1000L);
         ResultActions resultActions = getResultActionsForCreateDonation(request);
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
         resultActions.andExpect(status().isBadRequest()).andExpect(jsonPath("code").value(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT.getCode()));
-        resultActions.andDo(getDocumentForCreateDonation());
+        resultActions.andDo(getDocumentForCreateDonation("fail"));
     }
 
-    //    -----------------------------------------------------------------------------------------------------------
 
     private ResultActions getResultActionsForGetAllDonations() throws Exception {
         return mockMvc.perform(
@@ -272,8 +245,8 @@ class DonationIntegrationTest {
         );
     }
 
-    private RestDocumentationResultHandler getDocumentForGetAllDonations(){
-        return document("api/users/staff/donations",
+    private RestDocumentationResultHandler getDocumentForGetAllDonations(String identifier){
+        return document("api/donations/getDonations/"+identifier,
                 preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
                 preprocessResponse(prettyPrint(), getModifiedHeader()),
                 responseFields(responseFieldDescriptorsForDonations),
@@ -311,13 +284,9 @@ class DonationIntegrationTest {
                 .build());
 
         ResultActions resultActions = getResultActionsForGetAllDonations();
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
         resultActions.andExpect(status().isOk());
-        resultActions.andDo(getDocumentForGetAllDonations());
+        resultActions.andDo(getDocumentForGetAllDonations("success"));
     }
-
-
-    //    -----------------------------------------------------------------------------------------------------------
 
     private ResultActions getResultActionsForGetDonationByUser(Long userId) throws Exception {
         return mockMvc.perform(
@@ -328,8 +297,8 @@ class DonationIntegrationTest {
         );
     }
 
-    private RestDocumentationResultHandler getDocumentForGetDonationByUser(Integer identifier){
-        return document("api/users/donations/"+identifier,
+    private RestDocumentationResultHandler getDocumentForGetDonationByUser(String identifier){
+        return document("api/donations/getDonationByUser/"+identifier,
                 preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
                 preprocessResponse(prettyPrint(), getModifiedHeader()),
                 responseFields(responseFieldDescriptorsForDonations),
@@ -346,23 +315,16 @@ class DonationIntegrationTest {
     @Test
     public void 사용자별_후원내역_조회_성공() throws Exception {
         ResultActions resultActions = getResultActionsForGetDonationByUser(1L);
-
-        // Print request and response
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
-
-        // Verify the results
         resultActions.andExpect(status().isOk());
-        resultActions.andDo(getDocumentForGetDonationByUser(1));
+        resultActions.andDo(getDocumentForGetDonationByUser("success"));
     }
 
     @Test
     public void 사용자별_후원내역_조회_실패() throws Exception {
         ResultActions resultActions = getResultActionsForGetDonationByUser(30000L);
-        System.out.println("Response: " + resultActions.andReturn().getResponse().getContentAsString());
-
         resultActions.andExpect(status().isBadRequest()).andExpect(jsonPath("code").value(ResponseCodeEnum.USER_NOT_FOUND.getCode())).andExpect(jsonPath("data").value(nullValue()));;
         resultActions.andDo(
-                document("api/users/donations/"+1,
+                document("api/donations/getDonationByUser/fail",
                 preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
                 preprocessResponse(prettyPrint(), getModifiedHeader()),
                 responseFields(responseFieldDescriptorsForDonationError),
@@ -375,7 +337,6 @@ class DonationIntegrationTest {
                                 .description("사용자 ID를 통해 사용자별로 후원 내역을 조회함.")
                                 .build())));
     }
-//    -----------------------------------------------------------------------------------------------------------
 
     private ResultActions getResultActionsForGetTotalDonationAmount() throws Exception {
         return mockMvc.perform(
@@ -386,8 +347,8 @@ class DonationIntegrationTest {
         );
     }
 
-    private RestDocumentationResultHandler getDocumentForGetTotalDonationAmount(){
-        return document("api/donations/amount",
+    private RestDocumentationResultHandler getDocumentForGetTotalDonationAmount(String identifier){
+        return document("api/donations/getDonationAmount/"+identifier,
                 preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
                 preprocessResponse(prettyPrint(), getModifiedHeader()),
                 responseFields(responseFieldDescriptorsForDonationTotalAmount),
@@ -404,7 +365,7 @@ class DonationIntegrationTest {
     public void 전체_후원금액_조회_성공() throws Exception {
         ResultActions resultActions = getResultActionsForGetTotalDonationAmount();
         resultActions.andExpect(status().isOk());
-        resultActions.andDo(getDocumentForGetTotalDonationAmount());
+        resultActions.andDo(getDocumentForGetTotalDonationAmount("success"));
     }
 
 }
