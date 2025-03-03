@@ -119,6 +119,7 @@ include::build/generated-snippets/api/auth/login/success/http-response.adoc[]
 ==== 실패 Response
 include::build/generated-snippets/api/auth/login/failure-missing-fields/http-response.adoc[]
 
+
 === **2. 토큰재발급 (POST /api/auth/refreshedtokens)**
 Request에 포함된 Refresh Token을 검증하고 새로운 Access Token 및 Refresh Token을 발급하는 API입니다. +
 
@@ -140,3 +141,59 @@ include::build/generated-snippets/api/auth/refreshedtokens/failure-mismatch/http
 
 실패4. (서버 저장소에 없는 Refresh Token)
 include::build/generated-snippets/api/auth/refreshedtokens/failure-stolen/http-response.adoc[]
+
+
+== 후원 관리
+
+=== **1. 후원 요청 (api/donations)**
+새로운 후원을 생성하는 api입니다. +
+userId를 바탕으로 후원한 유저의 존재를 찾고 그 아이디를 가진 이름과 후원자의 이름이 같은지 확인 후 후원요청을 생성합니다.
+
+==== Request
+include::build/generated-snippets/api/donations/createDonations/success/curl-request.adoc[]
+
+==== Request fields
+include::build/generated-snippets/api/donations/createDonations/success/request-fields.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/donations/createDonations/success/http-response.adoc[]
+
+==== 실패 Response
+include::build/generated-snippets/api/donations/createDonations/fail/http-response.adoc[]
+
+
+=== **2. 전체 후원 조회 (api/users/staff/donations)**
+전체 후원을 조회하는 api입니다. +
+전체 후원 내역을 조회합니다.
+
+==== Request
+include::build/generated-snippets/api/donations/getDonations/success/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/donations/getDonations/success/http-response.adoc[]
+
+
+=== **3. 사용자별 후원 조회 (api/users/donations/{user_id})**
+사용자별 후원을 조회하는 api입니다. +
+후원 내역을 사용자 id를 통하여 사용자별로 조회합니다.
+
+==== Request
+include::build/generated-snippets/api/donations/getDonationByUser/success/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/donations/getDonationByUser/success/http-response.adoc[]
+
+==== 실패 Response
+include::build/generated-snippets/api/donations/getDonationByUser/fail/http-response.adoc[]
+
+
+=== **4. 전체 후원 금액 조회 (api/donations/amount)**
+전체 후원을 조회하는 api입니다. +
+전체 후원 금액을 더한 값을 조회합니다.
+
+==== Request
+include::build/generated-snippets/api/donations/getDonationAmount/success/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/donations/getDonationAmount/success/http-response.adoc[]
+
