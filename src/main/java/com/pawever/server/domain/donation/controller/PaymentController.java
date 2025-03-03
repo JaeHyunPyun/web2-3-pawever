@@ -52,18 +52,16 @@ public class PaymentController {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
-/*
-    @PostMapping("/cancel")
-    public ResponseEntity<ApiResponse> cancelPayment(@RequestParam String paymentKey,
-                                                     @RequestParam String cancelReason) {
+
+    @PostMapping("api/payments/cancel")
+    public ResponseEntity<ApiResponse> cancelPayment(@RequestParam String paymentKey) {
         try {
-            paymentService.cancelPayment(paymentKey, cancelReason);
+            paymentService.cancelPayment(paymentKey);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
 
- */
 
 }

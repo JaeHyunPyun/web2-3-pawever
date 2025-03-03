@@ -1,6 +1,7 @@
 package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.PaymentTO;
+import com.pawever.server.domain.donation.dto.TossCancelTO;
 import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,23 +42,25 @@ public class PaymentService {
         payment.setPaymentAmount(paymentAmount);
         payment.setRequestedAt(LocalDateTime.now());
         payment.setPaymentStatus(Payment.PaymentStatus.PENDING);
+
     }
 
     @Transactional
     public void requestConfirmPayment(String paymentKey, String orderId, long paymentAmount) {
         Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
-        if (paymentAmount == payment.getPaymentAmount()) {
+        if (paymentAmount != payment.getPaymentAmount()) {
             throw new IllegalArgumentException("Invalid amount: " + paymentAmount);
         }
         PaymentTO response = sendConfirmPaymentRequest(paymentKey, orderId, paymentAmount);
-        updatePaymentStatus(payment, response);
+        updatePaymentStatus(payment, response, paymentKey);
     }
 
     private PaymentTO sendConfirmPaymentRequest(String paymentKey, String orderId, long paymentAmount) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(tossSecretKey);
+        String basicAuthValue = "Basic " + Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
+        headers.set("Authorization", basicAuthValue);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> body = new HashMap<>();
@@ -74,14 +78,56 @@ public class PaymentService {
         return response.getBody();
     }
 
-    private void updatePaymentStatus(Payment payment, PaymentTO response) {
+    private void updatePaymentStatus(Payment payment, PaymentTO response, String paymentKey) {
         if ("DONE".equals(response.getPaymentStatus())) {
             payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
         } else {
             payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+            cancelPayment(paymentKey);
         }
         payment.setApprovedAt(LocalDateTime.now());
         paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public void cancelPayment(String paymentKey) {
+        String cancelReason = "서버 오류로 결제에 실패했습니다";
+        Payment payment = paymentRepository.findByPaymentId(paymentKey)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다: " + paymentKey));
+
+        if (payment.getPaymentStatus() == Payment.PaymentStatus.CANCELED) {
+            throw new IllegalStateException("이미 취소된 결제입니다.");
+        }
+
+        TossCancelTO response = sendCancelPaymentRequest(paymentKey, cancelReason);
+
+        payment.setPaymentStatus(Payment.PaymentStatus.CANCELED);
+        payment.setCanceledAt(LocalDateTime.now());
+        paymentRepository.save(payment);
+    }
+
+    private TossCancelTO sendCancelPaymentRequest(String paymentKey, String cancelReason) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String basicAuthValue = "Basic " + Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes());
+        headers.set("Authorization", basicAuthValue);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("cancelReason", cancelReason);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<TossCancelTO> response = restTemplate.exchange(
+                url, HttpMethod.POST, request, TossCancelTO.class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("토스 결제 취소 요청 실패");
+        }
+
+        return response.getBody();
     }
 
     public void processTossWebhook(TossWebhookTO webhookRequest) {
@@ -128,47 +174,6 @@ public class PaymentService {
         payment.setPaymentStatus(Payment.PaymentStatus.EXPIRED);
         paymentRepository.save(payment);
     }
-/*
-    @Transactional
-    public void cancelPayment(String paymentKey, String cancelReason) {
-        Payment payment = paymentRepository.findByPaymentId(paymentKey)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다: " + paymentKey));
 
-        if (payment.getPaymentStatus() == Payment.PaymentStatus.CANCELED) {
-            throw new IllegalStateException("이미 취소된 결제입니다.");
-        }
 
-        // 토스 API에 결제 취소 요청
-        TossCancelTO response = sendCancelPaymentRequest(paymentKey, cancelReason);
-
-        // 취소가 성공하면 결제 상태 업데이트
-        payment.setPaymentStatus(Payment.PaymentStatus.CANCELED);
-        payment.setCanceledAt(LocalDateTime.now());
-        paymentRepository.save(payment);
-    }
-
-    private TossCancelTO sendCancelPaymentRequest(String paymentKey, String cancelReason) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth(tossSecretKey, "");
-
-        Map<String, String> body = new HashMap<>();
-        body.put("cancelReason", cancelReason);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<TossCancelTO> response = restTemplate.exchange(
-                url, HttpMethod.POST, request, TossCancelTO.class);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("토스 결제 취소 요청 실패");
-        }
-
-        return response.getBody();
-    }
-
- */
 }
