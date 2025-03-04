@@ -1,7 +1,12 @@
 package com.pawever.server.domain.user.config;
 
+import com.pawever.server.domain.user.handler.FilterExceptionHandler;
+import com.pawever.server.domain.user.jwt.CustomLogoutFilter;
 import com.pawever.server.domain.user.jwt.JwtFilter;
 import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.service.AccessTokenService;
+import com.pawever.server.domain.user.service.RefreshTokenService;
+import com.pawever.server.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +28,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
+    private final UserService userService;
+    private final AccessTokenService accessTokenService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,6 +41,8 @@ public class SecurityConfig {
             .formLogin((auth) -> auth.disable());
         http
             .httpBasic((auth) -> auth.disable());
+        http
+            .logout((auth) -> auth.disable());
         // 경로별 인가 처리
         http
             .authorizeHttpRequests((auth) -> auth
@@ -53,7 +64,12 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
-            .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtFilter(jwtUtil, accessTokenService), UsernamePasswordAuthenticationFilter.class);
+        http
+            .addFilterAt(new CustomLogoutFilter(jwtUtil, refreshTokenService, userService), LogoutFilter.class);
+        http
+            .addFilterBefore(new FilterExceptionHandler(), LogoutFilter.class);
+
 
         return http.build();
     }
