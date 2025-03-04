@@ -3,8 +3,10 @@ package com.pawever.server.domain.carehub.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+@Profile("!test")
 @Service
 @RequiredArgsConstructor
 public class InitializationService {

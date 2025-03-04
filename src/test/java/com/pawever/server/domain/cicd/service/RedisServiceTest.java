@@ -7,8 +7,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class RedisServiceTest {
-    // Mock 객체 없이 실제 Redis 테스트
-
+//    // Mock 객체 없이 실제 Redis 테스트
+//
 //    @Autowired
 //    private RedisService redisService;
 //

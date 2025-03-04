@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: pawEver
   profiles:
@@ -7,6 +9,10 @@ spring:
     scheduling:
       pool:
         size: 5
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    accessTokenExpirationTime: ${ACCESSTOKEN_EXPIRATION_TIME}   #테스트용 : 3분(180000)
+    refreshTokenExpirationTime: ${REFRESHTOKEN_EXPIRATION_TIME} #테스트용 : 5분(300000)
 logging:
   config: classpath:logback-spring.xml
 springdoc:
@@ -33,5 +39,8 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+
+
 
 
