@@ -48,7 +48,7 @@ public class DonationService {
             donation.setUpdatedAt(LocalDateTime.now());
             donationRepository.save(donation);
             return donation.getDonationId();
-        }  catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         } catch(Exception e) {
             throw new RuntimeException("Error saving donation", e);

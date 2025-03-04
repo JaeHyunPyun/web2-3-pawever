@@ -23,6 +23,9 @@ public class DonationController {
             long donationId = donationService.createDonation(request);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationId));
         } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("Invalid user ID") || e.getMessage().contains("Provided donorName")) {
+                return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.USER_NOT_FOUND));
+            }
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
