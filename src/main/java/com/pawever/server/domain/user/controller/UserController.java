@@ -1,5 +1,10 @@
 package com.pawever.server.domain.user.controller;
 
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.post.service.ImageService;
+import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
+import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.UserService;
@@ -7,12 +12,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -22,7 +31,7 @@ public class UserController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
-
+    private final ImageService imageService;
 
     @GetMapping("/admin")
     public String admin(HttpServletRequest request) {
@@ -53,6 +62,12 @@ public class UserController {
         userService.softDeleteUserByUuid(request);
 
         return ResponseEntity.noContent().build(); // 204 No Content 반환
+    }
+
+    @GetMapping("/profiles")
+    public ResponseEntity<UserProfileResponseDto> getUserProfiles(HttpServletRequest request){
+        return ResponseEntity
+            .ok(userService.getUserProfiles(request));  // 200(ok) + UserResponseDto 반환
     }
 
 }

@@ -3,12 +3,12 @@ package com.pawever.server.domain.user.service;
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
+import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
-import jakarta.persistence.PersistenceException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,11 +26,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
+    private final AccessTokenService accessTokenService;
     private final JwtUtil jwtUtil;
 
     public UserResponseDto getUserInfoByUuid(String socialLoginUuid){
 
-        Optional<User> foundUser = userRepository.findUuid(socialLoginUuid);
+        Optional<User> foundUser = userRepository.findBySocialLoginUuid(socialLoginUuid);
         return foundUser.map(user -> UserResponseDto.builder()
             .userId(user.getUserId())
             .socialLoginUuid(user.getSocialLoginUuid())
@@ -83,7 +84,7 @@ public class UserService {
         String userUuid = jwtUtil.getSocialLoginUuid(refreshToken);
 
         // 3. 유저가 존재하는지 확인 후 Soft Delete 실행
-        if (userRepository.findUuid(userUuid).isEmpty()) {
+        if (userRepository.findBySocialLoginUuid(userUuid).isEmpty()) {
             throw new CustomException(ResponseCodeEnum.USER_NOT_FOUND);
         }
 
@@ -117,4 +118,19 @@ public class UserService {
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);  // 204 응답코드 전송
 
     }
+
+    public UserProfileResponseDto getUserProfiles(HttpServletRequest request) {
+        String userSocialLoginUuid = accessTokenService.getRequestSocialLoginUuid(request);
+
+        // 유저 정보 조회
+        Optional<User> optionalUser = userRepository.findBySocialLoginUuid(userSocialLoginUuid);
+
+        return optionalUser.map(user -> UserProfileResponseDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .profileImageUrl(user.getProfileImageUrl())
+                .build())
+            .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+    }
+
 }
