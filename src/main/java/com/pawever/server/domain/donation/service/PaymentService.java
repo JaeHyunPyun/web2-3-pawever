@@ -56,7 +56,7 @@ public class PaymentService {
         payment.setPgTid(paymentKey);
         paymentRepository.save(payment);
     }
-/*
+
     public void confirmPayment(String paymentKey, String orderId, long paymentAmount) {
         ResponseEntity<PaymentTO> response = requestConfirm(paymentKey, orderId, paymentAmount);
         System.out.println("response: "+response);
@@ -145,51 +145,5 @@ public class PaymentService {
 
     }
 
-    @Transactional
-    public void processTossWebhook(TossWebhookTO webhookRequest) {
-        String paymentKey = webhookRequest.getPaymentKey();
-        String orderId = webhookRequest.getOrderId();
-        String status = webhookRequest.getStatus();
-
-        switch (status) {
-            case "DONE":
-                handlePaymentSuccess(paymentKey, orderId, webhookRequest);
-                break;
-            case "FAILED":
-                handlePaymentFailure(paymentKey, orderId);
-                break;
-            case "EXPIRED":
-                handlePaymentExpired(paymentKey, orderId);
-                break;
-            default:
-                throw new IllegalArgumentException("알 수 없는 결제 상태: " + status);
-        }
-    }
-
-    private void handlePaymentSuccess(String paymentKey, String orderId, TossWebhookTO webhookRequest) {
-        Payment payment = paymentRepository.findByPaymentId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
-
-        payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
-        payment.setApprovedAt(LocalDateTime.parse(webhookRequest.getApprovedAt()));
-        paymentRepository.save(payment);
-    }
-
-    private void handlePaymentFailure(String paymentKey, String orderId) {
-        Payment payment = paymentRepository.findByPaymentId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
-
-        payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
-        paymentRepository.save(payment);
-    }
-
-    private void handlePaymentExpired(String paymentKey, String orderId) {
-        Payment payment = paymentRepository.findByPaymentId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 존재하지 않습니다: " + paymentKey));
-
-        payment.setPaymentStatus(Payment.PaymentStatus.EXPIRED);
-        paymentRepository.save(payment);
-    }
- */
 
 }
