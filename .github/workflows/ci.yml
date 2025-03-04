@@ -29,6 +29,8 @@ jobs:
           redis-version: 6
       - name: 테스트용 .env 파일 만들기
         run: echo "${{ secrets.ENV_TEST }}" > .env
+      - name: RestDocs 디렉토리 생성 (테스트 오류 방지)
+        run: mkdir -p build/generated-snippets
       - name: Grant execute permission to Gradle wrapper
         run: chmod +x ./gradlew
       - name: Build and run tests
