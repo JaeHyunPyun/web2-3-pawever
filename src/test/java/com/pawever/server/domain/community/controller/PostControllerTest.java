@@ -10,6 +10,12 @@ import com.pawever.server.domain.post.dto.response.PostResponseDTO;
 import com.pawever.server.domain.post.entity.Post;
 import com.pawever.server.domain.post.repository.PostRepository;
 import com.pawever.server.domain.post.service.PostService;
+import com.pawever.server.domain.user.dto.response.UserResponseDto;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.enums.Role;
+import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
+import com.pawever.server.domain.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,8 +69,19 @@ public class PostControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+
 
     @BeforeEach
     void setup(WebApplicationContext context , RestDocumentationContextProvider restDocumentation) {
@@ -105,6 +122,17 @@ public class PostControllerTest {
      //게시글 생성 테스트(성공)
     @Test
     void createPostSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         MockMultipartFile jsonRequest = new MockMultipartFile(
                 "request", "", "application/json",
                 mapper.writeValueAsBytes(new PostRequestDTO.CreatePostRequest("테스트 제목", "테스트 내용"))
@@ -120,6 +148,7 @@ public class PostControllerTest {
                         .file(jsonRequest)
                         .file(imageFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)  //request body content type
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andDo(document("api/community/posts/create-post", //API가 저장되는 경로
@@ -144,6 +173,18 @@ public class PostControllerTest {
     //게시글 생성 테스트(실패)
     @Test
     void createPostFailure() throws Exception {
+
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         MockMultipartFile jsonRequest = new MockMultipartFile(
                 "requests", "", "application/json",
                 mapper.writeValueAsBytes(new PostRequestDTO.CreatePostRequest("테스트 제목", "테스트 내용"))
@@ -154,6 +195,7 @@ public class PostControllerTest {
                                 .multipart("/api/community/posts")
                                 .file(jsonRequest)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Authorization", "Bearer " + accessToken)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT.getStatus().value()))
                 .andDo(document("api/community/posts/create-post-fail",
@@ -177,9 +219,16 @@ public class PostControllerTest {
     //게시글 단건 조회 (성공)
     @Test
     void getPostSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
 
         Post post = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("테스트 제목 1")
                 .content("테스트 내용 1")
                 .build());
@@ -226,14 +275,22 @@ public class PostControllerTest {
     //게시글 전체 조회 (성공)
     @Test
     void getAllPostsSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
         Post post1 = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("테스트 제목 1")
                 .content("테스트 내용 1")
                 .build());
 
         Post post2 = postRepository.save(Post.builder()
-                .userId(2L)
+                .user(user)
                 .title("테스트 제목 2")
                 .content("테스트 내용 2")
                 .build());
@@ -257,9 +314,20 @@ public class PostControllerTest {
     // 게시글 수정 (성공)
     @Test
     void updatePostSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         // 기존 게시글 저장
         Post post = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("기존 제목")
                 .content("기존 내용")
                 .build());
@@ -286,6 +354,7 @@ public class PostControllerTest {
                                     return request;
                                 })
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Authorization", "Bearer " + accessToken)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("api/community/posts/update-post",
@@ -311,6 +380,17 @@ public class PostControllerTest {
     void updatePostFailure_PostNotFound() throws Exception {
         Long postId = 9999L; // 존재하지 않는 게시글 ID
 
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         // 수정 요청 데이터 생성
         MockMultipartFile jsonRequest = new MockMultipartFile(
                 "request", "", "application/json",
@@ -326,6 +406,7 @@ public class PostControllerTest {
                                     return request;
                                 })
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Authorization", "Bearer " + accessToken)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.POST_NOT_FOUND.getStatus().value()))
                 .andDo(document("api/community/posts/update-post-fail",
@@ -345,9 +426,28 @@ public class PostControllerTest {
     // 게시글 수정 (실패 - 권한 없음)
     @Test
     void updatePostFailure_Unauthorized() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        User user2 = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid2")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         // 기존 게시글 저장 (다른 사용자 ID)
         Post post = postRepository.save(Post.builder()
-                .userId(2L) // 현재 테스트에서는 1L이 로그인 유저로 설정됨
+                .user(user2) // 현재 테스트에서는 1L이 로그인 유저로 설정됨
                 .title("기존 제목")
                 .content("기존 내용")
                 .build());
@@ -369,6 +469,7 @@ public class PostControllerTest {
                                     return request;
                                 })
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Authorization", "Bearer " + accessToken)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.UNAUTHORIZED_ACTION.getStatus().value()))
                 .andDo(document("api/community/posts/update-post-unauthorized",
@@ -389,9 +490,20 @@ public class PostControllerTest {
     // 게시글 삭제 (성공)
     @Test
     void deletePostSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         // 기존 게시글 저장
         Post post = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("삭제할 게시글")
                 .content("삭제할 내용")
                 .build());
@@ -400,6 +512,7 @@ public class PostControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders
                         .delete("/api/community/posts/{postId}", postId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("api/community/posts/delete-post",
@@ -425,8 +538,20 @@ public class PostControllerTest {
     void deletePostFailure_PostNotFound() throws Exception {
         Long postId = 9999L; // 존재하지 않는 게시글 ID
 
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         mockMvc.perform(RestDocumentationRequestBuilders
                         .delete("/api/community/posts/{postId}", postId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.POST_NOT_FOUND.getStatus().value()))
                 .andDo(document("api/community/posts/delete-post-fail",
@@ -445,9 +570,27 @@ public class PostControllerTest {
     // 게시글 삭제 (실패 - 권한 없음)
     @Test
     void deletePostFailure_Unauthorized() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
+        User user2 = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid2")
+                .role(Role.ROLE_USER)
+                .build());
         // 기존 게시글 저장 (다른 사용자 ID)
         Post post = postRepository.save(Post.builder()
-                .userId(2L) // 현재 테스트에서는 1L이 로그인 유저로 설정됨
+                .user(user2) // 현재 테스트에서는 1L이 로그인 유저로 설정됨
                 .title("삭제할 게시글")
                 .content("삭제할 내용")
                 .build());
@@ -456,6 +599,7 @@ public class PostControllerTest {
 
         mockMvc.perform(RestDocumentationRequestBuilders
                         .delete("/api/community/posts/{postId}", postId)
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.UNAUTHORIZED_ACTION.getStatus().value()))
                 .andDo(document("api/community/posts/delete-post-unauthorized",
@@ -475,15 +619,26 @@ public class PostControllerTest {
     // 내가 작성한 게시글 조회 (성공)
     @Test
     void getAllUsersPostSuccess() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
+
         // Given: 로그인된 사용자가 작성한 게시글 저장
         Post post1 = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("내가 작성한 첫 번째 게시글")
                 .content("내용1")
                 .build());
 
         Post post2 = postRepository.save(Post.builder()
-                .userId(1L)
+                .user(user)
                 .title("내가 작성한 두 번째 게시글")
                 .content("내용2")
                 .build());
@@ -492,6 +647,7 @@ public class PostControllerTest {
         // When & Then
         mockMvc.perform(RestDocumentationRequestBuilders
                         .get("/api/community/my-posts")
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("api/community/posts/get-my-posts",
@@ -509,8 +665,20 @@ public class PostControllerTest {
     // 내가 작성한 게시글 조회 (실패 - 게시글 없음)
     @Test
     void getAllUsersPostFailure_NoPosts() throws Exception {
+        User user = userRepository.save(User.builder()
+                .email("test@gmail.com")
+                .name("테스트 유저")
+                .socialLoginProvider("kakao")
+                .socialLoginUuid("example-uuid")
+                .role(Role.ROLE_USER)
+                .build());
+
+        UserResponseDto userResponseDto = userService.getUserInfoByUuid("example-uuid");
+        String accessToken = jwtUtil.createJwt("access", userResponseDto, 3600000L);
+
         mockMvc.perform(RestDocumentationRequestBuilders
                         .get("/api/community/my-posts")
+                        .header("Authorization", "Bearer " + accessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()) // 성공 응답이지만 데이터는 빈 배열
                 .andDo(document("api/community/posts/get-my-posts-fail",
