@@ -57,23 +57,30 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
-    @Transactional
     public void confirmPayment(String paymentKey, String orderId, long paymentAmount) {
         ResponseEntity<PaymentTO> response = requestConfirm(paymentKey, orderId, paymentAmount);
+        System.out.println("response: "+response);
+        System.out.println("response code: "+response.getStatusCode());
+        System.out.println("Toss API 응답: " + response.getBody());
+        System.out.println("결제 정보 조회 시작");
 
+        Payment payment = paymentRepository.findByPaymentId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             try {
-                Payment payment = paymentRepository.findByPaymentId(orderId)
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
-
                 payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
                 payment.setApprovedAt(LocalDateTime.now());
+                System.out.println("1");
                 paymentRepository.save(payment);
+                System.out.println("2");
             } catch (Exception e) {
                 cancelPayment(paymentKey, orderId);
+                System.out.println("3");
                 throw new RuntimeException("결제 정보 저장 실패", e);
             }
         } else {
+            System.out.println("4");
+            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
             throw new RuntimeException("결제 승인 요청 실패: " + response.getStatusCode());
         }
     }
@@ -99,8 +106,8 @@ public class PaymentService {
         return response;
     }
 
-    @Transactional
     public void cancelPayment(String paymentKey, String orderId) {
+        System.out.println("결제 정보 저장 실패. 취소 요청 시작");
         String cancelReason = "서버 오류로 결제에 실패했습니다";
         Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보를 찾을 수 없습니다: " + paymentKey));
