@@ -70,4 +70,15 @@ public class UserController {
             .ok(userService.getUserProfiles(request));  // 200(ok) + UserResponseDto 반환
     }
 
+    @GetMapping("/upload/defaultimages")
+    public ResponseEntity<String> uploadDefaultUserImage(@RequestParam("file") MultipartFile file){
+        // user 디폴트 이미지를 s3에 올리고 링크를 반환받는 api
+        // 반환되는 객체 uri를 회원가입시 이미지가 없는 유저 profile image url에 매핑
+        if(file.isEmpty()){
+            // 500(Internal Server Error)
+            throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
+        }
+        return ResponseEntity.ok(imageService.uploadImageToS3(file));
+    }
+
 }
