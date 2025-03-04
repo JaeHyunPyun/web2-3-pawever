@@ -12,16 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(value = "SELECT u FROM User u WHERE u.socialLoginUuid = :social_login_uuid")
-    Optional<User> findUuid(@Param("social_login_uuid") String social_login_uuid);
+    @Query(value = "SELECT u FROM User u WHERE u.socialLoginUuid = :socialLoginUuid")
+    Optional<User> findBySocialLoginUuid(@Param("socialLoginUuid") String socialLoginUuid);
 
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.isDeleted = true, u.deleted_at = CURRENT_TIMESTAMP WHERE u.socialLoginUuid = :social_login_uuid")
-    void softDeleteByUuid(@Param("social_login_uuid") String social_login_uuid);
+    @Query("UPDATE User u SET u.isDeleted = true, u.deleted_at = CURRENT_TIMESTAMP WHERE u.socialLoginUuid = :socialLoginUuid")
+    void softDeleteByUuid(@Param("socialLoginUuid") String socialLoginUuid);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM User u WHERE u.socialLoginUuid = :social_login_uuid")
-    void hardDeleteByUuid(@Param("social_login_uuid") String social_login_uuid);
+    @Query("DELETE FROM User u WHERE u.socialLoginUuid = :socialLoginUuid")
+    void hardDeleteByUuid(@Param("socialLoginUuid") String socialLoginUuid);
 }
