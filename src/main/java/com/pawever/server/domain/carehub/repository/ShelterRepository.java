@@ -9,10 +9,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ShelterRepository extends JpaRepository<Shelter, Long> {
     Optional<Shelter> findByNameAndCityCodeAndDistrictCode(String name, String cityCode, String districtCode);
 
     Page<Shelter> findAll(Pageable pageable);
+
+    List<Shelter> findByProviderShelterIdIn(Set<Long> providerShelterIds);
 }
