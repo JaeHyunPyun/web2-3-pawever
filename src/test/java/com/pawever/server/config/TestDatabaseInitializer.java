@@ -21,8 +21,7 @@ public class TestDatabaseInitializer  {
         //test 시 table 생성 & data 삽입
         //모든 test class에 대하여 한번만 실행되도록 함.
         if (!initialized) {
-            entityManager.createNativeQuery("RUNSCRIPT FROM 'classpath:schema-test.sql'").executeUpdate();
-            entityManager.createNativeQuery("RUNSCRIPT FROM 'classpath:data-test.sql'").executeUpdate();
+            entityManager.createNativeQuery("RUNSCRIPT FROM 'classpath:data/data.sql'").executeUpdate();
             initialized = true;
         }
     }

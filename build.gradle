@@ -99,7 +99,6 @@ asciidoctor {
 
 
 tasks.named('test') {
-//    delete file('build/generated-snippets')
     useJUnitPlatform()
     outputs.dir snippetsDir
     systemProperty 'spring.profiles.active', 'test'
@@ -123,7 +122,8 @@ build {
 
 openapi3 {
     servers = [
-            { url = "http://localhost:8080" }
+            { url = "http://localhost:8080" },
+            { url = "https://yellowdog.p-e.kr"}
     ]
     title = 'PAWEVER API DOCUMENT'
     description = 'pawEver api 명세서입니다.'
@@ -165,6 +165,5 @@ tasks.withType(GenerateSwaggerUI) {
                 "  - APIKey : []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
-   }
+    }
 }
-
