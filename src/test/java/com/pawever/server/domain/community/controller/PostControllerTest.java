@@ -122,7 +122,7 @@ public class PostControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA)  //request body content type
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andDo(document("/api/community/posts/create-post", //API가 저장되는 경로
+                .andDo(document("api/community/posts/create-post", //API가 저장되는 경로
                         preprocessRequest(prettyPrint(),modifyUris().scheme("http").host("localhost").removePort()),   // request 출력 형식 지정->host 이름 변경
                         preprocessResponse(prettyPrint(), getModifiedHeader()),  // response 출력 형식 지정
                         responseFields(responseFieldDescriptorsForPost),
@@ -156,7 +156,7 @@ public class PostControllerTest {
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT.getStatus().value()))
-                .andDo(document("/api/community/posts/create-post-fail",
+                .andDo(document("api/community/posts/create-post-fail",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         responseFields(responseFieldDescriptorsForPost),  // 응답 필드
@@ -189,7 +189,7 @@ public class PostControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/community/posts/{postId}", postId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("/api/community/posts/get-post",
+                .andDo(document("api/community/posts/get-post",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(pathParametersForGetPost),  // Path Parameter 문서화
@@ -210,7 +210,7 @@ public class PostControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/community/posts/{postId}", postId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.POST_NOT_FOUND.getStatus().value()))
-                .andDo(document("/api/community/posts/get-post-fail",
+                .andDo(document("api/community/posts/get-post-fail",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(pathParametersForGetPost),  // Path Parameter 문서화
@@ -241,7 +241,7 @@ public class PostControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/api/community/posts")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("/api/community/posts/get-all-post",
+                .andDo(document("api/community/posts/get-all-post",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         responseFields(responseFieldDescriptorsForPostList), // Response 필드 문서화
@@ -288,7 +288,7 @@ public class PostControllerTest {
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("/api/community/posts/update-post",
+                .andDo(document("api/community/posts/update-post",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("수정할 게시글 ID")),
@@ -328,7 +328,7 @@ public class PostControllerTest {
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.POST_NOT_FOUND.getStatus().value()))
-                .andDo(document("/api/community/posts/update-post-fail",
+                .andDo(document("api/community/posts/update-post-fail",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("수정할 게시글 ID (존재하지 않는 ID)")),
@@ -371,7 +371,7 @@ public class PostControllerTest {
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.UNAUTHORIZED_ACTION.getStatus().value()))
-                .andDo(document("/api/community/posts/update-post-unauthorized",
+                .andDo(document("api/community/posts/update-post-unauthorized",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("수정할 게시글 ID (권한 없음)")),
@@ -402,7 +402,7 @@ public class PostControllerTest {
                         .delete("/api/community/posts/{postId}", postId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("/api/community/posts/delete-post",
+                .andDo(document("api/community/posts/delete-post",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("삭제할 게시글 ID")),
@@ -429,7 +429,7 @@ public class PostControllerTest {
                         .delete("/api/community/posts/{postId}", postId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.POST_NOT_FOUND.getStatus().value()))
-                .andDo(document("/api/community/posts/delete-post-fail",
+                .andDo(document("api/community/posts/delete-post-fail",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("삭제할 게시글 ID (존재하지 않는 ID)")),
@@ -458,7 +458,7 @@ public class PostControllerTest {
                         .delete("/api/community/posts/{postId}", postId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(ResponseCodeEnum.UNAUTHORIZED_ACTION.getStatus().value()))
-                .andDo(document("/api/community/posts/delete-post-unauthorized",
+                .andDo(document("api/community/posts/delete-post-unauthorized",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         pathParameters(parameterWithName("postId").description("삭제할 게시글 ID (권한 없음)")),
@@ -494,7 +494,7 @@ public class PostControllerTest {
                         .get("/api/community/my-posts")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document("/api/community/posts/get-my-posts",
+                .andDo(document("api/community/posts/get-my-posts",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         responseFields(responseFieldDescriptorsForPostList),
@@ -513,7 +513,7 @@ public class PostControllerTest {
                         .get("/api/community/my-posts")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()) // 성공 응답이지만 데이터는 빈 배열
-                .andDo(document("/api/community/posts/get-my-posts-fail",
+                .andDo(document("api/community/posts/get-my-posts-fail",
                         preprocessRequest(prettyPrint(), modifyUris().scheme("http").host("localhost").removePort()),
                         preprocessResponse(prettyPrint(), getModifiedHeader()),
                         responseFields(responseFieldDescriptorsForPostList),
