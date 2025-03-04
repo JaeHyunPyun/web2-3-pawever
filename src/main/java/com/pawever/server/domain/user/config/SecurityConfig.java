@@ -4,6 +4,7 @@ import com.pawever.server.domain.user.handler.FilterExceptionHandler;
 import com.pawever.server.domain.user.jwt.CustomLogoutFilter;
 import com.pawever.server.domain.user.jwt.JwtFilter;
 import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.service.AccessTokenService;
 import com.pawever.server.domain.user.service.RefreshTokenService;
 import com.pawever.server.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
+    private final AccessTokenService accessTokenService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -62,7 +64,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
-            .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtFilter(jwtUtil, accessTokenService), UsernamePasswordAuthenticationFilter.class);
         http
             .addFilterAt(new CustomLogoutFilter(jwtUtil, refreshTokenService, userService), LogoutFilter.class);
         http
