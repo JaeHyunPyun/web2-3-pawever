@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ShelterRepository extends JpaRepository<Shelter, Long> {
     Optional<Shelter> findByNameAndCityCodeAndDistrictCode(String name, String cityCode, String districtCode);
+
+    Optional<Shelter> findByProviderShelterId(Long providerShelterId);
 }

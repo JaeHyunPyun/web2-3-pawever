@@ -28,6 +28,9 @@ public enum ResponseCodeEnum {
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
 
+    ANIMAL_NOT_FOUND(HttpStatus.NOT_FOUND, "ANIMAL_1", "animal 정보를 찾을 수 없음."),
+    SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND, "SHELTER_1", "shelter 정보를 찾을 수 없음."),
+
     // 로그인/회원가입 에러
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "LOGIN_0", "입력된 회원정보에 오류가 있습니다."),
     DATA_PERSISTENCE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGIN_1", "데이터 저장 중 오류가 발생했습니다."),
