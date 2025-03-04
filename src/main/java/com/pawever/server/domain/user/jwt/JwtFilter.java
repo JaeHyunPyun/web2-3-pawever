@@ -39,8 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
         boolean isTokenRefreshRequest = path.equals("/api/auth/refreshedtokens") &&
             (method.equalsIgnoreCase("POST"));
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-//        return allRequestAllowance;
-        return isLoginRequest || isTokenRefreshRequest;
+        return allRequestAllowance;
+//        return isLoginRequest || isTokenRefreshRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로
