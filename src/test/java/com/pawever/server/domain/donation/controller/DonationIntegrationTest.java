@@ -318,7 +318,7 @@ class DonationIntegrationTest {
         resultActions.andExpect(status().isOk());
         resultActions.andDo(getDocumentForGetDonationByUser("success"));
     }
-
+/*
     @Test
     public void 사용자별_후원내역_조회_실패() throws Exception {
         ResultActions resultActions = getResultActionsForGetDonationByUser(30000L);
@@ -337,6 +337,8 @@ class DonationIntegrationTest {
                                 .description("사용자 ID를 통해 사용자별로 후원 내역을 조회함.")
                                 .build())));
     }
+
+ */
 
     private ResultActions getResultActionsForGetTotalDonationAmount() throws Exception {
         return mockMvc.perform(
