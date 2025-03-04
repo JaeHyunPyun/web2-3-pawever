@@ -206,21 +206,21 @@ include::build/generated-snippets/api/donations/getDonationAmount/success/http-r
 보호소 별 날짜에 따른 방문 예약 가능 시간대를 조회함.
 
 ==== Request
-include::{snippets}/api/reservations/shelters/1/http-request.adoc[]
+include::build/generated-snippets/api/reservations/shelters/1/http-request.adoc[]
 
 ==== Request Path Parameter Fields
-include::{snippets}/api/reservations/shelters/1/path-parameters.adoc[]
+include::build/generated-snippets/api/reservations/shelters/1/path-parameters.adoc[]
 
 ==== Request Query Parameter Fields
-include::{snippets}/api/reservations/shelters/1/query-parameters.adoc[]
+include::build/generated-snippets/api/reservations/shelters/1/query-parameters.adoc[]
 
 ==== 성공 Response
-include::{snippets}/api/reservations/shelters/1/http-response.adoc[]
+include::build/generated-snippets/api/reservations/shelters/1/http-response.adoc[]
 
 ==== Response Body Fields
-include::{snippets}/api/reservations/shelters/1/response-fields.adoc[]
+include::build/generated-snippets/api/reservations/shelters/1/response-fields.adoc[]
 
 ==== 실패 Response
 실패1. 등록된 보호소 정보를 찾을 수 없음.
-include::{snippets}/api/ㅔreservations/shelters/2/http-response.adoc[]
+include::build/generated-snippets/api/reservations/shelters/2/http-response.adoc[]
 ---
