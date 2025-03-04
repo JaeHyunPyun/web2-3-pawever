@@ -42,7 +42,7 @@ public class Payment {
     private PaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false)
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
     public enum PaymentStatus {
