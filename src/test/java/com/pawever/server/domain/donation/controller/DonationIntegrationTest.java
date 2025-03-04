@@ -1,53 +1,51 @@
-//package com.pawever.server.domain.donation.controller;
-//
-//import com.epages.restdocs.apispec.ResourceSnippetParameters;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.pawever.server.PawEverApplication;
-//import com.pawever.server.common.response.ResponseCodeEnum;
-//import com.pawever.server.domain.donation.dto.DonationTO;
-//import com.pawever.server.domain.donation.entity.Donation;
-//import com.pawever.server.domain.donation.repository.DonationRepository;
-//import com.pawever.server.domain.donation.service.DonationService;
-//import com.pawever.server.domain.user.entity.jpa.User;
-//import com.pawever.server.domain.user.enums.Role;
-//import com.pawever.server.domain.user.repository.jpa.UserRepository;
-//import lombok.extern.slf4j.Slf4j;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.restdocs.RestDocumentationContextProvider;
-//import org.springframework.restdocs.RestDocumentationExtension;
-//import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-//import org.springframework.restdocs.operation.preprocess.HeadersModifyingOperationPreprocessor;
-//import org.springframework.restdocs.payload.FieldDescriptor;
-//import org.springframework.restdocs.payload.JsonFieldType;
-//import org.springframework.restdocs.request.ParameterDescriptor;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-//import org.springframework.test.web.servlet.ResultActions;
-//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-//import org.springframework.web.context.WebApplicationContext;
-//
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
-//import java.util.*;
-//
-//import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-//import static org.hamcrest.Matchers.nullValue;
-//import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-//import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-//import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-//import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-//import static org.springframework.restdocs.request.RequestDocumentation.*;
-//import static org.springframework.restdocs.snippet.Attributes.key;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-//
+package com.pawever.server.domain.donation.controller;
+
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawever.server.PawEverApplication;
+import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.donation.entity.Donation;
+import com.pawever.server.domain.donation.repository.DonationRepository;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.enums.Role;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.operation.preprocess.HeadersModifyingOperationPreprocessor;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.request.ParameterDescriptor;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 //@Slf4j
 //@AutoConfigureMockMvc
 //@AutoConfigureRestDocs
@@ -67,9 +65,6 @@
 //    @Autowired
 //    private DonationRepository donationRepository;
 //
-//    @Autowired
-//    private DonationService donationService;
-//
 //    @BeforeEach
 //    void setup(WebApplicationContext context , RestDocumentationContextProvider restDocumentation) {
 //        this.mockMvc = MockMvcBuilders
@@ -77,10 +72,6 @@
 //                //.apply(SecurityMockMvcConfigurers.springSecurity()) //secrutiy filter 적용 // Security 설정 완료 후 나중에 적용
 //                .apply(documentationConfiguration(restDocumentation))
 //                .build();
-//        List<Donation> donations = donationRepository.findAll();
-//        for (Donation donation : donations) {
-//            System.out.println("Donation ID: " + donation.getDonationId());
-//        }
 //    }
 //
 //    // 불필요한 header 제거 함수
@@ -88,21 +79,13 @@
 //        return modifyHeaders().remove("X-Content-Type-Options").remove("X-XSS-Protection").remove("Cache-Control").remove("Pragma").remove("Expires").remove("Content-Length");
 //    }
 //
-//    // response body field - data(Number)
-//    private final List<FieldDescriptor> responseFieldDescriptorsForCreateDonation = List.of(
+//    // response body field - data(Object)
+//    private final List<FieldDescriptor> responseFieldDescriptorsForDonation = List.of(
 //            fieldWithPath("isSuccess").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
 //            fieldWithPath("status").type(JsonFieldType.STRING).description("응답 상태"),
 //            fieldWithPath("code").type(JsonFieldType.STRING).description("상태 코드"),
-//            fieldWithPath("data").type(JsonFieldType.NUMBER).optional().description("data")
+//            fieldWithPath("data").type(JsonFieldType.OBJECT).optional().description("data")
 //    );
-//
-////    // response body field - data(Object)
-////    private final List<FieldDescriptor> responseFieldDescriptorsForDonation = List.of(
-////            fieldWithPath("isSuccess").type(JsonFieldType.BOOLEAN).description("요청 성공 여부"),
-////            fieldWithPath("status").type(JsonFieldType.STRING).description("응답 상태"),
-////            fieldWithPath("code").type(JsonFieldType.STRING).description("상태 코드"),
-////            fieldWithPath("data").type(JsonFieldType.OBJECT).optional().description("data")
-////    );
 //
 //    // response body field - data(Array)
 //    private final List<FieldDescriptor> responseFieldDescriptorsForDonations = List.of(
@@ -159,7 +142,7 @@
 //                preprocessRequest(prettyPrint(),modifyUris().scheme("https").host("yellowdog.p-e.kr").removePort()),
 //                preprocessResponse(prettyPrint(), getModifiedHeader()),
 //                requestFields(donationRequestDescriptors),
-//                responseFields(responseFieldDescriptorsForCreateDonation),
+//                responseFields(responseFieldDescriptorsForDonation),
 ////                requestHeaders(headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer : 사용자 access Token")), //jwt 토큰, security 설정 이후 활성화
 //                resource(
 //                        ResourceSnippetParameters.builder()
@@ -331,14 +314,6 @@
 //
 //    @Test
 //    public void 사용자별_후원내역_조회_성공() throws Exception {
-//        List<Donation> donations = donationRepository.findAll();
-//        for (Donation donation : donations) {
-//            System.out.println("Donation ID in 사용자별_후원내역_조회_성공: " + donation.getDonationId());
-//            System.out.println("Donation ID in 사용자별_후원내역_조회_성공: " + donation.getUserId().getUserId());
-//            System.out.println("Donation ID in 사용자별_후원내역_조회_성공: " + donation.getUserId().getName());
-//        }
-//        List<DonationTO> donations1 = donationService.getDonationByUser(1L);
-//        System.out.println("API Response: " + donations1);
 //        ResultActions resultActions = getResultActionsForGetDonationByUser(1L);
 //        resultActions.andExpect(status().isOk());
 //        resultActions.andDo(getDocumentForGetDonationByUser("success"));
@@ -394,4 +369,4 @@
 //    }
 //
 //}
-//
+
