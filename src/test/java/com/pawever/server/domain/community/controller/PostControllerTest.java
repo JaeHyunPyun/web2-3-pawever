@@ -32,6 +32,7 @@ import org.springframework.restdocs.operation.preprocess.HeadersModifyingOperati
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.ParameterDescriptor;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -69,7 +70,7 @@ public class PostControllerTest {
     void setup(WebApplicationContext context , RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
-                //.apply(SecurityMockMvcConfigurers.springSecurity()) //secrutiy filter 적용 // Security 설정 완료 후 나중에 적용
+                .apply(SecurityMockMvcConfigurers.springSecurity()) //secrutiy filter 적용 // Security 설정 완료 후 나중에 적용
                 .apply(documentationConfiguration(restDocumentation))
                 .build();
     }
