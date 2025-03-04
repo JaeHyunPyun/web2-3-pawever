@@ -21,7 +21,7 @@
 [cols="2,4,4",options="header"]
 |===
 | 환경 | 도메인 | 비고
-| 개발(dev) | https://greenroom-server.site | API 문서 제공
+| 개발(dev) | https://yellowdog.p-e.kr | API 문서 제공
 |===
 
 == 응답형식
@@ -100,6 +100,7 @@ Content-Type: application/json
 | 공통 | 400 | BAD_REQUEST | REQUEST_0 | 부적절한 request argument가 전달됨
 | 공통 | 404 | NOT FOUND | USER_0 | access token에 포함된 user 정보를 서버에서 찾지 못하는 경우 공통적으로 반환됨
 |===
+
 
 == 회원 관리
 
@@ -196,4 +197,150 @@ include::build/generated-snippets/api/donations/getDonationAmount/success/curl-r
 
 ==== 성공 Response
 include::build/generated-snippets/api/donations/getDonationAmount/success/http-response.adoc[]
+
+
+== 커뮤니티 게시글
+
+=== **1. 게시글 생성 (POST /api/community/posts)**
+커뮤니티에 게시글을 작성하는 API입니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/create-post/curl-request.adoc[]
+
+==== Request Parts
+include::build/generated-snippets/api/community/posts/create-post/request-parts.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/create-post/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/create-post/response-fields.adoc[]
+
+==== 실패 Response
+실패1.
+include::build/generated-snippets/api/community/posts/create-post-fail/http-response.adoc[]
+
+
+=== **2. 게시글 단건 조회 (GET /api/community/posts/{postId})**
+특정 `postId`를 이용하여 게시글을 조회하는 API입니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/get-post/http-request.adoc[]
+
+==== Path Parameters
+include::build/generated-snippets/api/community/posts/get-post/path-parameters.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/get-post/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/get-post/response-fields.adoc[]
+
+==== 실패 Response
+실패1. (존재하지 않는 postId 조회)
+include::build/generated-snippets/api/community/posts/get-post-fail/fail/http-response.adoc[]
+
+
+
+=== **3. 게시글 전체 조회 (GET /api/community/posts)**
+전체 게시글을 최신순으로 정렬하여 조회하는 API입니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/get-all-post/http-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/get-all-post/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/get-all-post/response-fields.adoc[]
+
+
+
+
+=== **4. 게시글 수정 (PATCH /api/community/posts/{postId})**
+게시글을 수정하는 API입니다. request 파트는 필수고, images는 선택적으로 보내주시면 됩니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/update-post/curl-request.adoc[]
+
+==== Request Parts
+include::build/generated-snippets/api/community/posts/update-post/request-parts.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/update-post/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/update-post/response-fields.adoc[]
+
+==== 실패 Response
+실패1. (존재하지 않는 게시글)
+include::build/generated-snippets/api/community/posts/update-post-fail/http-response.adoc[]
+
+실패2. (수정 권한 없음)
+include::build/generated-snippets/api/community/posts/update-post-unauthorized/http-response.adoc[]
+
+
+
+=== 5. 게시글 삭제 (DELETE /api/community/posts/{postId})
+게시글을 삭제하는 API입니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/delete-post/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/delete-post/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/delete-post/response-fields.adoc[]
+
+==== 실패 Response
+실패1. (존재하지 않는 게시글)
+include::build/generated-snippets/api/community/posts/delete-post-fail/http-response.adoc[]
+
+실패2. (삭제 권한 없음)
+include::build/generated-snippets/api/community/posts/delete-post-unauthorized/http-response.adoc[]
+
+
+=== **6. 내가 작성한 게시글 조회 (GET /api/community/posts/my-posts)**
+로그인한 사용자가 작성한 게시글을 최신순으로 조회하는 API입니다.
+
+==== Request
+include::build/generated-snippets/api/community/posts/get-my-posts/curl-request.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/community/posts/get-my-posts/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/community/posts/get-my-posts/response-fields.adoc[]
+
+==== 실패 Response
+실패1. (작성한 게시글 없음)
+include::build/generated-snippets/api/community/posts/get-my-posts-fail/http-response.adoc[]
+
+
+== 보호소 방문 예약
+
+=== **1. 보호소 방문 예약 가능 시간대 조회**
+
+보호소 별 날짜에 따른 방문 예약 가능 시간대를 조회함.
+
+==== Request
+include::build/generated-snippets/api/reservations/shelters/1/http-request.adoc[]
+
+==== Request Path Parameter Fields
+include::build/generated-snippets/api/reservations/shelters/1/path-parameters.adoc[]
+
+==== Request Query Parameter Fields
+include::build/generated-snippets/api/reservations/shelters/1/query-parameters.adoc[]
+
+==== 성공 Response
+include::build/generated-snippets/api/reservations/shelters/1/http-response.adoc[]
+
+==== Response Body Fields
+include::build/generated-snippets/api/reservations/shelters/1/response-fields.adoc[]
+
+==== 실패 Response
+실패1. 등록된 보호소 정보를 찾을 수 없음.
+include::build/generated-snippets/api/reservations/shelters/2/http-response.adoc[]
+---
 
