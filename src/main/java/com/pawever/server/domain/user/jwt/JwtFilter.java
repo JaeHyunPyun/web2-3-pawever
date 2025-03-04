@@ -38,8 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
             (method.equalsIgnoreCase("POST"));
         boolean isTokenRefreshRequest = path.equals("/api/auth/refreshedtokens") &&
             (method.equalsIgnoreCase("POST"));
-         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-         return allRequestAllowance;
+        boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
+        return allRequestAllowance;
 //        return isLoginRequest || isTokenRefreshRequest;
     }
 
@@ -52,12 +52,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessTokenWithBearer= request.getHeader("Authorization");
         System.out.println("accessTokenWithBearer: " + accessTokenWithBearer);
 
-        // 2. 토큰이 없다면 권한이 없다고 반환하고 필터 종료하기
+        // 2. 토큰이 없다면 400(BAD_REQUEST) 발생시키고 필터 종료
         if (accessTokenWithBearer == null || !accessTokenWithBearer.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("액세스 토큰이 없습니다.");
-            log.info("[JWTFilter] 액세스 토큰이 없습니다.");
-            return;
+            log.error("[JWTFilter] 액세스 토큰이 없습니다.");
+            throw new CustomException(ResponseCodeEnum.ACCESS_TOKEN_NULL);
         }
 
         // 2-1. 토큰에서 Bearer 제거하고 실질적인 토큰값을 가져오기
@@ -73,14 +71,12 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new CustomException(ResponseCodeEnum.JWT_TOKEN_EXPIRED);
         }
 
-
-        // 4. 토큰 category 가 access인지 확인 (발급시 페이로드에 명시)
+        // 4. 토큰 category 가 access인지 확인
+        // Refresh 토큰이 주어진 경우 BAD_REQUEST(400) 반환
         String category = jwtUtil.getCategory(accessToken);
         if (!category.equals("access")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().print("[JWTFilter] 액세스 토큰 타입이 아닙니다.");
-            log.info("[JWTFilter] 액세스 액세스 토큰 타입이 아닙니다.");
-            return;
+            log.error("[JWTFilter] 액세스 토큰 타입이 아닙니다.");
+            throw new CustomException(ResponseCodeEnum.TOKEN_CATEGORY_MISMATCH);
         }
 
         // 5. accesstoken에 대한 검증이 완료되었으므로 accesstoken에서 socialLoginUuid, role 값을 가져오기
