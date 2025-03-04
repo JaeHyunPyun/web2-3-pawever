@@ -10,7 +10,5 @@ public class TossWebhookTO {
     private String orderId;
     private String status;
     private long amount;
-    private String method;
-    private String requestedAt;
     private String approvedAt;
 }
