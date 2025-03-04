@@ -10,14 +10,11 @@ import com.pawever.server.domain.carehub.repository.AbandonedPetRepository;
 import com.pawever.server.domain.carehub.repository.ShelterRepository;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
