@@ -19,12 +19,26 @@ springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
-    path: /swagger-ui
+    path: /swagger-ui.html
+    urls:
+        - name: PAWEVER API
+          url: /docs/openapi3.yaml
 openapi:
   service-key: ${OPENAPI_SERVICE_KEY}
 kakao:
   api:
     key: ${KAKAO_REST_API_KEY}
+cloud:
+  aws:
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_ACCESS_KEY}
+    s3:
+      bucket-name: paweverbucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
 
 

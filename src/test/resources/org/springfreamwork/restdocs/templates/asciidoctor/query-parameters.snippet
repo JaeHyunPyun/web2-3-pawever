@@ -1,11 +1,11 @@
 |===
-|Parameter|Description|Constraint|Required|Default
+|Parameter|Description|Required|Default
 
 {{#parameters}}
     |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
     |{{#tableCellContent}}{{description}}{{/tableCellContent}}
-    |{{#tableCellContent}}{{#constraint}}{{constraint}}{{/constraint}}{{^constraint}} {{/constraint}}{{/tableCellContent}}
     |{{#tableCellContent}}{{#optional}}false{{/optional}}{{^optional}}true{{/optional}}{{/tableCellContent}}
+    |{{#tableCellContent}}{{#constraint}}{{constraint}}{{/constraint}}{{^constraint}} {{/constraint}}{{/tableCellContent}}
     |{{#tableCellContent}}{{#default}}{{default}}{{/default}}{{^default}} {{/default}}{{/tableCellContent}}
 {{/parameters}}
 |===
