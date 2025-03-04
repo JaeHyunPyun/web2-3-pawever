@@ -23,25 +23,18 @@ public class DonationService {
     private UserRepository userRepository;
 
     @Transactional
-    public Long createDonation(Map<String, Object> request) {
+    public Long createDonation(Map<String, Object> request, String uuid) {
         try {
             if (!request.containsKey("donationAmount") || ((Number) request.get("donationAmount")).longValue() < 0L) { // 요청 값의 donationAmount 값 누락 여부 검사
                 throw new IllegalArgumentException("Invalid donationAmount format");
             }
 
             Donation donation = new Donation();
-            if (request.get("userId") != null) { // 후원자 익명 여부 검사
-                Long userId = ((Number) request.get("userId")).longValue();
+            User user = userRepository.findUuid(uuid)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid user UUID: " + uuid));
+            donation.setUserId(user);
+            donation.setDonorName((String) request.get("donorName"));
 
-                User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
-                String donorName = (String) request.get("donorName");
-                if (!donorName.equals(user.getName())) { // 후원자 이름 검증
-                    throw new IllegalArgumentException("Provided donorName does not match the registered user name.");
-                }
-                donation.setUserId(user);
-                donation.setDonorName(donorName);
-            }
             donation.setDonorMessage((String) request.get("donorMessage"));
             donation.setDonationAmount(((Number) request.get("donationAmount")).longValue());
             donation.setCreatedAt(LocalDateTime.now());
@@ -60,8 +53,8 @@ public class DonationService {
         return getDonationTO(donations);
     }
 
-    public List<DonationTO> getDonationByUser(Long userId) {
-        User user = userRepository.findById(userId)
+    public List<DonationTO> getDonationByUser(String uuid) {
+        User user = userRepository.findUuid(uuid)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         List<Donation> donations = donationRepository.findByUserId(user);
         return getDonationTO(donations);
@@ -71,7 +64,8 @@ public class DonationService {
     public List<DonationTO> getDonationTO(List<Donation> donations) {
         return donations.stream().map(donation -> {
             DonationTO donationTO = new DonationTO();
-            donationTO.setUserId(donation.getUserId().getUserId());
+            donationTO.setUserId(donation.getUserId().getSocialLoginUuid());
+            donationTO.setDonationId(donation.getDonationId());
             donationTO.setDonorName(donation.getDonorName());
             donationTO.setDonorMessage(donation.getDonorMessage());
             donationTO.setDonationAmount(donation.getDonationAmount());

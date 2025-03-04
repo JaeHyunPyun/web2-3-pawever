@@ -4,8 +4,10 @@ import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.service.DonationService;
+import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,9 +20,11 @@ public class DonationController {
     private DonationService donationService;
 
     @PostMapping("api/donations")
-    public ResponseEntity<ApiResponse> createDonation(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<ApiResponse> createDonation(@RequestBody Map<String, Object> request,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
-            long donationId = donationService.createDonation(request);
+            String uuid = customUserDetails.getUsername();
+            long donationId = donationService.createDonation(request, uuid);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationId));
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Invalid user ID") || e.getMessage().contains("Provided donorName")) {
@@ -42,10 +46,11 @@ public class DonationController {
         }
     }
 
-    @GetMapping("api/users/donations/{user_id}")
-    public ResponseEntity<ApiResponse> getDonationByUser(@PathVariable Long user_id) {
+    @GetMapping("api/users/donations")
+    public ResponseEntity<ApiResponse> getDonationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
-            List<DonationTO> donationsByUser = donationService.getDonationByUser(user_id);
+            String uuid = customUserDetails.getUsername();
+            List<DonationTO> donationsByUser = donationService.getDonationByUser(uuid);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, donationsByUser));
         } catch (RuntimeException e){
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.USER_NOT_FOUND));
