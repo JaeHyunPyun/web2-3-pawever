@@ -48,6 +48,13 @@ public enum ResponseCodeEnum {
     // 메인 기능 에러
     SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_0","등록된 보호소 정보를 찾을 수 없음."),
 
+    // 결제 관련 에러
+    PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),
+
+    //예약 관련
+    INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST,"RES_0","방문 예약이 불가능한 시간으로 예약을 요청함."),
+    SHELTER_NOT_REGISTERED(HttpStatus.BAD_REQUEST,"RES_1","방문 예약이 불가능한 보호소를 대상으로 예약을 요청함."),
+
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");
 

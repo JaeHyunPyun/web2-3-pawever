@@ -39,6 +39,9 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+tosspayments:
+    secret-key: ${TOSSPAYMENTS_SECRET_KEY}
+
 
 
 
