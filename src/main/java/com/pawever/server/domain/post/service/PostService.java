@@ -9,6 +9,8 @@ import com.pawever.server.domain.post.entity.Post;
 import com.pawever.server.domain.post.entity.PostImages;
 import com.pawever.server.domain.post.repository.PostImagesRepository;
 import com.pawever.server.domain.post.repository.PostRepository;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImagesRepository postImagesRepository;
     private final ImageService imageService;
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -42,9 +45,12 @@ public class PostService {
         }
 
         try {
+            //User 찾아오기
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
             // 게시글 엔티티 생성
             Post post = Post.builder()
-                    .userId(userId)
+                    .user(user)
                     .title(request.title())
                     .content(request.content())
                     .build();
@@ -76,7 +82,7 @@ public class PostService {
                 }
             }
 
-            return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
 
     } catch (CustomException e) {
         throw e; // 이미 처리된 예외는 그대로 던짐
@@ -93,6 +99,8 @@ public class PostService {
         // 게시글 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.POST_NOT_FOUND));
+        // 유저
+        User user = post.getUser();
 
         // 저장되어있는 이미지 조회
         List<String> imageUrls;
@@ -105,7 +113,7 @@ public class PostService {
             throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
         }
 
-        return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+        return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
     }
 
     //게시글 전체 조회
@@ -128,13 +136,12 @@ public class PostService {
 
         // 엔티티 → DTO 변환
         return posts.stream().map(post -> {
-//            User user = userRepository.findById(post.getUser().getId())
-//                    .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+            User user = post.getUser();
 
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
@@ -146,8 +153,7 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.POST_NOT_FOUND));
 
         // 수정 권한 확인
-        //if (!post.getUser().getId().equals(userId)) {
-        if (!post.getUserId().equals(userId)) {
+        if (!post.getUser().getUserId().equals(userId)) {
             throw new CustomException(ResponseCodeEnum.UNAUTHORIZED_ACTION);
         }
 
@@ -212,8 +218,8 @@ public class PostService {
                 imageUrls = Collections.emptyList(); // 빈 리스트로 초기화하여 NullPointerException 방지
             }
         }
-
-        return new PostResponseDTO.PostResponse(updatedPost.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
+        User user = updatedPost.getUser();
+        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getName(), user.getProfileImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
     }
 
     @Transactional
@@ -223,8 +229,7 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.POST_NOT_FOUND));
 
         // 삭제 권한 확인
-        //if (!post.getUser().getId().equals(userId)) {
-        if (!post.getUserId().equals(userId)) {
+        if (!post.getUser().getUserId().equals(userId)) {
             throw new CustomException(ResponseCodeEnum.UNAUTHORIZED_ACTION);
         }
 
@@ -262,8 +267,9 @@ public class PostService {
     //로그인 한 회원이 작성한 게시글 전체 조회
     @Transactional(readOnly = true)
     public List<PostResponseDTO.PostResponse> getAllUsersPosts(Long userId) {
-//            User user = userRepository.findById(userId)
-//                    .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+        // 유저 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
         // 최신순으로 게시글 전체 조회
         List<Post> posts = postRepository.findAllByUserId(userId);
@@ -285,7 +291,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), "작성자(수정필요)", "프로필이미지url(수정필요)", post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 

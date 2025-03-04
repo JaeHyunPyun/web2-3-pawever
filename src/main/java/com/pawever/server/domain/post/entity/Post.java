@@ -1,6 +1,7 @@
 package com.pawever.server.domain.post.entity;
 
 import com.pawever.server.common.entity.BaseEntity;
+import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,12 +17,9 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //멤버 구현 전 임시로 매핑
-    @Column(name = "user_id", nullable = false)
-    private Long userId = 1L;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id", nullable = false)
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "title", nullable = false)
     private String title;

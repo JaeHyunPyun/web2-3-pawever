@@ -15,4 +15,5 @@ public class UserResponseDto {
     private String socialLoginUuid;         //소셜로그인 uuid
     private String name;                    //소셜로그인 닉네임
     private Role role;                      //유저 권한
+    private Boolean isDeleted;              //삭제 여부
 }
