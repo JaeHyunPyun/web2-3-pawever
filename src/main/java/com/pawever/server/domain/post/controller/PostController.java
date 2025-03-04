@@ -5,9 +5,16 @@ import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.post.dto.request.PostRequestDTO;
 import com.pawever.server.domain.post.dto.response.PostResponseDTO;
 import com.pawever.server.domain.post.service.PostService;
+import com.pawever.server.domain.user.dto.response.CustomUserDetails;
+import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.service.AccessTokenService;
+import com.pawever.server.domain.user.service.RefreshTokenService;
+import com.pawever.server.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,15 +25,18 @@ import java.util.List;
 @RequestMapping("/api/community")
 public class PostController {
     private final PostService postService;
+    private final AccessTokenService accessTokenService;
+    private final JwtUtil jwtUtil;
 
     //게시글 작성
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse> createPost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestPart(value = "request", required = true) PostRequestDTO.CreatePostRequest request) {
+            @RequestPart(value = "request", required = true) PostRequestDTO.CreatePostRequest request,
+            HttpServletRequest httpServletRequest) {
 
-        //멤버 아이디 임의 설정
-        Long userId = 1L;
+        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
+        Long userId = jwtUtil.getUserId(accessToken);
 
         // 게시글 생성
         PostResponseDTO.PostResponse response = postService.createPost(request, userId, images);
@@ -64,10 +74,11 @@ public class PostController {
     public ResponseEntity<ApiResponse> updatePost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @PathVariable Long postId,
-            @RequestPart PostRequestDTO.UpdatePostRequest request) {
+            @RequestPart PostRequestDTO.UpdatePostRequest request,
+            HttpServletRequest httpServletRequest) {
 
-        //멤버 아이디 임의 설정
-        Long userId = 1L;
+        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
+        Long userId = jwtUtil.getUserId(accessToken);
 
         PostResponseDTO.PostResponse response = postService.updatePost(postId, userId, request, images);
 
@@ -78,9 +89,10 @@ public class PostController {
 
     //게시글 삭제
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId) {
-        //멤버 아이디 임의 설정
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, HttpServletRequest httpServletRequest) {
+
+        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
+        Long userId = jwtUtil.getUserId(accessToken);
 
         // 게시글 삭제
         postService.deletePost(postId, userId);
@@ -92,9 +104,10 @@ public class PostController {
 
     //로그인 한 회원이 작성한 게시글 전체 조회
     @GetMapping("/my-posts")
-    public ResponseEntity<ApiResponse> getAllUsersPost() {
-        //멤버 아이디 임의 설정
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse> getAllUsersPost(HttpServletRequest httpServletRequest) {
+
+        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
+        Long userId = jwtUtil.getUserId(accessToken);
 
         List<PostResponseDTO.PostResponse> response = postService.getAllUsersPosts(userId);
 
