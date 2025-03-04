@@ -20,4 +20,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "GROUP BY r.reservationTimeSlot")
     List<Object[]> findAllByVisitDateAndReservationTimeSlotIds(@Param("date")LocalDate date, @Param("ids")List<Long> ids);
 
+    @Query("SELECT COUNT(r) " +
+            "FROM Reservation r " +
+            "WHERE r.visitDate = :date " +
+            "AND r.reservationTimeSlot.reservationTimeSlotId = :id"
+    )
+    Integer getCountByVisitDateAndReservationTimeSlotId(@Param("date")LocalDate date, @Param("id")Long id);
 }

@@ -117,4 +117,10 @@ public class UserService {
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);  // 204 응답코드 전송
 
     }
+
+    public User findUserByUuid(String socialLoginUuid){
+
+        return userRepository.findUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+    }
+
 }

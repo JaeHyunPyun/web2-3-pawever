@@ -22,10 +22,7 @@ ext {
 
 bootJar {
     dependsOn asciidoctor
-//    copy {
-//        from "build/docs/asciidoc"
-//        into 'static/docs'
-//    }
+
     from("${asciidoctor.outputDir}") {
         into("BOOT-INF/classes/static/docs")
     }
@@ -97,9 +94,6 @@ tasks.named('test') {
     useJUnitPlatform()
     outputs.dir snippetsDir
     systemProperty 'spring.profiles.active', 'test'
-//    testLogging {
-//        showStandardStreams = true
-//    }
 }
 
 

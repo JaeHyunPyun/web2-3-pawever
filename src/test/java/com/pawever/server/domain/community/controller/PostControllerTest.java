@@ -1,3 +1,4 @@
+
 package com.pawever.server.domain.community.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -62,6 +63,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @ExtendWith({RestDocumentationExtension.class})
 public class PostControllerTest {
+
 //
 //    @Autowired
 //    private MockMvc mockMvc;
