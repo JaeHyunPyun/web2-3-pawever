@@ -1,5 +1,7 @@
 package com.pawever.server.domain.carehub.service;
 
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.dto.response.ShelterApiResponse;
 import com.pawever.server.domain.carehub.entity.CityCode;
 import com.pawever.server.domain.carehub.entity.DistrictCode;
@@ -90,5 +92,9 @@ public class ShelterService {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public Shelter findShelterByShelterId(Long shelterId){
+        return shelterRepository.findById(shelterId).orElseThrow(()-> new CustomException(ResponseCodeEnum.SHELTER_NOT_FOUND));
     }
 }

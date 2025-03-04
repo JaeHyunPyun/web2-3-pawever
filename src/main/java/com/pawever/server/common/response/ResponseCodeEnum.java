@@ -15,7 +15,6 @@ public enum ResponseCodeEnum {
     INVALID_REQUEST_ARGUMENT(HttpStatus.BAD_REQUEST,"REQUEST_0","부적절한 request argument가 전달됨"),
     NO_REQUEST_ARGUMENT(HttpStatus.BAD_REQUEST,"REQUEST_1","request가 요청에 포함되지 않았습니다."),
 
-
     // 인증 관련 에러
     JWT_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_0", "JWT 토큰이 만료되었습니다."),
     JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "AUTH_1", "JWT 토큰이 유효하지 않습니다."),
@@ -44,6 +43,9 @@ public enum ResponseCodeEnum {
     // 로그인/회원가입 에러
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "LOGIN_0", "입력된 회원정보에 오류가 있습니다."),
     DATA_PERSISTENCE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGIN_1", "데이터 저장 중 오류가 발생했습니다."),
+
+    // 메인 기능 에러
+    SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_0","등록된 보호소 정보를 찾을 수 없음."),
 
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");

@@ -34,7 +34,4 @@ public class ApiResponse {
         System.out.println("ApiResponse fail(ResponseCodeEnum responseCodeEnum, Object data)");
         return new ApiResponse(false,responseCodeEnum.getStatus().name(),responseCodeEnum.getCode(),data);
     }
-
-
-    
 }
