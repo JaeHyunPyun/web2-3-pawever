@@ -47,18 +47,18 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
-                .requestMatchers("/**").permitAll()  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-//                .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
-//                .requestMatchers("/admin").hasRole("ADMIN")
+//                .requestMatchers("/**").permitAll()  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
+                .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
+                .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
             );
         //인증 실패 시 401 Unauthorized 응답을 반환
         //접근 권한이 없을 때 403 Forbidden 응답을 반환
-//        http
-//            .exceptionHandling(exceptionHandling -> exceptionHandling
-//                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-//                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendError(
-//                    HttpServletResponse.SC_FORBIDDEN, "Forbidden")));
+        http
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN, "Forbidden")));
         http
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
