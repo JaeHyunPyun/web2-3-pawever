@@ -32,6 +32,9 @@ public enum ResponseCodeEnum {
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "LOGIN_0", "입력된 회원정보에 오류가 있습니다."),
     DATA_PERSISTENCE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGIN_1", "데이터 저장 중 오류가 발생했습니다."),
 
+    // 결제 관련 에러
+    PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),
+
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");
 

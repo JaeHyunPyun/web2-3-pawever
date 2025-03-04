@@ -52,6 +52,8 @@ public class PaymentController {
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.PAYMENT_BAD_REQUEST));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
