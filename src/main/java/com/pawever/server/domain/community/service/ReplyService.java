@@ -25,12 +25,9 @@ public class ReplyService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    private static final Long TEST_USER_ID = 22L; // userId를 10으로 고정
-
-    // 댓글 생성
     @Transactional
-    public ReplyResponseDto createReply(Long postId, ReplyRequestDto requestDto) {
-        User user = userRepository.findById(TEST_USER_ID)
+    public ReplyResponseDto createReply(Long postId, Long userId,ReplyRequestDto requestDto) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
         Post post = postRepository.findById(postId)
@@ -45,14 +42,13 @@ public class ReplyService {
         return new ReplyResponseDto(replyRepository.save(reply));
     }
 
-    // 특정 게시글의 모든 댓글 목록 조회
     @Transactional(readOnly = true)
     public ReplyListResponseDto getAllRepliesByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new CustomException(ResponseCodeEnum.POST_NOT_FOUND);
         }
 
-        List<Reply> replies = replyRepository.findByPostIdOrderByCreatedAtAsc(postId);
+        List<Reply> replies = replyRepository.findByPostIdOrderByCreatedAtDesc(postId);
         List<ReplyResponseDto> repliesDto = replies.stream()
                 .map(ReplyResponseDto::new)
                 .collect(Collectors.toList());
@@ -60,34 +56,22 @@ public class ReplyService {
         return new ReplyListResponseDto(repliesDto);
     }
 
-    // 댓글 수정
     @Transactional
-    public ReplyResponseDto updateReply(Long postId, Long replyId, ReplyRequestDto requestDto) {
+    public ReplyResponseDto updateReply(Long postId, Long replyId, Long userId, ReplyRequestDto requestDto) {
         Reply reply = findReplyByPostIdAndReplyId(postId, replyId);
-
-        // userId = 10이 작성자인지 확인
-        if (!reply.getUser().getUserId().equals(TEST_USER_ID)) {
-            throw new CustomException(ResponseCodeEnum.REPLY_ACCESS_DENIED);
-        }
-
-        reply.updateContent(requestDto.getContent());
+        reply.updateContent(requestDto.getContent(), userId);
         return new ReplyResponseDto(reply);
     }
 
-    // 댓글 삭제
     @Transactional
-    public void deleteReply(Long postId, Long replyId) {
+    public void deleteReply(Long postId, Long replyId, Long userId) {
         Reply reply = findReplyByPostIdAndReplyId(postId, replyId);
-
-        // userId = 10이 작성자인지 확인
-        if (!reply.getUser().getUserId().equals(TEST_USER_ID)) {
-            throw new CustomException(ResponseCodeEnum.REPLY_ACCESS_DENIED);
-        }
-
+        reply.validateOwner(userId);
         replyRepository.delete(reply);
     }
 
-    // 게시글과 댓글 ID로 댓글 찾기 (중복 코드 제거)
+
+    // 게시글과 댓글 ID로 댓글 찾기
     private Reply findReplyByPostIdAndReplyId(Long postId, Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.REPLY_NOT_FOUND));

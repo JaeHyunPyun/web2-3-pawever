@@ -17,7 +17,7 @@ public class ReplyResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Entity -> DTO 변환 생성자
+    // Entity -> DTO 변환
     public ReplyResponseDto(Reply reply) {
         this.replyId = reply.getReplyId();
         this.userId = reply.getUser().getUserId();

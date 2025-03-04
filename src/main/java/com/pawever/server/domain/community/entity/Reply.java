@@ -1,5 +1,7 @@
 package com.pawever.server.domain.community.entity;
 
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.post.entity.Post;
 import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
@@ -44,9 +46,17 @@ public class Reply {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // 내용 업데이트 메서드
-    public void updateContent(String content) {
+    public void updateContent(String content, Long userId) {
+        if (!this.user.getUserId().equals(userId)) {
+            throw new CustomException(ResponseCodeEnum.REPLY_ACCESS_DENIED);
+        }
         this.content = content;
+    }
+
+    public void validateOwner(Long userId) {
+        if (!this.user.getUserId().equals(userId)) {
+            throw new CustomException(ResponseCodeEnum.REPLY_ACCESS_DENIED);
+        }
     }
 
 
