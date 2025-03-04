@@ -56,7 +56,7 @@ public class PaymentService {
         payment.setPgTid(paymentKey);
         paymentRepository.save(payment);
     }
-
+/*
     public void confirmPayment(String paymentKey, String orderId, long paymentAmount) {
         ResponseEntity<PaymentTO> response = requestConfirm(paymentKey, orderId, paymentAmount);
         System.out.println("response: "+response);
@@ -190,6 +190,6 @@ public class PaymentService {
         payment.setPaymentStatus(Payment.PaymentStatus.EXPIRED);
         paymentRepository.save(payment);
     }
-
+ */
 
 }

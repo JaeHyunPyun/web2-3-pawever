@@ -24,6 +24,8 @@ public class PaymentController {
         try {
             paymentService.createPayment(orderId, paymentAmount, donationId);
             return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
@@ -42,7 +44,7 @@ public class PaymentController {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
-
+/*
     @PostMapping("api/payments/confirm")
     public ResponseEntity<ApiResponse> confirmPayment(@RequestParam String paymentKey,
                                                       @RequestParam String orderId,
@@ -68,4 +70,5 @@ public class PaymentController {
             return ResponseEntity.internalServerError().body(ApiResponse.fail(ResponseCodeEnum.UNKNOWN_SERVER_ERROR));
         }
     }
+ */
 }
