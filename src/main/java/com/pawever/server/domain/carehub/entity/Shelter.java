@@ -78,4 +78,8 @@ public class Shelter {
         this.roadAddress = roadAddress;
     }
 
+
+    public void updateShelterStaff(User user){
+        this.user = user;
+    }
 }
