@@ -51,6 +51,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
         if (paymentAmount != payment.getPaymentAmount()) {
+            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+            paymentRepository.save(payment);
             throw new IllegalArgumentException("Invalid amount: " + paymentAmount);
         }
         payment.setPgTid(paymentKey);
