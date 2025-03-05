@@ -54,6 +54,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
 //                .requestMatchers("/**").permitAll()  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
                 .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
+                .requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()  // 게시글 조회
+                .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
+                .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
+                .requestMatchers(HttpMethod.GET,"/api/animals/search").permitAll()  // 유기동물 조회(입양 동물 정보)
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
             );
