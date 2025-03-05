@@ -95,12 +95,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 도메인 받으면 수정예정
+//    // 프론트엔드 도메인 명시적으로 지정
+//        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app")); // 프론트 도메인
         configuration.setAllowedOriginPatterns(List.of("*"));  // 프론트 도메인 받으면 수정예정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-//        configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
-        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
+        configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
+//        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
         configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
