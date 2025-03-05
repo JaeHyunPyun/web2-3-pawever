@@ -2,9 +2,12 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.service.ShelterService;
+import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.post.service.ImageService;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
+import com.pawever.server.domain.user.dto.response.StaffProfileResponseDto;
 import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.entity.jpa.User;
@@ -14,6 +17,7 @@ import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +101,18 @@ public class UserService {
 
         // 5. Soft Delete 실행
         userRepository.softDeleteByUuid(userUuid);
+
+        // 6. staff인 경우, shelter 테이블에서 본인 user_id가 조회되는 경우 전부 null로 변경
+        if(user.getRole() == Role.ROLE_STAFF){
+            List<Shelter> staffShelterList = user.getShelters();
+            if(!staffShelterList.isEmpty()){
+                for(Shelter shelter : staffShelterList){
+                    log.info("[회원탈퇴] shelter 테이블내 담당자 user_id 제거 시작");
+                    shelter.clearUserReference();
+                    log.info("[회원탈퇴] shelter 테이블내 담당자 user_id 제거 완료");
+                }
+            }
+        }
     }
 
     @Transactional
@@ -176,4 +192,32 @@ public class UserService {
         return userRepository.findBySocialLoginUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
 
+    @Transactional
+    public void updateLocationIfChanged(Long userId, AuthRequestDto authRequestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+        // 입력된 위도, 경도 값이 존재하고, 기존 DB 값과 다를 경우 업데이트
+        if (authRequestDto.getLatitude() != null && authRequestDto.getLongitude() != null) {
+            if (!authRequestDto.getLatitude().equals(user.getLatitude()) ||
+                !authRequestDto.getLongitude().equals(user.getLongitude())) {
+
+                user.setLatitude(authRequestDto.getLatitude());
+                user.setLongitude(authRequestDto.getLongitude());
+                userRepository.save(user);
+            }
+        }
+    }
+
+    public List<StaffProfileResponseDto> getStaffProfiles(HttpServletRequest request) {
+        String staffAccessToken = accessTokenService.getRequestAccessToken(request);
+        Long staffUserId = jwtUtil.getUserId(staffAccessToken);
+
+        List<StaffProfileResponseDto> staffProfiles = userRepository.findStaffProfileByUserId(staffUserId);
+
+        if(staffProfiles.isEmpty()){
+            throw new CustomException(ResponseCodeEnum.STAFF_NOT_FOUND);        // 404 NOTFOUND 반환
+        }
+
+        return staffProfiles;
+    }
 }

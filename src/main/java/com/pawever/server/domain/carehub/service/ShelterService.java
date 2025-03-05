@@ -9,6 +9,10 @@ import com.pawever.server.domain.carehub.entity.DistrictCode;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.repository.DistrictCodeRepository;
 import com.pawever.server.domain.carehub.repository.ShelterRepository;
+import com.pawever.server.domain.reservation.service.ReservationTimeSlotService;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.enums.Role;
+import com.pawever.server.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +34,9 @@ public class ShelterService {
 
     private final ShelterRepository shelterRepository;
     private final DistrictCodeRepository districtCodeRepository;
+
+    private final UserService userService;
+    private final ReservationTimeSlotService reservationTimeSlotService;
     private final WebClient webClient = WebClient.builder().build();
 
     public void fetchAndSaveShelters(String serviceKey) {
@@ -105,5 +112,18 @@ public class ShelterService {
     public List<ShelterSimpleInfoDTO> findAllShelters(Integer page, Integer size){
         Pageable pageable = PageRequest.of(page,size, Sort.by("name").ascending());
         return shelterRepository.findAll(pageable).getContent().stream().map(ShelterSimpleInfoDTO::of).toList();
+    }
+
+    public void registerShelterStaff(String uuid,Long shelterId){
+
+        User user = userService.findUserByUuid(uuid);
+
+        user.updateUserRole(Role.ROLE_STAFF); // 권한 update
+
+        Shelter shelter = findShelterByShelterId(shelterId);
+
+        shelter.updateShelterStaff(user); //관리자 update
+
+        reservationTimeSlotService.createReservationTimeSlotForShelter(shelter);
     }
 }

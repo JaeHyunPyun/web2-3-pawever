@@ -23,12 +23,9 @@ public class ReservationTimeSlotService {
     //repository
     private final ReservationTimeSlotRepository reservationTimeSlotRepository;
 
-    //service
-    private final ShelterService shelterService;
-
     //보호소 관리자 가입 시 예약 시간 슬롯 생성
     @Transactional
-    public void createReservationTimeSlotForShelter(Long shelterID){
+    public void createReservationTimeSlotForShelter(Shelter shelter){
 
         List<ReservationTimeSlot> reservationTimeSlotList = new ArrayList<>();
 
@@ -42,8 +39,6 @@ public class ReservationTimeSlotService {
                 LocalTime.of(16, 0),
                 LocalTime.of(17,0),
                 LocalTime.of(18,0));
-
-        Shelter shelter = shelterService.findShelterByShelterId(shelterID);
 
         timeSlotList.forEach(t->reservationTimeSlotList.add(ReservationTimeSlot.of(shelter,1,t)));
 
