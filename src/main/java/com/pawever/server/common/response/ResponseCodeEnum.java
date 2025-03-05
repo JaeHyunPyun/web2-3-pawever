@@ -53,6 +53,9 @@ public enum ResponseCodeEnum {
     // 메인 기능 에러
     SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_0","등록된 보호소 정보를 찾을 수 없음."),
 
+    //유기동물 관련 에러
+    PET_NOT_FOUND(HttpStatus.NOT_FOUND, "PET_0", "유기동물을 찾을 수 없습니다."),
+
     // 결제 관련 에러
     PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),
 

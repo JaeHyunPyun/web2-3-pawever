@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ShelterRepository extends JpaRepository<Shelter, Long> {
@@ -28,5 +29,7 @@ public interface ShelterRepository extends JpaRepository<Shelter, Long> {
                                      @Param("distance") Double distance);
 
     Page<Shelter> findAll(Pageable pageable);
+
+    List<Shelter> findByProviderShelterIdIn(Set<Long> providerShelterIds);
 
 }
