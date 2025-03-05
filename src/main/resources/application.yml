@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
   config:
     import: optional:file:.env[.properties]
   application:
@@ -41,6 +45,9 @@ cloud:
       auto: false
 tosspayments:
     secret-key: ${TOSSPAYMENTS_SECRET_KEY}
+paw:
+  user:
+    default-image-url: ${PAW_USER_DEFAULT_IMAGE_S3_URL}
 
 
 

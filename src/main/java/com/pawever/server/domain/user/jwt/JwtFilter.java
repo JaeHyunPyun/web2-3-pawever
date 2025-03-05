@@ -64,46 +64,12 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-//        // 1. AccessToken 꺼내기
-//        String accessTokenWithBearer= request.getHeader("Authorization");
-//        System.out.println("accessTokenWithBearer: " + accessTokenWithBearer);
-//
-//        // 2. 토큰이 없다면 400(BAD_REQUEST) 발생시키고 필터 종료
-//        if (accessTokenWithBearer == null || !accessTokenWithBearer.startsWith("Bearer ")) {
-//            log.error("[JWTFilter] 액세스 토큰이 없습니다.");
-//            throw new CustomException(ResponseCodeEnum.ACCESS_TOKEN_NULL);
-//        }
-//
-//        // 2-1. 토큰에서 Bearer 제거하고 실질적인 토큰값을 가져오기
-//        String accessToken = accessTokenWithBearer.split(" ")[1];
-//
-//        // 3. 토큰이 있다면 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
-//        // todo 프론트 측과 만료시 반환하는 응답 코드 및 메세지 조율 필요(400 또는 401)
-//        // 토큰 만료시 401(UNAUTHORIZED) 반환
-//        try {
-//            jwtUtil.isExpired(accessToken);
-//        } catch (ExpiredJwtException e) {
-//            log.error("[JWTFilter] 액세스 토큰이 만료되었습니다.");
-//            throw new CustomException(ResponseCodeEnum.JWT_TOKEN_EXPIRED);
-//        }
-//
-//        // 4. 토큰 category 가 access인지 확인
-//        // Refresh 토큰이 주어진 경우 BAD_REQUEST(400) 반환
-//        String category = jwtUtil.getCategory(accessToken);
-//        if (!category.equals("access")) {
-//            log.error("[JWTFilter] 액세스 토큰 타입이 아닙니다.");
-//            throw new CustomException(ResponseCodeEnum.TOKEN_CATEGORY_MISMATCH);
-//        }
         // 1. 유효한 AccessToken 가져오기
         String validAccessToken = accessTokenService.getValidRequestAccessToken(request);
 
         // 2. accesstoken에 대한 검증이 완료되었으므로 accesstoken에서 socialLoginUuid, role 값을 가져오기
         String socialLoginUuid = jwtUtil.getSocialLoginUuid(validAccessToken);
         Role role = jwtUtil.getRole(validAccessToken);
-
-//        // 3. api에서 sociluuid 가져오는 것 테스트
-//        System.out.println("test get uuid from request : " + accessTokenService.getRequestSocialLoginUuid(request));
-
 
         // 3. UserAuthInfoDto에 name과 role을 넣어주고 CustomUserDetails에 담고
         CustomUserDetails customUserDetails = new CustomUserDetails(

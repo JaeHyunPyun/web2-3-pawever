@@ -1,5 +1,11 @@
 package com.pawever.server.domain.user.controller;
 
+
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.post.service.ImageService;
+import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
+import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.reservation.service.ReservationService;
@@ -11,13 +17,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -27,6 +37,7 @@ public class UserController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final ImageService imageService;
     private final ReservationService reservationService;
 
 
@@ -61,6 +72,35 @@ public class UserController {
         return ResponseEntity.noContent().build(); // 204 No Content 반환
     }
 
+
+    @GetMapping("/profiles")
+    public ResponseEntity<UserProfileResponseDto> getUserProfiles(HttpServletRequest request){
+        return ResponseEntity
+            .ok(userService.getUserProfiles(request));  // 200(ok) + UserResponseDto 반환
+    }
+
+    @GetMapping("/upload/defaultimages")
+    public ResponseEntity<String> uploadDefaultUserImage(@RequestParam("file") MultipartFile file){
+        // user 디폴트 이미지를 s3에 올리고 링크를 반환받는 api
+        // 반환되는 객체 uri를 회원가입시 이미지가 없는 유저 profile image url에 매핑
+        if(file.isEmpty()){
+            // 500(Internal Server Error)
+            throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
+        }
+        return ResponseEntity.ok(imageService.uploadImageToS3(file));
+    }
+
+    @PatchMapping(value="/profiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateUserProfile(
+        @RequestPart(value = "data", required = false) UserProfileUpdateRequestDto userProfileUpdateRequestDto,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImageFile,
+        HttpServletRequest request
+    ) {
+        userService.updateUserProfile(userProfileUpdateRequestDto, profileImageFile, request);
+
+        return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
+    }
+
     @GetMapping("/reservations")
     public ResponseEntity<ApiResponse> findReservationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByUser(customUserDetails.getUsername())));
@@ -69,6 +109,7 @@ public class UserController {
     @GetMapping("/staff/reservations")
     public ResponseEntity<ApiResponse> findReservationByStaff(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByStaff(customUserDetails.getUsername())));
+
     }
 
 }

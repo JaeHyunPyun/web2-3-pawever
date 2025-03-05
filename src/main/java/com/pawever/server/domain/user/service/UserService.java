@@ -2,13 +2,15 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.post.service.ImageService;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
+import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
+import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
-import jakarta.persistence.PersistenceException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -26,11 +29,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
+    private final AccessTokenService accessTokenService;
     private final JwtUtil jwtUtil;
+    private final ImageService imageService;
+    private final UserImageService userImageService;
 
     public UserResponseDto getUserInfoByUuid(String socialLoginUuid){
 
-        Optional<User> foundUser = userRepository.findUuid(socialLoginUuid);
+        Optional<User> foundUser = userRepository.findBySocialLoginUuid(socialLoginUuid);
         return foundUser.map(user -> UserResponseDto.builder()
             .userId(user.getUserId())
             .socialLoginUuid(user.getSocialLoginUuid())
@@ -83,11 +89,13 @@ public class UserService {
         String userUuid = jwtUtil.getSocialLoginUuid(refreshToken);
 
         // 3. 유저가 존재하는지 확인 후 Soft Delete 실행
-        if (userRepository.findUuid(userUuid).isEmpty()) {
-            throw new CustomException(ResponseCodeEnum.USER_NOT_FOUND);
-        }
+        User user = userRepository.findBySocialLoginUuid(userUuid)
+            .orElseThrow(()->new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
-        // 4. Soft Delete 실행
+        // 4. s3에서 프로필 이미지 제거
+        userImageService.deleteUserOldProfileImage(user);
+
+        // 5. Soft Delete 실행
         userRepository.softDeleteByUuid(userUuid);
     }
 
@@ -118,9 +126,54 @@ public class UserService {
 
     }
 
-    public User findUserByUuid(String socialLoginUuid){
+    public UserProfileResponseDto getUserProfiles(HttpServletRequest request) {
+        String userSocialLoginUuid = accessTokenService.getRequestSocialLoginUuid(request);
 
-        return userRepository.findUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+        // 유저 정보 조회
+        Optional<User> optionalUser = userRepository.findBySocialLoginUuid(userSocialLoginUuid);
+
+        return optionalUser.map(user -> UserProfileResponseDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .profileImageUrl(user.getProfileImageUrl())
+                .build())
+            .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void updateUserProfile(UserProfileUpdateRequestDto userProfileUpdateRequestDto,
+        MultipartFile profileImageFile,
+        HttpServletRequest request){
+
+        // 1. request로부터 Uuid 추출
+        String socialLoginUuid = accessTokenService.getRequestSocialLoginUuid(request);
+
+        // 2. User 조회
+        User user = userRepository.findBySocialLoginUuid(socialLoginUuid)
+            .orElseThrow(()->new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+        // 3. 닉네임 및 자기소개 변경
+        if(userProfileUpdateRequestDto != null){
+            user.updateUserProfile(userProfileUpdateRequestDto.getName(), userProfileUpdateRequestDto.getIntroduction());
+        }
+
+        // 4. 프로필 이미지 변경
+        if(profileImageFile != null && !profileImageFile.isEmpty()){
+            String newProfileImageUrl = imageService.uploadImageToS3(profileImageFile);
+
+            // s3에서 기존 이미지 삭제
+            userImageService.deleteUserOldProfileImage(user);
+
+            // 새로운 이미지로 업로드
+            user.updateProfileImageUrl(newProfileImageUrl);
+        }
+
+        // 5. 변경된 user 정보 저장
+        userRepository.save(user);
+    }
+
+    public User findUserByUuid(String socialLoginUuid){
+        return userRepository.findBySocialLoginUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
 
 }
