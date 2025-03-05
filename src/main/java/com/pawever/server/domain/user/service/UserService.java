@@ -173,4 +173,10 @@ public class UserService {
     }
 
 
+
+    public User findUserByUuid(String socialLoginUuid){
+
+        return userRepository.findUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+    }
+
 }

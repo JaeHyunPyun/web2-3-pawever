@@ -41,12 +41,27 @@ public enum ResponseCodeEnum {
     UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "Post403_0", "이 게시글을 수정할 권한이 없습니다."),
     UNAUTHORIZED_DELETE_ACTION(HttpStatus.FORBIDDEN, "Post403_1", "이 게시글을 삭제할 권한이 없습니다."),
 
+    //댓글 관련 에러
+    REPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "Reply404_0", "댓글이 존재하지 않습니다."),
+    REPLY_ACCESS_DENIED(HttpStatus.FORBIDDEN, "Reply403_0", "댓글에 대한 권한이 없습니다."),
+    REPLY_POST_MISMATCH(HttpStatus.BAD_REQUEST, "Reply400_0", "해당 게시글에 속한 댓글이 아닙니다."),
+
     // 로그인/회원가입 에러
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "LOGIN_0", "입력된 회원정보에 오류가 있습니다."),
     DATA_PERSISTENCE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGIN_1", "데이터 저장 중 오류가 발생했습니다."),
 
     // 메인 기능 에러
     SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_0","등록된 보호소 정보를 찾을 수 없음."),
+
+    //유기동물 관련 에러
+    PET_NOT_FOUND(HttpStatus.NOT_FOUND, "PET_0", "유기동물을 찾을 수 없습니다."),
+
+    // 결제 관련 에러
+    PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),
+
+    //예약 관련
+    INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST,"RES_0","방문 예약이 불가능한 시간으로 예약을 요청함."),
+    SHELTER_NOT_REGISTERED(HttpStatus.BAD_REQUEST,"RES_1","방문 예약이 불가능한 보호소를 대상으로 예약을 요청함."),
 
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");

@@ -38,9 +38,17 @@ public class JwtFilter extends OncePerRequestFilter {
             (method.equalsIgnoreCase("POST"));
         boolean isTokenRefreshRequest = path.equals("/api/auth/refreshedtokens") &&
             (method.equalsIgnoreCase("POST"));
+        boolean isGetAllPostRequest = path.equals("/api/community/posts") &&
+                (method.equalsIgnoreCase("GET"));
+        boolean isGetPostRequest = path.matches("^/api/community/posts(/\\d+)?$") &&
+                method.equalsIgnoreCase("GET");
+        boolean isGetPetMainRequest = path.equals("/api/animals") &&
+                (method.equalsIgnoreCase("GET"));
+        boolean isGetPetRequest = path.equals("/api/animals/search") &&
+                (method.equalsIgnoreCase("GET"));
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
 //        return allRequestAllowance;
-        return isLoginRequest || isTokenRefreshRequest;
+        return isLoginRequest || isTokenRefreshRequest || isGetAllPostRequest || isGetPostRequest || isGetPetMainRequest || isGetPetRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로

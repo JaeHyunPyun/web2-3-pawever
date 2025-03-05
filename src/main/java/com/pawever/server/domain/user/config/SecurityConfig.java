@@ -21,6 +21,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +40,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf((auth) -> auth.disable());
         http
             .formLogin((auth) -> auth.disable());
@@ -47,18 +52,22 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
-                .requestMatchers("/**").permitAll()  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
-//                .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
-//                .requestMatchers("/admin").hasRole("ADMIN")
+//                .requestMatchers("/**").permitAll()  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
+                .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
+                .requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()  // 게시글 조회
+                .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
+                .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
+                .requestMatchers(HttpMethod.GET,"/api/animals/search").permitAll()  // 유기동물 조회(입양 동물 정보)
+                .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
             );
         //인증 실패 시 401 Unauthorized 응답을 반환
         //접근 권한이 없을 때 403 Forbidden 응답을 반환
-//        http
-//            .exceptionHandling(exceptionHandling -> exceptionHandling
-//                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-//                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendError(
-//                    HttpServletResponse.SC_FORBIDDEN, "Forbidden")));
+        http
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN, "Forbidden")));
         http
             .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -73,4 +82,24 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    /**
+     * CORS configuration for routes managed by Spring Security
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 도메인 받으면 수정예정
+        configuration.setAllowedOriginPatterns(List.of("*"));  // 프론트 도메인 받으면 수정예정
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
+        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 }

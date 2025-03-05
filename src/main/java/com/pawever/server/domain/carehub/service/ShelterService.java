@@ -3,6 +3,7 @@ package com.pawever.server.domain.carehub.service;
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.dto.response.ShelterApiResponse;
+import com.pawever.server.domain.carehub.dto.response.ShelterSimpleInfoDTO;
 import com.pawever.server.domain.carehub.entity.CityCode;
 import com.pawever.server.domain.carehub.entity.DistrictCode;
 import com.pawever.server.domain.carehub.entity.Shelter;
@@ -10,6 +11,9 @@ import com.pawever.server.domain.carehub.repository.DistrictCodeRepository;
 import com.pawever.server.domain.carehub.repository.ShelterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -96,5 +100,10 @@ public class ShelterService {
 
     public Shelter findShelterByShelterId(Long shelterId){
         return shelterRepository.findById(shelterId).orElseThrow(()-> new CustomException(ResponseCodeEnum.SHELTER_NOT_FOUND));
+    }
+
+    public List<ShelterSimpleInfoDTO> findAllShelters(Integer page, Integer size){
+        Pageable pageable = PageRequest.of(page,size, Sort.by("name").ascending());
+        return shelterRepository.findAll(pageable).getContent().stream().map(ShelterSimpleInfoDTO::of).toList();
     }
 }
