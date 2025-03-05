@@ -29,4 +29,6 @@ public interface ShelterRepository extends JpaRepository<Shelter, Long> {
 
     Page<Shelter> findAll(Pageable pageable);
 
+    Optional<Shelter> findByProviderShelterId(Long providerShelterId);
+
 }
