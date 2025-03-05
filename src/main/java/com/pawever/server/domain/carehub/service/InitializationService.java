@@ -24,7 +24,7 @@ public class InitializationService {
         cityCodeService.fetchAndSaveCityCodes(serviceKey);      // 시도 코드 저장
         districtCodeService.fetchAndSaveDistrictCodes(serviceKey); // 시군구 코드 저장
         shelterService.fetchAndSaveShelters(serviceKey);       // 보호소 저장
-        abandonedPetService.fetchAndSaveAbandonedPets(serviceKey); // 유기동물 정보 저장
+        //abandonedPetService.fetchAndSaveAbandonedPets(serviceKey); // 유기동물 정보 저장
 
     }
 }
