@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Table(name = "user")
-@Slf4j
 public class User extends BaseEntity {
 
     @Id
@@ -95,4 +94,9 @@ public class User extends BaseEntity {
             this.profileImageUrl = profileImageUrl;
         }
     }
+
+    public void updateUserRole(Role role){
+        this.role =role;
+    }
+
 }

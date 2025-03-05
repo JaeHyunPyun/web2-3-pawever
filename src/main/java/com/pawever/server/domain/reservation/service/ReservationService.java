@@ -14,6 +14,9 @@ import com.pawever.server.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -96,19 +99,23 @@ public class ReservationService {
         return ReservationResultResponseDTO.of(true,shelter.getName(),reservationShelterVisitRequestDTO.getVisitDate().format(dateFormatter),reservationShelterVisitRequestDTO.getVisitTime().format(timeFormatter));
     }
 
-    public List<ReservationResponseDTO> findReservationByUser(String uuid){
+    public List<ReservationResponseDTO> findReservationByUser(String uuid, Integer page, Integer size){
         User user = userService.findUserByUuid(uuid);
 
-        return reservationRepository.findAllByUser(user)
+        Pageable pageable = PageRequest.of(page,size, Sort.by("visitDate").descending());
+
+        return reservationRepository.findAllByUser(user,pageable).getContent()
                 .stream()
                 .map(ReservationResponseDTO::of)
                 .toList();
     }
 
-    public List<ReservationResponseDTO> findReservationByStaff(String uuid){
+    public List<ReservationResponseDTO> findReservationByStaff(String uuid, Integer page, Integer size){
         User staff = userService.findUserByUuid(uuid);
 
-        return reservationRepository.findAllByShelterStaff(staff)
+        Pageable pageable = PageRequest.of(page,size, Sort.by("r.visitDate").descending());
+
+        return reservationRepository.findAllByShelterStaff(staff,pageable).getContent()
                 .stream()
                 .map(ReservationResponseDTO::of)
                 .toList();

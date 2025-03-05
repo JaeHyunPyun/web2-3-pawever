@@ -82,4 +82,8 @@ public class Shelter {
         this.user = null;
     }
 
+
+    public void updateShelterStaff(User user){
+        this.user = user;
+    }
 }
