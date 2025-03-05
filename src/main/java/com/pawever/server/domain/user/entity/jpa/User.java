@@ -70,4 +70,21 @@ public class User extends BaseEntity {
     @Column(name="is_deleted", nullable = false, length = 10)
     @Convert(converter = BooleanToYNConverter.class)
     private Boolean isDeleted; // 삭제 여부, 기본값 false(N)
+
+    public void updateUserProfile(String name, String introduction){
+        if(name != null){
+            this.name = name;
+        }
+
+        if(introduction != null){
+            this.introduction = introduction;
+        }
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl){
+        if(profileImageUrl != null){
+            this.profileImageUrl = profileImageUrl;
+        }
+    }
+
 }

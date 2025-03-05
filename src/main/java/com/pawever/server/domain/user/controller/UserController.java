@@ -81,4 +81,15 @@ public class UserController {
         return ResponseEntity.ok(imageService.uploadImageToS3(file));
     }
 
+    @PatchMapping(value="/profiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateUserProfile(
+        @RequestPart(value = "data", required = false) UserProfileUpdateRequestDto userProfileUpdateRequestDto,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImageFile,
+        HttpServletRequest request
+    ){
+        userService.updateUserProfile(userProfileUpdateRequestDto, profileImageFile, request);
+
+        return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
+    }
+
 }
