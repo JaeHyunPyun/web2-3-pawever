@@ -60,4 +60,10 @@ public class AbandonedPetTemp {
 
     @Column(name = "notice_number", nullable = false, length = 255)
     private String noticeNumber;  // 공고번호
+
+    @Column(name = "city_code")
+    private String cityCode;
+
+    @Column(name = "district_code")
+    private String districtCode;
 }

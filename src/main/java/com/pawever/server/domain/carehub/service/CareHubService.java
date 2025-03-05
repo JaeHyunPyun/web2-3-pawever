@@ -7,6 +7,8 @@ import com.pawever.server.domain.carehub.entity.AbandonedPet;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.carehub.repository.AbandonedPetRepository;
+import com.pawever.server.domain.carehub.repository.CityCodeRepository;
+import com.pawever.server.domain.carehub.repository.DistrictCodeRepository;
 import com.pawever.server.domain.carehub.repository.ShelterRepository;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,9 +31,64 @@ public class CareHubService {
     private final AbandonedPetRepository abandonedPetRepository;
     private final ShelterRepository shelterRepository;
     private final UserRepository userRepository;
+    private final CityCodeRepository cityCodeRepository;
+    private final DistrictCodeRepository districtCodeRepository;
+
+    //(메인) 유기동물 정보 페이지네이션해서 가져오기 + 필터링 3가지 적용 - 개/고양이 & 시도 & 시군구
+    public Page<CareHubResponseDTO> getAbandonedPets(int page, int size, String species, String cityName, String districtName) {
+
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 필터링
+        Specification<AbandonedPet> spec = (root, query, cb) -> cb.conjunction();
+
+        if (species != null) {
+            log.info("품종 : " + species);
+            try {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("species"), Species.valueOf(species)));
+            } catch (IllegalArgumentException e) {
+                throw new CustomException(ResponseCodeEnum.INVALID_SPECIES);
+            }
+        }
+        if (cityName != null) {
+            Long cityCodeId = cityCodeRepository.findCodeByName(cityName);
+            if (cityCodeId != null) {
+                log.info("시도 코드 : " + cityCodeId);
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("cityCode"), cityCodeId));
+            } else {
+                throw new CustomException(ResponseCodeEnum.DISTRICT_NOT_FOUND);
+            }
+        }
+        if (cityName != null && districtName != null) {
+            Long cityCodeId = cityCodeRepository.findCodeByName(cityName);
+            Long districtCodeId = districtCodeRepository.findCodeByName(districtName, cityCodeId);
+            Long uprCityCodeId = districtCodeRepository.findUprCodeByName(districtName, cityCodeId);
+            log.info("시군구 코드1 : " + districtCodeId);
+            log.info("시군구 코드2 : " + cityCodeId);
+            log.info("시군구 코드3 : " + uprCityCodeId);
+            if (districtCodeId != null && cityCodeId.equals(uprCityCodeId)) {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("districtCode"), districtCodeId));
+            } else {
+                throw new CustomException(ResponseCodeEnum.DISTRICT_NOT_FOUND);
+            }
+
+        }
+
+        Page<AbandonedPet> abandonedPets = abandonedPetRepository.findAll(spec, pageable);
+
+
+        if (page < 0 || page >= abandonedPets.getTotalPages()) {
+            pageable = PageRequest.of(0, size);
+            abandonedPets = abandonedPetRepository.findAll(spec, pageable);
+        }
+
+        // DTO 변환 후 반환
+        return abandonedPets.map(this::convertToDTO);
+    }
 
     //유기동물 정보 페이지네이션해서 가져오기 (아직은 필터링 X)
-    public Page<CareHubResponseDTO> getAbandonedPets(int page, int size) {
+    public Page<CareHubResponseDTO> searchAbandonedPets(int page, int size) {
 
 
         Pageable pageable = PageRequest.of(page, size);
@@ -45,6 +103,7 @@ public class CareHubService {
         // DTO 변환 후 반환
         return abandonedPets.map(this::convertToDTO);
     }
+
 
 
     //사용자 반경 distance KM 내 유기동물 조회

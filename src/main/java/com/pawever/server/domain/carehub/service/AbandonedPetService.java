@@ -156,6 +156,8 @@ public class AbandonedPetService {
                 .color(item.getColorCd())
                 .characteristics(item.getSpecialMark())
                 .noticeNumber(item.getNoticeNo())
+                .cityCode(uprCd)
+                .districtCode(orgCd)
                 .build();
 
         try {
