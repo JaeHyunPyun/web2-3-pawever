@@ -30,7 +30,7 @@ public class DonationService {
             }
 
             Donation donation = new Donation();
-            User user = userRepository.findUuid(uuid)
+            User user = userRepository.findBySocialLoginUuid(uuid)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user UUID: " + uuid));
             donation.setUserId(user);
             donation.setDonorName((String) request.get("donorName"));
@@ -54,7 +54,7 @@ public class DonationService {
     }
 
     public List<DonationTO> getDonationByUser(String uuid) {
-        User user = userRepository.findUuid(uuid)
+        User user = userRepository.findBySocialLoginUuid(uuid)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         List<Donation> donations = donationRepository.findByUserId(user);
         return getDonationTO(donations);
