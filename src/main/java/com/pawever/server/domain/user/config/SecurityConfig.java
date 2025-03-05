@@ -62,7 +62,9 @@ public class SecurityConfig {
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
                 .requestMatchers("/error").permitAll()
-                .requestMatchers("/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
+                .requestMatchers(HttpMethod.POST,"/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
+                .requestMatchers(HttpMethod.DELETE,"/api/auth/tokens").permitAll()  // 로그아웃 요청
+                .requestMatchers(HttpMethod.DELETE,"/api/users/profiles").permitAll()  // 회원탈퇴 요청
                 .requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()  // 게시글 조회
                 .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
                 .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
