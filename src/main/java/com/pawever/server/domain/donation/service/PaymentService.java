@@ -1,7 +1,6 @@
 package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.PaymentTO;
-import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
 import com.pawever.server.domain.donation.repository.DonationRepository;
