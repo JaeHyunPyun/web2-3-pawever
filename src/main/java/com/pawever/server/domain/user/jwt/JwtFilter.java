@@ -48,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
             (method.equalsIgnoreCase("POST"));
         boolean isLogoutRequest = path.equals("/api/auth/tokens") &&
             (method.equalsIgnoreCase("DELETE"));
-        boolean isWithdrawRequest = path.equals("/api/auth/tokens") &&
+        boolean isWithdrawRequest = path.equals("/api/users/profiles") &&
             (method.equalsIgnoreCase("DELETE"));
         boolean isGetAllPostRequest = path.equals("/api/community/posts") &&
                 (method.equalsIgnoreCase("GET"));
