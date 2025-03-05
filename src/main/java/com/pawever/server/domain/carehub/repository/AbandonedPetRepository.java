@@ -20,4 +20,7 @@ public interface AbandonedPetRepository extends JpaRepository<AbandonedPet, Long
     Page<AbandonedPet> findByProviderShelterIdsAndSpecies(@Param("providerShelterId") List<Long> providerShelterId,
                                                   @Param("species") Species species,
                                                   Pageable pageable);
+
+    @Query("SELECT a.id FROM AbandonedPet a")
+    List<Long> findAllIds();
 }
