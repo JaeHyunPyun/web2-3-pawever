@@ -1,6 +1,7 @@
 package com.pawever.server.domain.user.entity.jpa;
 
 import com.pawever.server.common.entity.BaseEntity;
+import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.user.converter.BooleanToYNConverter;
 import com.pawever.server.domain.user.enums.Role;
 import jakarta.persistence.Column;
@@ -11,15 +12,18 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
@@ -27,6 +31,7 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Table(name = "user")
+@Slf4j
 public class User extends BaseEntity {
 
     @Id
@@ -71,6 +76,10 @@ public class User extends BaseEntity {
     @Convert(converter = BooleanToYNConverter.class)
     private Boolean isDeleted; // 삭제 여부, 기본값 false(N)
 
+    @Getter
+    @OneToMany(mappedBy = "user")
+    private List<Shelter> shelters; // 유저가 소유한 보호소 목록
+
     public void updateUserProfile(String name, String introduction){
         if(name != null){
             this.name = name;
@@ -86,5 +95,4 @@ public class User extends BaseEntity {
             this.profileImageUrl = profileImageUrl;
         }
     }
-
 }
