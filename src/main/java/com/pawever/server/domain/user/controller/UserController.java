@@ -40,6 +40,7 @@ public class UserController {
     private final ImageService imageService;
     private final ReservationService reservationService;
 
+
     @GetMapping("/admin")
     public String admin(HttpServletRequest request) {
         // admin 권한 확인용 테스트 컨트롤러입니다.
@@ -94,10 +95,11 @@ public class UserController {
         @RequestPart(value = "data", required = false) UserProfileUpdateRequestDto userProfileUpdateRequestDto,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImageFile,
         HttpServletRequest request
-    ){
+    ) {
         userService.updateUserProfile(userProfileUpdateRequestDto, profileImageFile, request);
 
         return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
+    }
 
     @GetMapping("/reservations")
     public ResponseEntity<ApiResponse> findReservationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails){
