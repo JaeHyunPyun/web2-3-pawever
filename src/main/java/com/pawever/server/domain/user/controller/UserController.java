@@ -112,4 +112,10 @@ public class UserController {
 
     }
 
+    @GetMapping("/staffs")
+    public ResponseEntity<ApiResponse> getStaffProfiles(HttpServletRequest request){
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getStaffProfiles(request)));
+    }
+
 }
