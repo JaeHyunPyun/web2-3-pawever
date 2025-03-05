@@ -172,11 +172,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-
-
     public User findUserByUuid(String socialLoginUuid){
-
-        return userRepository.findUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+        return userRepository.findBySocialLoginUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
 
 }
