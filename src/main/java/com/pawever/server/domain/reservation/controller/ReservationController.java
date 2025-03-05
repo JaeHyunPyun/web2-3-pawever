@@ -33,11 +33,6 @@ public class ReservationController {
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.getShelterReservationTime(shelterId,date)));
     }
 
-    @PostMapping("/shelters/{shelter_id}/timeslot")
-    public void registerStaff(@PathVariable(value = "shelter_id")Long shelterId){
-        reservationTimeSlotService.createReservationTimeSlotForShelter(shelterId);
-    }
-
     @GetMapping("/shelters")
     public ResponseEntity<ApiResponse> getShelters(@RequestParam(value = "page",required = false, defaultValue = "0")Integer pageNo, @RequestParam(value = "size", required = false, defaultValue ="100000")Integer size){
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,shelterService.findAllShelters(pageNo,size)));
@@ -46,6 +41,16 @@ public class ReservationController {
     @PostMapping()
     public ResponseEntity<ApiResponse> createReservations(@AuthenticationPrincipal CustomUserDetails customUserDetails , @RequestBody ReservationShelterVisitRequestDTO reservationShelterVisitRequestDTO){
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.createReservation(customUserDetails.getUsername(),reservationShelterVisitRequestDTO)));
+    }
+
+    @GetMapping()
+    public ResponseEntity<ApiResponse> findReservationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails,@RequestParam(value = "page",required = false, defaultValue = "0")Integer pageNo, @RequestParam(value = "size", required = false, defaultValue ="100000")Integer size){
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByUser(customUserDetails.getUsername(),pageNo,size)));
+    }
+
+    @GetMapping("/staff")
+    public ResponseEntity<ApiResponse> findReservationByStaff(@AuthenticationPrincipal CustomUserDetails customUserDetails,@RequestParam(value = "page",required = false, defaultValue = "0")Integer pageNo, @RequestParam(value = "size", required = false, defaultValue ="100000")Integer size){
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByStaff(customUserDetails.getUsername(),pageNo,size)));
     }
 
 }

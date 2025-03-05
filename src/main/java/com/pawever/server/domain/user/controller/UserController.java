@@ -20,13 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -38,8 +32,6 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final ImageService imageService;
-    private final ReservationService reservationService;
-
 
     @GetMapping("/admin")
     public String admin(HttpServletRequest request) {
@@ -100,16 +92,4 @@ public class UserController {
 
         return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
     }
-
-    @GetMapping("/reservations")
-    public ResponseEntity<ApiResponse> findReservationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByUser(customUserDetails.getUsername())));
-    }
-
-    @GetMapping("/staff/reservations")
-    public ResponseEntity<ApiResponse> findReservationByStaff(@AuthenticationPrincipal CustomUserDetails customUserDetails){
-        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByStaff(customUserDetails.getUsername())));
-
-    }
-
 }

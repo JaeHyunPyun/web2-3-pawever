@@ -2,6 +2,7 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.service.ShelterService;
 import com.pawever.server.domain.post.service.ImageService;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
@@ -191,5 +192,4 @@ public class UserService {
             }
         }
     }
-
 }

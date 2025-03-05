@@ -12,17 +12,21 @@ import java.time.format.DateTimeFormatter;
 public class ReservationResponseDTO {
     private String visitNote;
     private String visitorName;
+    private String visitorPhoneNumber;
+    private String visitType;
     private String shelterName;
     private String visitDate;
     private String visitTime;
 
     @Builder
-    public ReservationResponseDTO(String visitNote, String visitorName, String shelterName, String visitDate, String visitTime) {
+    public ReservationResponseDTO(String visitNote, String visitorName, String shelterName, String visitDate, String visitTime, String visitorPhoneNumber, String visitType) {
         this.visitNote = visitNote;
         this.visitorName = visitorName;
         this.shelterName = shelterName;
         this.visitDate = visitDate;
         this.visitTime = visitTime;
+        this.visitorPhoneNumber = visitorPhoneNumber;
+        this.visitType = visitType;
     }
 
     public static ReservationResponseDTO of(Reservation reservation){
@@ -36,6 +40,8 @@ public class ReservationResponseDTO {
                 .shelterName(reservation.getReservationTimeSlot().getShelter().getName())
                 .visitDate(reservation.getVisitDate().format(dateFormatter))
                 .visitTime(reservation.getReservationTimeSlot().getTimeSlot().format(timeFormatter))
+                .visitorPhoneNumber(reservation.getVisitorPhoneNumber())
+                .visitType(reservation.getVisitType().name())
                 .build();
     }
 
