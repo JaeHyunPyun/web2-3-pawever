@@ -1,5 +1,9 @@
 package com.pawever.server.domain.user.controller;
 
+import com.pawever.server.common.response.ApiResponse;
+import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.reservation.service.ReservationService;
+import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.UserService;
@@ -9,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +27,7 @@ public class UserController {
 
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final ReservationService reservationService;
 
 
     @GetMapping("/admin")
@@ -53,6 +59,16 @@ public class UserController {
         userService.softDeleteUserByUuid(request);
 
         return ResponseEntity.noContent().build(); // 204 No Content 반환
+    }
+
+    @GetMapping("/reservations")
+    public ResponseEntity<ApiResponse> findReservationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByUser(customUserDetails.getUsername())));
+    }
+
+    @GetMapping("/staff/reservations")
+    public ResponseEntity<ApiResponse> findReservationByStaff(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS,reservationService.findReservationByStaff(customUserDetails.getUsername())));
     }
 
 }

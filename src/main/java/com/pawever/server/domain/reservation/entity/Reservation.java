@@ -7,17 +7,19 @@ import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name="reservation")
 @Getter
+@NoArgsConstructor
 public class Reservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reservation_id;
+    private Long reservationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -38,7 +40,6 @@ public class Reservation extends BaseEntity {
 
     private String visitNote;
 
-
     @Builder
     private Reservation(User user, ReservationTimeSlot reservationTimeSlot,VisitType visitType, LocalDate visitDate, String visitorName, String visitorPhoneNumber, String visitNote ){
         this.user = user;
@@ -50,8 +51,6 @@ public class Reservation extends BaseEntity {
         this.visitorPhoneNumber = visitorPhoneNumber;
 
     }
-
-
 
     public static Reservation createReservation(User user,ReservationTimeSlot reservationTimeSlot, ReservationShelterVisitRequestDTO reservationShelterVisitRequestDTO){
          return Reservation.builder()
