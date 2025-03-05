@@ -176,4 +176,20 @@ public class UserService {
         return userRepository.findBySocialLoginUuid(socialLoginUuid).orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
 
+    @Transactional
+    public void updateLocationIfChanged(Long userId, AuthRequestDto authRequestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+        // 입력된 위도, 경도 값이 존재하고, 기존 DB 값과 다를 경우 업데이트
+        if (authRequestDto.getLatitude() != null && authRequestDto.getLongitude() != null) {
+            if (!authRequestDto.getLatitude().equals(user.getLatitude()) ||
+                !authRequestDto.getLongitude().equals(user.getLongitude())) {
+
+                user.setLatitude(authRequestDto.getLatitude());
+                user.setLongitude(authRequestDto.getLongitude());
+                userRepository.save(user);
+            }
+        }
+    }
+
 }
