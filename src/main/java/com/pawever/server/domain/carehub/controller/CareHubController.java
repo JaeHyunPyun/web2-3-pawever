@@ -28,12 +28,15 @@ public class CareHubController {
     private final AccessTokenService accessTokenService;
     private final JwtUtil jwtUtil;
 
-    //유기동물 정보 페이지네이션해서 가져오기 (아직은 필터링 X) : 메인화면
+    //유기동물 정보 페이지네이션해서 가져오기 (품종/시도/시군구로 필터링) : 메인화면
     @GetMapping()
     public ResponseEntity<ApiResponse> getAbandonedPets(
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "species", required = false) String species,
+            @RequestParam(name = "cityName", required = false) String cityName,
+            @RequestParam(name = "districtName", required = false) String districtName
     ) {
-        Page<CareHubResponseDTO> abandonedPets = careHubService.getAbandonedPets(page, 5);
+        Page<CareHubResponseDTO> abandonedPets = careHubService.getAbandonedPets(page, 5, species, cityName, districtName);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", abandonedPets.getContent());
@@ -44,10 +47,10 @@ public class CareHubController {
 
     //유기동물 정보 페이지네이션해서 가져오기 (아직은 필터링 X) : 유기동물 조회 페이지
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> getFilteredAbandonedPets(
+    public ResponseEntity<ApiResponse> getSearchAbandonedPets(
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
-        Page<CareHubResponseDTO> abandonedPets = careHubService.getAbandonedPets(page, 30);
+        Page<CareHubResponseDTO> abandonedPets = careHubService.searchAbandonedPets(page, 30);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", abandonedPets.getContent());
