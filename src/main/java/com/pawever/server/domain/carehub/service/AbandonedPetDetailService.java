@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AbandonedPetDetailService {
@@ -24,9 +26,8 @@ public class AbandonedPetDetailService {
         AbandonedPet pet = abandonedPetRepository.findById(petId)
                 .orElseThrow(()-> new CustomException(ResponseCodeEnum.ANIMAL_NOT_FOUND));
 
-        Shelter shelter = shelterRepository.findByProviderShelterId(pet.getProviderShelterId())
-                .orElseThrow(() ->new CustomException(ResponseCodeEnum.SHELTER_NOT_FOUND));
-
+        Shelter shelter = Optional.ofNullable(shelterRepository.findByProviderShelterId(pet.getProviderShelterId()))
+                .orElseThrow(() -> new CustomException(ResponseCodeEnum.SHELTER_NOT_FOUND));
 
         return AbandonedPetDetailResponse.builder()
                 .name(pet.getName())
