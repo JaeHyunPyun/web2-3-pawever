@@ -54,14 +54,17 @@ public class AuthService {
             );
         }
 
-        // 4. Access/Refresh Token 생성
+        // 4. 사용자 로그인시 위도/경도 변경시 db에 반영
+        userService.updateLocationIfChanged(userResponseDto.getUserId(), authRequestDto);
+
+        // 5. Access/Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", userResponseDto, accessTokenExpiredMs);
         String refreshToken = jwtUtil.createJwt("refresh", userResponseDto, refreshTokenExpiredMs);
 
-        // 5. Refresh토큰 Redis에 저장
+        // 6. Refresh토큰 Redis에 저장
         refreshTokenService.saveRefreshToken(refreshToken, userResponseDto.getName());
 
-        // 6. 컨트롤러로 반환
+        // 7. 컨트롤러로 반환
         return createHttpHeader(accessToken, refreshToken);
     }
 
@@ -104,5 +107,7 @@ public class AuthService {
         // https 설정
 //        return name + "=" + value + "; Path=/; HttpOnly; Secure;  Max-Age=" + (refreshTokenExpiredMs);
     }
+
+
 
 }
