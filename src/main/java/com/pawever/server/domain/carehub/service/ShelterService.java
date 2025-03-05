@@ -72,7 +72,7 @@ public class ShelterService {
                             Shelter shelter = Shelter.builder()
                                     .providerShelterId(Long.valueOf(item.getCareRegNo()))
                                     .name(item.getCareNm())
-                                    .userId(null)
+                                    .user(null)
                                     .centerPhoneNumber(null)
                                     .managerPhoneNumber(null)
                                     .cityCode(districtCode.getUprCd())

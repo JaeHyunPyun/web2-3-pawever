@@ -3,6 +3,7 @@ package com.pawever.server.domain.reservation.service;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.service.ShelterService;
 import com.pawever.server.domain.reservation.dto.in.ReservationShelterVisitRequestDTO;
+import com.pawever.server.domain.reservation.dto.out.ReservationResponseDTO;
 import com.pawever.server.domain.reservation.dto.out.ReservationResultResponseDTO;
 import com.pawever.server.domain.reservation.dto.out.ReservationTimeResponseDto;
 import com.pawever.server.domain.reservation.entity.Reservation;
@@ -95,4 +96,21 @@ public class ReservationService {
         return ReservationResultResponseDTO.of(true,shelter.getName(),reservationShelterVisitRequestDTO.getVisitDate().format(dateFormatter),reservationShelterVisitRequestDTO.getVisitTime().format(timeFormatter));
     }
 
+    public List<ReservationResponseDTO> findReservationByUser(String uuid){
+        User user = userService.findUserByUuid(uuid);
+
+        return reservationRepository.findAllByUser(user)
+                .stream()
+                .map(ReservationResponseDTO::of)
+                .toList();
+    }
+
+    public List<ReservationResponseDTO> findReservationByStaff(String uuid){
+        User staff = userService.findUserByUuid(uuid);
+
+        return reservationRepository.findAllByShelterStaff(staff)
+                .stream()
+                .map(ReservationResponseDTO::of)
+                .toList();
+    }
 }
