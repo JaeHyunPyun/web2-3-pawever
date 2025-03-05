@@ -43,5 +43,4 @@ public class ReservationTimeSlot extends BaseEntity {
                 .maxCapacity(maxCapacity)
                 .build();
     }
-
 }

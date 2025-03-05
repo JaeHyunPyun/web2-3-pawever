@@ -1,5 +1,6 @@
 package com.pawever.server.domain.carehub.entity;
 
+import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -18,8 +19,9 @@ public class Shelter {
     @Column(name = "id", nullable = false)
     private Long id;  // 보호소ID
 
-    @Column(name = "user_id")
-    private Long userId;  // 사용자ID (NULL일 경우 보호소 관계자 아님)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;  // 사용자ID (NULL일 경우 보호소 관계자 아님)
 
     @Column(name = "provider_shelter_id", nullable = false)
     private Long providerShelterId;  // API에서 제공하는 보호소 고유 ID
