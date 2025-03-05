@@ -1,8 +1,17 @@
 package com.pawever.server.domain.user.constant;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserConstants {
     // user디폴트 이미지 주소
-    public static final String DEFAULT_PROFILE_IMAGE_URL =
-        "https://paweverbucket.s3.ap-northeast-2.amazonaws.com/9c2752b2-27c9-44c1-a203-9b426c043397pawever_user_default_image_2025_03_04_22_04.jpg";
+    @Value("${paw.user.default-image-url}")
+    public static String DEFAULT_PROFILE_IMAGE_URL;
 
+    // static 변수에 값을 주입하기 위한 setter
+    @Value("${paw.user.default-image-url}")
+    public void setDefaultProfileImageUrl(String url) {
+        DEFAULT_PROFILE_IMAGE_URL = url;
+    }
 }
