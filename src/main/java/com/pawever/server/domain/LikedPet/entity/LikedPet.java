@@ -23,8 +23,10 @@ public class LikedPet {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "abandoned_pet_id", insertable = false, updatable = false)
-    private Long abandonedPetId;
+    // 연관관계 매핑 (지연 로딩, 읽기 전용)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "abandoned_pet_id", insertable = false, updatable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private AbandonedPet abandonedPet;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
