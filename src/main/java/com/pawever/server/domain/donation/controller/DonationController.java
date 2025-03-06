@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@Tag(name = "기부 API")
+@Tag(name = "후원 API", description = "후원 생성 및 후원 조회 관련 API")
 public class DonationController {
     @Autowired
     private DonationService donationService;
 
     @PostMapping("api/donations")
-    @Operation(summary = "기부 등록")
+    @Operation(summary = "후원 생성 API")
     public ResponseEntity<ApiResponse> createDonation(@RequestBody Map<String, Object> request,
                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
@@ -41,7 +41,7 @@ public class DonationController {
     }
 
     @GetMapping("admin/donations")
-    @Operation(summary = "스태프 기부 내역 조회")
+    @Operation(summary = "관리자용 전체 후원 조회 API")
     public ResponseEntity<ApiResponse> getAllDonations() {
         try {
             List<DonationTO> donations = donationService.getAllDonations();
@@ -52,7 +52,7 @@ public class DonationController {
     }
 
     @GetMapping("api/users/donations")
-    @Operation(summary = "사용자 기부 내역 조회")
+    @Operation(summary = "사용자 후원 내역 조회 API")
     public ResponseEntity<ApiResponse> getDonationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
             String uuid = customUserDetails.getUsername();
@@ -66,7 +66,7 @@ public class DonationController {
     }
 
     @GetMapping("api/donations/amount")
-    @Operation(summary = "전체 기부 금액 조회")
+    @Operation(summary = "전체 후원 금액 조회 API")
     public ResponseEntity<ApiResponse> getTotalDonationAmount() {
         try {
             double totalDonationAmount = donationService.getTotalDonationAmount();
