@@ -10,4 +10,6 @@ import java.util.List;
 public interface AbandonedPetRepository extends JpaRepository<AbandonedPet, Long> {
     List<AbandonedPet> findByBreedContaining(String breed);
 
+
+
 }

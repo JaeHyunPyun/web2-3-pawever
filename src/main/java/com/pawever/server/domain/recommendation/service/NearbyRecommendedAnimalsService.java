@@ -1,5 +1,6 @@
 package com.pawever.server.domain.recommendation.service;
 
+import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.domain.carehub.entity.AbandonedPet;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.repository.AbandonedPetRepository;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.pawever.server.common.response.ResponseCodeEnum.LOCATION_NOT_PROVIDED;
+
 @Service
 @RequiredArgsConstructor
 public class NearbyRecommendedAnimalsService {
@@ -32,6 +35,11 @@ public class NearbyRecommendedAnimalsService {
     @Transactional(readOnly = true)
     public List<NearbyRecommendedAnimalResponse> findNearbyRecommendedAnimals(
             NearbyRecommendedAnimalsRequest request) {
+
+
+        if (request.getUserLatitude() == 0.0 && request.getUserLongitude() == 0.0) {
+            throw new CustomException(LOCATION_NOT_PROVIDED);
+        }
 
         // 1. 추천 견종 이름으로 부분 일치 검색
         List<AbandonedPet> matchingPets = abandonedPetRepository.findByBreedContaining(request.getRecommendedBreed());

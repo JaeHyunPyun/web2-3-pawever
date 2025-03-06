@@ -6,6 +6,7 @@ import com.pawever.server.domain.recommendation.dto.nearby.NearbyRecommendedAnim
 import com.pawever.server.domain.recommendation.dto.nearby.NearbyRecommendedAnimalsRequest;
 import com.pawever.server.domain.recommendation.dto.recommendation.RecommendationRequest;
 import com.pawever.server.domain.recommendation.dto.recommendation.RecommendationResponse;
+import com.pawever.server.domain.recommendation.service.CatRecommendationService;
 import com.pawever.server.domain.recommendation.service.DogRecommendationService;
 import com.pawever.server.domain.recommendation.service.NearbyRecommendedAnimalsService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetRecommendationController {
 
-    private final DogRecommendationService recommendationService;
+    private final DogRecommendationService dogRecommendationService;
+    private final CatRecommendationService catRecommendationService;
     private final NearbyRecommendedAnimalsService nearbyRecommendedAnimalsService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse> recommendAnimals(@RequestBody RecommendationRequest request) {
-        List<RecommendationResponse> recommendations = recommendationService.recommendPets(request.getResponses());
+    @PostMapping("/dog")
+    public ResponseEntity<ApiResponse> recommendDog(@RequestBody RecommendationRequest request) {
+        List<RecommendationResponse> recommendations = dogRecommendationService.recommendDogs(request.getResponses());
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, recommendations));
+    }
+
+    @PostMapping("/cat")
+    public ResponseEntity<ApiResponse> recommendCat(@RequestBody RecommendationRequest request) {
+        List<RecommendationResponse> recommendations = catRecommendationService.recommendCats(request.getResponses());
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, recommendations));
     }

@@ -4,42 +4,44 @@ import com.pawever.server.domain.recommendation.dto.recommendation.BreedMatchRes
 import com.pawever.server.domain.recommendation.dto.recommendation.RecommendationResponse;
 import com.pawever.server.domain.recommendation.dto.recommendation.TraitImpact;
 import com.pawever.server.domain.recommendation.dto.recommendation.UserTraitPreference;
-import com.pawever.server.domain.recommendation.entity.DogTraitType;
-import com.pawever.server.domain.recommendation.entity.DogTraits;
+import com.pawever.server.domain.recommendation.entity.CatTraitType;
+import com.pawever.server.domain.recommendation.entity.CatTraits;
 import com.pawever.server.domain.recommendation.entity.RecommendPet;
 import com.pawever.server.domain.recommendation.entity.Species;
-import com.pawever.server.domain.recommendation.repository.DogTraitsRepository;
+import com.pawever.server.domain.recommendation.repository.CatTraitsRepository;
 import com.pawever.server.domain.recommendation.repository.RecommendPetRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class DogRecommendationService {
+public class CatRecommendationService {
 
     private final RecommendPetRepository recommendPetRepository;
-    private final DogTraitsRepository dogTraitsRepository;
-    private final DogQuestionTraitMappingService dogQuestionTraitMappingService;
+    private final CatTraitsRepository catTraitsRepository;
+    private final CatQuestionTraitMappingService catQuestionTraitMappingService;
 
     @Transactional(readOnly = true)
-    public List<RecommendationResponse> recommendDogs(Map<Integer, Integer> userResponses) {
+    public List<RecommendationResponse> recommendCats(Map<Integer, Integer> userResponses) {
         //응답을 기준으로 특성 선호도 계산
         Map<String, UserTraitPreference> userTraitPreferences = calculateUserTraitPreferences(userResponses);
 
-        //견종 특성 데이터 조회
-        List<DogTraits> allDogTraits = dogTraitsRepository.findAll();
+        //고양이 특성 데이터 조회
+        List<CatTraits> allCatTraits = catTraitsRepository.findAll();
 
-        // 각 견종별 매칭 점수 계산
-        List<BreedMatchResult> breedMatchResults = calculateBreedMatchScores(allDogTraits, userTraitPreferences);
+        // 각 고양이 품종별 매칭 점수 계산
+        List<BreedMatchResult> breedMatchResults = calculateBreedMatchScores(allCatTraits, userTraitPreferences);
 
         // 매칭 점수로 정렬
         breedMatchResults.sort(Comparator.comparing(BreedMatchResult::getMatchScore).reversed());
 
-        // 상위 1개 견종 선택
+        // 상위 1개 품종 선택
         List<BreedMatchResult> topBreeds = breedMatchResults.stream()
                 .limit(1)
                 .collect(Collectors.toList());
@@ -49,7 +51,6 @@ public class DogRecommendationService {
 
     //답변에 따라 점수 계산
     private Map<String, UserTraitPreference> calculateUserTraitPreferences(Map<Integer, Integer> userResponses) {
-
         Map<String, Double> traitScores = new HashMap<>();  //특성별 점수
         Map<String, Double> traitWeights = new HashMap<>();  //특성별 가중치
         Map<String, Boolean> traitTolerances = new HashMap<>();  //무시 여부
@@ -59,7 +60,7 @@ public class DogRecommendationService {
             int optionId = response.getValue();
 
             // 질문-옵션에 해당하는 특성 영향 정보 전체 조회
-            List<TraitImpact> traitImpacts = dogQuestionTraitMappingService.getTraitImpacts(questionId, optionId);
+            List<TraitImpact> traitImpacts = catQuestionTraitMappingService.getTraitImpacts(questionId, optionId);
 
             for (TraitImpact impact : traitImpacts) {
                 String traitName = impact.getTraitName();
@@ -96,24 +97,31 @@ public class DogRecommendationService {
         return userTraitPreferences;
     }
 
+    // calculateBreedMatchScores 메소드에 디버깅 로그 추가
     private List<BreedMatchResult> calculateBreedMatchScores(
-            List<DogTraits> dogTraits,
+            List<CatTraits> catTraits,
             Map<String, UserTraitPreference> userTraitPreferences) {
 
         List<BreedMatchResult> results = new ArrayList<>();
+        log.debug("User trait preferences: {}", userTraitPreferences);
+        log.debug("Number of cat breeds to evaluate: {}", catTraits.size());
 
-        for (DogTraits breed : dogTraits) {
+        for (CatTraits breed : catTraits) {
             double totalScore = 0;
             double totalWeight = 0;
             Map<String, Double> traitMatchScores = new HashMap<>();
+            log.debug("Evaluating breed: {}", breed.getBreed());
 
             // 각 특성별 매칭 점수 계산
             for (Map.Entry<String, UserTraitPreference> entry : userTraitPreferences.entrySet()) {
                 String traitName = entry.getKey();
                 UserTraitPreference preference = entry.getValue();
 
-                // 견종의 해당 특성 값 조회
+                // 품종의 해당 특성 값 조회
                 Integer breedTraitValue = getBreedTraitValue(breed, traitName);
+
+                log.debug("  Trait: {}, User preference: {}, Breed value: {}",
+                        traitName, preference.getScore(), breedTraitValue);
 
                 if (breedTraitValue != null) {
                     double matchScore;
@@ -121,43 +129,58 @@ public class DogRecommendationService {
                     // 상관없음(tolerance) 처리
                     if (preference.isTolerance()) {
                         matchScore = 1.0; // 최대 매칭 점수
+                        log.debug("  -> Tolerance applied for trait {}", traitName);
                     } else {
                         // 일반적인 매칭 점수 계산 (0~1 사이 값)
                         double difference = Math.abs(preference.getScore() - breedTraitValue);
                         matchScore = 1.0 - (difference / 4.0);
                     }
 
+                    log.debug("  -> Match score for trait {}: {}", traitName, matchScore);
                     totalScore += matchScore;
                     totalWeight += 1.0;
                     traitMatchScores.put(traitName, matchScore);
+                } else {
+                    log.debug("  -> Trait value is null, skipping");
                 }
             }
 
             // 최종 매칭 점수 계산
             double finalMatchScore = totalWeight > 0 ? totalScore / totalWeight : 0;
+            log.debug("Final match score for {}: {}", breed.getBreed(), finalMatchScore);
 
             // 결과 추가
             results.add(new BreedMatchResult(breed.getBreed(), finalMatchScore));
         }
 
+        // 결과 정렬 전 로깅
+        log.debug("Unsorted match results: {}", results.stream()
+                .map(r -> r.getBreedName() + ": " + r.getMatchScore())
+                .collect(Collectors.joining(", ")));
+
         return results;
     }
 
-    private Integer getBreedTraitValue(DogTraits breed, String traitName) {
+    private Integer getBreedTraitValue(CatTraits breed, String traitName) {
         String formattedName = traitName
                 .replaceAll("([a-z])([A-Z])", "$1_$2") // 카멜케이스 → 언더스코어 변환
                 .toUpperCase();
 
-        return DogTraitType.valueOf(formattedName).getValue(breed);
+        try {
+            return CatTraitType.valueOf(formattedName).getValue(breed);
+        } catch (IllegalArgumentException e) {
+            // 해당 특성이 CatTraitType에 없는 경우
+            return null;
+        }
     }
 
     private List<RecommendationResponse> createRecommendationResponses(List<BreedMatchResult> topBreeds) {
         List<RecommendationResponse> responses = new ArrayList<>();
 
         for (BreedMatchResult result : topBreeds) {
-            // 견종 이름으로 RecommendPet 정보 조회
+            // 품종 이름으로 RecommendPet 정보 조회
             RecommendPet pet = recommendPetRepository.findByBreedAndSpecies(
-                            result.getBreedName(), Species.DOG)
+                            result.getBreedName(), Species.CAT)
                     .orElse(null);
 
             if (pet != null) {
