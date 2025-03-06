@@ -31,9 +31,8 @@ public enum ResponseCodeEnum {
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_1", "staff 정보를 찾을 수 없음"),
-
-
     ANIMAL_NOT_FOUND(HttpStatus.NOT_FOUND, "ANIMAL_1", "animal 정보를 찾을 수 없음."),
+
 
     // S3 이미지 관련 에러
     UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_0", "이미지 업로드 중 오류가 발생했습니다."),

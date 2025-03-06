@@ -13,8 +13,9 @@ public class AbandonedPetScheduler {
 
     private final AbandonedPetService abandonedPetService;
 
-    @Scheduled(cron = "0 0 0 * * *")  // 매일 00:00 실행
-//    @Scheduled(cron = "0 6 17 * * *") // 테스트용
+
+//    @Scheduled(cron = "0 0 0 * * *")  // 매일 00:00 실행
+    @Scheduled(cron = "0 0 19 * * *") // 테스트용
     public void refreshAbandonedPetData() {
         log.info("[스케줄러 시작] 유기동물 데이터 새로고침 시작");
 

@@ -126,4 +126,11 @@ public class ShelterService {
 
         reservationTimeSlotService.createReservationTimeSlotForShelter(shelter);
     }
+
+    public Long getShelterId(Long userId){
+        Long shelterId = shelterRepository.findShelterIdByUserId(userId)
+                .orElseThrow(()-> new CustomException(ResponseCodeEnum.STAFF_NOT_FOUND));
+        return shelterId;
+    }
+
 }

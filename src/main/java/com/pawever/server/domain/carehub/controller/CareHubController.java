@@ -2,7 +2,9 @@ package com.pawever.server.domain.carehub.controller;
 
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.dto.request.SearchShelterRequestDTO;
 import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
+import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.carehub.service.CareHubService;
 import com.pawever.server.domain.user.jwt.JwtUtil;
@@ -55,6 +57,15 @@ public class CareHubController {
         Map<String, Object> response = new HashMap<>();
         response.put("content", abandonedPets.getContent());
         response.put("totalPages", abandonedPets.getTotalPages());
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, response));
+    }
+
+    //필터링시 보호소 조회
+    @GetMapping("/search/shelters")
+    public ResponseEntity<ApiResponse> searchShelter(@RequestBody SearchShelterRequestDTO.SearchShelterRequest request) {
+        // 유기동물 조회
+        List<String> response = careHubService.searchShelter(request);
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, response));
     }
