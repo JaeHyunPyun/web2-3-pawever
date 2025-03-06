@@ -36,5 +36,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 2. 로그아웃 진행
         userService.logout(request, response);
+        userService.createLogoutResponse(response);
     }
 }
