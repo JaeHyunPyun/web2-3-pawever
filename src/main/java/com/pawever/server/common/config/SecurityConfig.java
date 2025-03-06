@@ -1,4 +1,4 @@
-package com.pawever.server.domain.user.config;
+package com.pawever.server.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawever.server.domain.user.handler.FilterExceptionHandler;
@@ -9,16 +9,12 @@ import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.AccessTokenService;
 import com.pawever.server.domain.user.service.RefreshTokenService;
 import com.pawever.server.domain.user.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -67,7 +63,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE,"/api/users/profiles").permitAll()  // 회원탈퇴 요청
                 .requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()  // 게시글 조회
                 .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
-                .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
+                .requestMatchers(HttpMethod.GET, "/api/animals/**").permitAll()  // 유기동물 조회(메인)
                 .requestMatchers(HttpMethod.GET,"/api/animals/search/**").permitAll()  // 유기동물 조회(입양 동물 정보)
                 .requestMatchers("/admin/**").hasRole("ADMIN") // 권한 설정
                 .requestMatchers("/api/users/staff/**","/api/reservations/staff").hasRole("STAFF") // 권한 설정
