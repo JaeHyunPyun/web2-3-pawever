@@ -111,6 +111,13 @@ public class CareHubService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
+
+        // 위치 정보가 없는 경우 예외 처리
+        if (user.getLatitude() == null || user.getLongitude() == null) {
+            throw new CustomException(ResponseCodeEnum.USER_LOCATION_NOT_FOUND);
+        }
+
+
         // 반경 distance km 내 보호소 찾기
         List<Shelter> nearbyShelters = shelterRepository.findNearbyShelters(user.getLatitude(), user.getLongitude(), distance);
 

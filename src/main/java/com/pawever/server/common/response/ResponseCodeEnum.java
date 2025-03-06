@@ -31,6 +31,7 @@ public enum ResponseCodeEnum {
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_1", "staff 정보를 찾을 수 없음"),
+    USER_LOCATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER_2", "사용자의 위치 정보가 존재하지 않습니다."),
     ANIMAL_NOT_FOUND(HttpStatus.NOT_FOUND, "ANIMAL_1", "animal 정보를 찾을 수 없음."),
 
 
