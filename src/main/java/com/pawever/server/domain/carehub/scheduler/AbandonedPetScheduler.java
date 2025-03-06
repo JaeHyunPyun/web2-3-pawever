@@ -13,6 +13,7 @@ public class AbandonedPetScheduler {
 
     private final AbandonedPetService abandonedPetService;
 
+
 //    @Scheduled(cron = "0 0 0 * * *")  // 매일 00:00 실행
     @Scheduled(cron = "0 0 19 * * *") // 테스트용
     public void refreshAbandonedPetData() {

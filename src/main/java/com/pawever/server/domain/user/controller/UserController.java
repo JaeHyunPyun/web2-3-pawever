@@ -92,4 +92,10 @@ public class UserController {
 
         return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
     }
+
+    @GetMapping("/staffs")
+    public ResponseEntity<ApiResponse> getStaffProfiles(HttpServletRequest request){
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getStaffProfiles(request)));
+    }
 }

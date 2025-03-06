@@ -78,6 +78,10 @@ public class Shelter {
         this.roadAddress = roadAddress;
     }
 
+    public void clearUserReference() {
+        this.user = null;
+    }
+
 
     public void updateShelterStaff(User user){
         this.user = user;

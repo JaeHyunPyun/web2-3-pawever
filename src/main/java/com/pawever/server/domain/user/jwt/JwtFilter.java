@@ -48,13 +48,15 @@ public class JwtFilter extends OncePerRequestFilter {
             (method.equalsIgnoreCase("POST"));
         boolean isLogoutRequest = path.equals("/api/auth/tokens") &&
             (method.equalsIgnoreCase("DELETE"));
-        boolean isWithdrawRequest = path.equals("/api/auth/tokens") &&
+        boolean isWithdrawRequest = path.equals("/api/users/profiles") &&
             (method.equalsIgnoreCase("DELETE"));
         boolean isGetAllPostRequest = path.equals("/api/community/posts") &&
                 (method.equalsIgnoreCase("GET"));
         boolean isGetPostRequest = path.matches("^/api/community/posts(/\\d+)?$") &&
                 method.equalsIgnoreCase("GET");
-        boolean isGetPetMainRequest = path.startsWith("/api/animals") &&
+        boolean isGetPetMainRequest = path.equals("/api/animals") &&
+                (method.equalsIgnoreCase("GET"));
+        boolean isGetPetRequest = path.startsWith("/api/animals/search") &&
                 (method.equalsIgnoreCase("GET"));
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
 //        return allRequestAllowance;

@@ -68,8 +68,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()  // 게시글 조회
                 .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
                 .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
-                .requestMatchers(HttpMethod.GET,"/api/animals/search").permitAll()  // 유기동물 조회(입양 동물 정보)
-                .requestMatchers(HttpMethod.GET,"/api/animals/search/shelters").permitAll()  // 유기동물 조회(입양 동물 정보)
+                .requestMatchers(HttpMethod.GET,"/api/animals/search/**").permitAll()  // 유기동물 조회(입양 동물 정보)
                 .requestMatchers("/admin/**").hasRole("ADMIN") // 권한 설정
                 .requestMatchers("/api/users/staff/**","/api/reservations/staff").hasRole("STAFF") // 권한 설정
                 .anyRequest().authenticated()
@@ -96,12 +95,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 프론트 도메인 받으면 수정예정
-        configuration.setAllowedOriginPatterns(List.of("*"));  // 프론트 도메인 받으면 수정예정
+//    // 프론트엔드 도메인 명시적으로 지정
+//        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app")); // 프론트 도메인
+//        configuration.setAllowedOriginPatterns(List.of("*"));  // 프론트 도메인 받으면 수정예정
+        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app", "http://localhost:5175", "http://localhost:5173"));    // 특정 요청에 대해서 CORS 허용
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-//        configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
-        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
+        configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
+//        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
         configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
