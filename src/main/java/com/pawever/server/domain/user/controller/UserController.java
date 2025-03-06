@@ -8,6 +8,7 @@ import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.service.AccessTokenService;
 import com.pawever.server.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +28,7 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final ImageService imageService;
+    private final AccessTokenService accessTokenService;
 
     @GetMapping("/admin")
     public String admin(HttpServletRequest request) {
@@ -58,7 +60,6 @@ public class UserController {
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS)); // 200 SUCCESS 반환
     }
-
 
     @GetMapping("/profiles")
     public ResponseEntity<ApiResponse> getUserProfiles(HttpServletRequest request){
@@ -94,4 +95,22 @@ public class UserController {
         return ResponseEntity
             .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getStaffProfiles(request)));
     }
+
+    @GetMapping("/roles")
+    public ResponseEntity<ApiResponse> getUserRoles(HttpServletRequest request){
+        String accessToken = accessTokenService.getRequestAccessToken(request);
+        Role userRole = jwtUtil.getRole(accessToken);
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userRole));
+    }
+
+    @PatchMapping("/roles")
+    public ResponseEntity<ApiResponse> updateUserRoles(@RequestParam("role") String inputRole, HttpServletRequest request){
+
+        userService.updateUserRoles(inputRole, request);
+
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+    }
+
 }
