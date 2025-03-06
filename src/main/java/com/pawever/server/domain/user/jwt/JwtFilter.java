@@ -54,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 (method.equalsIgnoreCase("GET"));
         boolean isGetPostRequest = path.matches("^/api/community/posts(/\\d+)?$") &&
                 method.equalsIgnoreCase("GET");
-        boolean isGetPetMainRequest = path.equals("/api/animals") &&
+        boolean isGetPetMainRequest = path.startsWith("/api/animals") &&
                 (method.equalsIgnoreCase("GET"));
         boolean isGetPetRequest = path.startsWith("/api/animals/search") &&
                 (method.equalsIgnoreCase("GET"));
