@@ -232,4 +232,26 @@ public class UserService {
 
         return staffProfiles;
     }
+
+
+    @Transactional
+    public void updateUserRoles(String inputRole, HttpServletRequest request){
+        String userUuid = accessTokenService.getRequestSocialLoginUuid(request);
+        // 1. 유저 조회
+        User user = userRepository.findBySocialLoginUuid(userUuid)
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+        // 2. ROLE UPDATE
+        List<Role> roleList = Role.getRoles();
+        Role targetRole = roleList.stream()
+            .filter(role -> role.name().replace("ROLE_", "").equalsIgnoreCase(inputRole))
+            .findFirst()
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
+
+        user.updateUserRole(targetRole);
+
+        // 3. 변경된 user 정보 저장
+        userRepository.save(user);
+    }
+
 }
