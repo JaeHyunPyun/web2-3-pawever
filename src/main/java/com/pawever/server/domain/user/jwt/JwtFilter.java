@@ -58,9 +58,16 @@ public class JwtFilter extends OncePerRequestFilter {
                 (method.equalsIgnoreCase("GET"));
         boolean isGetPetRequest = path.startsWith("/api/animals/search") &&
                 (method.equalsIgnoreCase("GET"));
+        //swagger 경로 허용
+        boolean swaggerRequest1 = path.startsWith("/swagger-ui");
+        boolean swaggerRequest2 = path.startsWith("/v3/api-docs");
+        boolean swaggerRequest3 = path.startsWith("/swagger-resources");
+        boolean swaggerRequest4 = path.startsWith("/swagger-ui.html");
+        boolean swaggerRequest5 = path.startsWith("/swagger-config");
+        boolean swaggerRequest6 = path.startsWith("/docs");
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
 //        return allRequestAllowance;
-        return isLoginRequest || isTokenRefreshRequest ||isLogoutRequest || isWithdrawRequest || isGetAllPostRequest || isGetPostRequest || isGetPetMainRequest || isGetPetRequest;
+        return isLoginRequest || isTokenRefreshRequest ||isLogoutRequest || isWithdrawRequest || isGetAllPostRequest || isGetPostRequest || isGetPetMainRequest || isGetPetRequest || swaggerRequest1 || swaggerRequest2 || swaggerRequest3 || swaggerRequest4 || swaggerRequest5 || swaggerRequest6;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로

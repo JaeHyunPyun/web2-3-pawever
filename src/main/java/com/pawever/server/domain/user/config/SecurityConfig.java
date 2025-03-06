@@ -62,6 +62,12 @@ public class SecurityConfig {
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-config/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/auth/refreshedtokens").permitAll()  // 토큰 재발급 요청
                 .requestMatchers(HttpMethod.DELETE,"/api/auth/tokens").permitAll()  // 로그아웃 요청
                 .requestMatchers(HttpMethod.DELETE,"/api/users/profiles").permitAll()  // 회원탈퇴 요청

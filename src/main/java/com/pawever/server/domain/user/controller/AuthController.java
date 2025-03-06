@@ -4,6 +4,8 @@ import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Tag(name = "회원 인증 API")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/tokens")
+    @Operation(summary = "로그인 및 액세스 토큰 발급")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto) {
         return ResponseEntity.status(ResponseCodeEnum.NO_CONTENT.getStatus())
             .headers(authService.login(authRequestDto))
@@ -28,6 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/refreshedtokens")
+    @Operation(summary = "리프레시 토큰으로 액세스 토큰 발급")
     public ResponseEntity<?> refreshTokens(HttpServletRequest request) {
         return ResponseEntity.status(ResponseCodeEnum.NO_CONTENT.getStatus())
             .headers(authService.refreshTokens(request))
