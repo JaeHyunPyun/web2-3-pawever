@@ -8,4 +8,5 @@ public enum Role {
 
     public static List<Role> getRoles(){
         return Arrays.asList(Role.values());
+    }
 }
