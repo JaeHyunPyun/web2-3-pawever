@@ -1,4 +1,4 @@
-package com.pawever.server.domain.user.config;
+package com.pawever.server.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
