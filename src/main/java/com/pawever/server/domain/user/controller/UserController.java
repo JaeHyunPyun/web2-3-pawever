@@ -72,9 +72,9 @@ public class UserController {
 
     @GetMapping("/profiles")
     @Operation(summary = "사용자 프로필 조회 API")
-    public ResponseEntity<UserProfileResponseDto> getUserProfiles(HttpServletRequest request){
+    public ResponseEntity<ApiResponse> getUserProfiles(HttpServletRequest request){
         return ResponseEntity
-            .ok(userService.getUserProfiles(request));  // 200(ok) + UserResponseDto 반환
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getUserProfiles(request)));
     }
 
     @GetMapping("/upload/defaultimages")
@@ -91,14 +91,15 @@ public class UserController {
 
     @PatchMapping(value="/profiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "사용자 프로필 수정 API")
-    public ResponseEntity<String> updateUserProfile(
+    public ResponseEntity<ApiResponse> updateUserProfile(
         @RequestPart(value = "data", required = false) UserProfileUpdateRequestDto userProfileUpdateRequestDto,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImageFile,
         HttpServletRequest request
     ) {
         userService.updateUserProfile(userProfileUpdateRequestDto, profileImageFile, request);
 
-        return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
     }
 
     @GetMapping("/staffs")

@@ -71,6 +71,9 @@ public enum ResponseCodeEnum {
     INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST,"RES_0","방문 예약이 불가능한 시간으로 예약을 요청함."),
     SHELTER_NOT_REGISTERED(HttpStatus.BAD_REQUEST,"RES_1","방문 예약이 불가능한 보호소를 대상으로 예약을 요청함."),
 
+    //응답 생성 관련
+    API_RESPONSE_WRITE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESPONSE_0", "응답생성 중 에러가 발생했습니다."),
+
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");
 

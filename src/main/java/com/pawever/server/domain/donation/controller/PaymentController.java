@@ -2,7 +2,6 @@ package com.pawever.server.domain.donation.controller;
 
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

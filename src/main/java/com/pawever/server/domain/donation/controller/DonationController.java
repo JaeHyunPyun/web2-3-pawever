@@ -40,7 +40,7 @@ public class DonationController {
         }
     }
 
-    @GetMapping("api/users/staff/donations")
+    @GetMapping("admin/donations")
     @Operation(summary = "스태프 기부 내역 조회")
     public ResponseEntity<ApiResponse> getAllDonations() {
         try {
