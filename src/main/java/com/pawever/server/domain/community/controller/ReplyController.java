@@ -8,6 +8,8 @@ import com.pawever.server.domain.community.dto.ReplyResponseDto;
 import com.pawever.server.domain.community.service.ReplyService;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.AccessTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +20,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
+@Tag(name = "커뮤니티 게시글 댓글 API")
 public class ReplyController {
     private final ReplyService replyService;
     private final AccessTokenService accessTokenService;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/{postId}/replies")
+    @Operation(summary = "댓글 작성 API")
     public ResponseEntity<ApiResponse> createReply(
             @PathVariable Long postId,
             HttpServletRequest httpServletRequest,
@@ -38,6 +42,7 @@ public class ReplyController {
     }
 
     @GetMapping("/{postId}/replies")
+    @Operation(summary = "댓글 목록 조회 API")
     public ResponseEntity<ApiResponse> getAllReplies(
             @PathVariable Long postId) {
 
@@ -47,6 +52,7 @@ public class ReplyController {
     }
 
     @PutMapping("/{postId}/replies/{replyId}")
+    @Operation(summary = "댓글 수정 API")
     public ResponseEntity<ApiResponse> updateReply(
             @PathVariable Long postId,
             @PathVariable Long replyId,
@@ -61,6 +67,7 @@ public class ReplyController {
     }
 
     @DeleteMapping("/{postId}/replies/{replyId}")
+    @Operation(summary = "댓글 삭제 API")
     public ResponseEntity<ApiResponse> deleteReply(
             @PathVariable Long postId,
             @PathVariable Long replyId,

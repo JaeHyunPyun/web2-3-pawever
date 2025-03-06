@@ -10,6 +10,8 @@ import com.pawever.server.domain.carehub.service.CareHubService;
 import com.pawever.server.domain.carehub.service.ShelterService;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.AccessTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/users/staff")
+@Tag(name = "보호소 스태프 API")
 public class ShelterStaffController {
     private final CareHubService careHubService;
     private final ShelterService shelterService;
@@ -31,6 +34,7 @@ public class ShelterStaffController {
 
     //STAFF 페이지 - 보호중인 친구들
     @GetMapping("/pets")
+    @Operation(summary = "보호소 스태프가 관리하는 동물 조회")
     public ResponseEntity<ApiResponse> getShelterPets(
             HttpServletRequest httpServletRequest
     ) {

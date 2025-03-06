@@ -9,6 +9,8 @@ import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.carehub.service.CareHubService;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.AccessTokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/animals")
+@Tag(name = "유기동물 조회 API")
 public class CareHubController {
     private final CareHubService careHubService;
     private final AccessTokenService accessTokenService;
@@ -32,6 +35,7 @@ public class CareHubController {
 
     //유기동물 정보 페이지네이션해서 가져오기 (품종/시도/시군구로 필터링) : 메인화면
     @GetMapping()
+    @Operation(summary = "메인 화면 유기동물 조회 API")
     public ResponseEntity<ApiResponse> getAbandonedPets(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "species", required = false) String species,
@@ -48,6 +52,7 @@ public class CareHubController {
     }
 
     //유기동물 정보 페이지네이션해서 가져오기 (아직은 필터링 X) : 유기동물 조회 페이지
+    @Operation(summary = "입양동물찾기 화면 유기동물 조회 API")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse> getSearchAbandonedPets(
             @RequestParam(name = "page", defaultValue = "0") int page
@@ -63,6 +68,7 @@ public class CareHubController {
 
     //필터링시 보호소 조회
     @GetMapping("/search/shelters")
+    @Operation(summary = "시도, 시군구 명으로 보호소 조회 API(필터링 토글)")
     public ResponseEntity<ApiResponse> searchShelter(@RequestBody SearchShelterRequestDTO.SearchShelterRequest request) {
         // 유기동물 조회
         List<String> response = careHubService.searchShelter(request);
@@ -73,6 +79,7 @@ public class CareHubController {
 
     //사용자에게 가까운 강아지 조회 - 반경 15KM로 임의 설정
     @GetMapping("/nearby/dogs")
+    @Operation(summary = "사용자에게 가까운 강아지 조회")
     public ResponseEntity<ApiResponse> getNearbyDogs(
             @RequestParam(defaultValue = "0") int page,
             HttpServletRequest httpServletRequest
@@ -94,6 +101,7 @@ public class CareHubController {
 
     //사용자에게 가까운 고양이 조회 - 반경 15KM로 임의 설정
     @GetMapping("/nearby/cats")
+    @Operation(summary = "사용자에게 가까운 고양이 조회")
     public ResponseEntity<ApiResponse> getNearbyCats(
             @RequestParam(defaultValue = "0") int page,
             HttpServletRequest httpServletRequest

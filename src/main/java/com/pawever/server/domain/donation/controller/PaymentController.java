@@ -3,16 +3,20 @@ package com.pawever.server.domain.donation.controller;
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.donation.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@Tag(name = "결제 API", description = "결제 및 결제 승인 관련 API")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Operation(summary = "결제 요청 API")
     @PostMapping("api/payments")
     public ResponseEntity<ApiResponse> createPayment(@RequestParam String orderId,
                                                        @RequestParam long paymentAmount,
@@ -28,6 +32,7 @@ public class PaymentController {
     }
 
     @PostMapping("api/payments/confirm")
+    @Operation(summary = "결제 승인 API")
     public ResponseEntity<ApiResponse> confirmPayment(@RequestParam String paymentKey,
                                                       @RequestParam String orderId,
                                                       @RequestParam long paymentAmount) {

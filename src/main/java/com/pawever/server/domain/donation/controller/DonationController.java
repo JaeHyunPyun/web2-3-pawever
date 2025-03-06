@@ -5,6 +5,8 @@ import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.service.DonationService;
 import com.pawever.server.domain.user.dto.response.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,11 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Tag(name = "기부 API")
 public class DonationController {
     @Autowired
     private DonationService donationService;
 
     @PostMapping("api/donations")
+    @Operation(summary = "기부 등록")
     public ResponseEntity<ApiResponse> createDonation(@RequestBody Map<String, Object> request,
                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
@@ -37,6 +41,7 @@ public class DonationController {
     }
 
     @GetMapping("admin/donations")
+    @Operation(summary = "스태프 기부 내역 조회")
     public ResponseEntity<ApiResponse> getAllDonations() {
         try {
             List<DonationTO> donations = donationService.getAllDonations();
@@ -47,6 +52,7 @@ public class DonationController {
     }
 
     @GetMapping("api/users/donations")
+    @Operation(summary = "사용자 기부 내역 조회")
     public ResponseEntity<ApiResponse> getDonationByUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
             String uuid = customUserDetails.getUsername();
@@ -60,6 +66,7 @@ public class DonationController {
     }
 
     @GetMapping("api/donations/amount")
+    @Operation(summary = "전체 기부 금액 조회")
     public ResponseEntity<ApiResponse> getTotalDonationAmount() {
         try {
             double totalDonationAmount = donationService.getTotalDonationAmount();

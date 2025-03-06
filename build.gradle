@@ -66,7 +66,12 @@ dependencies {
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-    swaggerUI 'org.webjars:swagger-ui:4.11.1'
+//    swaggerUI 'org.webjars:swagger-ui:4.11.1'
+
+    // Swagger
+    // http://localhost:8080/swagger-ui/index.html#/
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.7.0'
 
     //jwt 의존성 추가
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
