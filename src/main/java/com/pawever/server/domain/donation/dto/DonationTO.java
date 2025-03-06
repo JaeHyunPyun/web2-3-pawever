@@ -1,5 +1,6 @@
 package com.pawever.server.domain.donation.dto;
 
+import com.pawever.server.domain.donation.entity.Payment;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class DonationTO {
     private String donorMessage;
     private Long donationAmount;
     private String createdAt;
+    private Payment.PaymentStatus paymentStatus;
 
     public void setCreatedAt(LocalDateTime createdAt) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");

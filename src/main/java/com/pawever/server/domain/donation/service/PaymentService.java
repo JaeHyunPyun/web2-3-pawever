@@ -1,7 +1,6 @@
 package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.PaymentTO;
-import com.pawever.server.domain.donation.dto.TossWebhookTO;
 import com.pawever.server.domain.donation.entity.Donation;
 import com.pawever.server.domain.donation.entity.Payment;
 import com.pawever.server.domain.donation.repository.DonationRepository;
@@ -51,6 +50,8 @@ public class PaymentService {
         Payment payment = paymentRepository.findByPaymentId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
         if (paymentAmount != payment.getPaymentAmount()) {
+            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+            paymentRepository.save(payment);
             throw new IllegalArgumentException("Invalid amount: " + paymentAmount);
         }
         payment.setPgTid(paymentKey);
