@@ -3,8 +3,10 @@ package com.pawever.server.domain.user.dto.response;
 import com.pawever.server.domain.user.entity.jpa.User;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
@@ -18,19 +20,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        Collection<GrantedAuthority> collection = new ArrayList<>();
-
-        collection.add(new GrantedAuthority() {
-
-            @Override
-            public String getAuthority() {
-
-                return userAuthInfoDto.getRole().name();
-            }
-        });
-
-        return collection;
+        return List.of(new SimpleGrantedAuthority(userAuthInfoDto.getRole().name()));
     }
 
     @Override

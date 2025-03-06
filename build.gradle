@@ -16,6 +16,18 @@ java {
     }
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+bootJar {
+    dependsOn asciidoctor
+
+    from("${asciidoctor.outputDir}") {
+        into("BOOT-INF/classes/static/docs")
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -45,13 +57,21 @@ dependencies {
     //WebClient
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    //AWS
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
     ///api 문서화
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-    swaggerUI 'org.webjars:swagger-ui:4.11.1'
+//    swaggerUI 'org.webjars:swagger-ui:4.11.1'
+
+    // Swagger
+    // http://localhost:8080/swagger-ui/index.html#/
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.7.0'
 
     //jwt 의존성 추가
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
@@ -77,38 +97,39 @@ dependencies {
 
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
 
 tasks.named('test') {
-//    delete file('build/generated-snippets')
     useJUnitPlatform()
     outputs.dir snippetsDir
     systemProperty 'spring.profiles.active', 'test'
-//    testLogging {
-//        showStandardStreams = true
-//    }
 }
 
-tasks.named('asciidoctor') {
-    dependsOn tasks.named('test') // asciidoctor는 test 이후 실행
+
+asciidoctor {
+    dependsOn test // 테스트 실행 후 Asciidoctor 실행
+    inputs.dir snippetsDir
+    outputDir = file("build/docs/asciidoc")
 }
+
 
 tasks.register('copyDocument', Copy){
     dependsOn tasks.named('asciidoctor')
-    delete file('src/main/resources/static/docs/index.html')
+    if (file('src/main/resources/static/docs/index.html').exists()) {
+        delete file('src/main/resources/static/docs/index.html')
+    }
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
+//    into file("build/resources/main/static/docs")
 }
 
-tasks.named('build') {
-    dependsOn tasks.named('copyDocument') // build 실행 시 copyDocument까지 포함
+build {
+    dependsOn copyDocument
 }
 
 openapi3 {
     servers = [
-            { url = "http://localhost:8080" }
+            { url = "http://localhost:8080" },
+            { url = "https://yellowdog.p-e.kr"}
     ]
     title = 'PAWEVER API DOCUMENT'
     description = 'pawEver api 명세서입니다.'
@@ -144,12 +165,22 @@ tasks.withType(GenerateSwaggerUI) {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yaml")
 
         def securitySchemesContent = "  securitySchemes:\n" + "    APIKey:\n" + "      type: apiKey\n" +  \
-                                      "      name: Autho rization\n" +  \
+                                      "      name: Authorization\n" +  \
                                       "      in:  header\n" + \
                                       "security:\n" +
                 "  - APIKey : []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
-   }
+    }
+}
+
+
+tasks.named('build') { //하나씩 Task 수행하기 번거로울 것 같아 build 누르면
+    dependsOn 'test'               // 테스트 및 스니펫 생성
+    dependsOn 'asciidoctor'        // AsciiDoc 문서 생성
+    dependsOn 'copyDocument'       // 생성된 문서를 static/docs에 복사
+    dependsOn 'openapi3'           // OpenAPI 스펙 생성
+    dependsOn 'copyOasToSwagger'   // OpenAPI 스펙 복사
+    dependsOn 'generateSwaggerUI'  // Swagger UI 생성
 }
 

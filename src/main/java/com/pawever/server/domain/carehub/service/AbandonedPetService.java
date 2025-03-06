@@ -144,7 +144,7 @@ public class AbandonedPetService {
         AbandonedPetTemp abandonedPetTemp = AbandonedPetTemp.builder()
                 .id(Long.valueOf(item.getDesertionNo()))
                 .providerShelterId(shelter.getProviderShelterId())
-                .imageUrl(item.getFilename())
+                .imageUrl(item.getPopfile())
                 .name(buildPetName(item))
                 .species(resolveSpecies(item.getKindCd()))
                 .breed(resolveBreed(item.getKindCd()))
@@ -156,6 +156,8 @@ public class AbandonedPetService {
                 .color(item.getColorCd())
                 .characteristics(item.getSpecialMark())
                 .noticeNumber(item.getNoticeNo())
+                .cityCode(uprCd)
+                .districtCode(orgCd)
                 .build();
 
         try {

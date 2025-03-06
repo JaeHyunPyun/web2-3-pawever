@@ -1,13 +1,23 @@
 package com.pawever.server.domain.carehub.service;
 
+import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.dto.response.ShelterApiResponse;
+import com.pawever.server.domain.carehub.dto.response.ShelterSimpleInfoDTO;
 import com.pawever.server.domain.carehub.entity.CityCode;
 import com.pawever.server.domain.carehub.entity.DistrictCode;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.repository.DistrictCodeRepository;
 import com.pawever.server.domain.carehub.repository.ShelterRepository;
+import com.pawever.server.domain.reservation.service.ReservationTimeSlotService;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.enums.Role;
+import com.pawever.server.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,6 +34,9 @@ public class ShelterService {
 
     private final ShelterRepository shelterRepository;
     private final DistrictCodeRepository districtCodeRepository;
+
+    private final UserService userService;
+    private final ReservationTimeSlotService reservationTimeSlotService;
     private final WebClient webClient = WebClient.builder().build();
 
     public void fetchAndSaveShelters(String serviceKey) {
@@ -66,7 +79,7 @@ public class ShelterService {
                             Shelter shelter = Shelter.builder()
                                     .providerShelterId(Long.valueOf(item.getCareRegNo()))
                                     .name(item.getCareNm())
-                                    .userId(null)
+                                    .user(null)
                                     .centerPhoneNumber(null)
                                     .managerPhoneNumber(null)
                                     .cityCode(districtCode.getUprCd())
@@ -91,4 +104,33 @@ public class ShelterService {
             }
         });
     }
+
+    public Shelter findShelterByShelterId(Long shelterId){
+        return shelterRepository.findById(shelterId).orElseThrow(()-> new CustomException(ResponseCodeEnum.SHELTER_NOT_FOUND));
+    }
+
+    public List<ShelterSimpleInfoDTO> findAllShelters(Integer page, Integer size){
+        Pageable pageable = PageRequest.of(page,size, Sort.by("name").ascending());
+        return shelterRepository.findAll(pageable).getContent().stream().map(ShelterSimpleInfoDTO::of).toList();
+    }
+
+    public void registerShelterStaff(String uuid,Long shelterId){
+
+        User user = userService.findUserByUuid(uuid);
+
+        user.updateUserRole(Role.ROLE_STAFF); // 권한 update
+
+        Shelter shelter = findShelterByShelterId(shelterId);
+
+        shelter.updateShelterStaff(user); //관리자 update
+
+        reservationTimeSlotService.createReservationTimeSlotForShelter(shelter);
+    }
+
+    public Long getShelterId(Long userId){
+        Long shelterId = shelterRepository.findShelterIdByUserId(userId)
+                .orElseThrow(()-> new CustomException(ResponseCodeEnum.STAFF_NOT_FOUND));
+        return shelterId;
+    }
+
 }
