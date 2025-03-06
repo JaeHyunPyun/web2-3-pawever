@@ -36,7 +36,7 @@ public class DonationController {
         }
     }
 
-    @GetMapping("api/users/staff/donations")
+    @GetMapping("admin/donations")
     public ResponseEntity<ApiResponse> getAllDonations() {
         try {
             List<DonationTO> donations = donationService.getAllDonations();
