@@ -1,6 +1,7 @@
 package com.pawever.server.domain.recommendation.service;
 
 import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.entity.AbandonedPet;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.repository.AbandonedPetRepository;
@@ -8,6 +9,8 @@ import com.pawever.server.domain.carehub.repository.ShelterRepository;
 import com.pawever.server.domain.recommendation.dto.nearby.AnimalWithDistance;
 import com.pawever.server.domain.recommendation.dto.nearby.NearbyRecommendedAnimalResponse;
 import com.pawever.server.domain.recommendation.dto.nearby.NearbyRecommendedAnimalsRequest;
+import com.pawever.server.domain.user.entity.jpa.User;
+import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,8 @@ import static com.pawever.server.common.response.ResponseCodeEnum.LOCATION_NOT_P
 @RequiredArgsConstructor
 public class NearbyRecommendedAnimalsService {
 
+    private final UserRepository userRepository;
+
     private static final int EARTH_RADIUS_KM = 6371; // 지구 반지름 (km)
     private static final int MAX_ANIMALS_TO_RETURN = 4;
 
@@ -34,10 +39,12 @@ public class NearbyRecommendedAnimalsService {
 
     @Transactional(readOnly = true)
     public List<NearbyRecommendedAnimalResponse> findNearbyRecommendedAnimals(
-            NearbyRecommendedAnimalsRequest request) {
+            NearbyRecommendedAnimalsRequest request, Long userId) {
 
+        User user =  userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
-        if (request.getUserLatitude() == 0.0 && request.getUserLongitude() == 0.0) {
+        if (user.getLatitude()== null && user.getLongitude()== null) {
             throw new CustomException(LOCATION_NOT_PROVIDED);
         }
 
@@ -74,7 +81,7 @@ public class NearbyRecommendedAnimalsService {
 
             // 거리 계산
             double distance = calculateDistance(
-                    request.getUserLatitude(), request.getUserLongitude(),
+                    user.getLatitude().doubleValue(), user.getLongitude().doubleValue(),
                     shelter.getLatitude().doubleValue(), shelter.getLongitude().doubleValue()
             );
 
