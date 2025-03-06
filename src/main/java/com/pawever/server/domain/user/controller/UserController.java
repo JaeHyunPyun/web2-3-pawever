@@ -5,11 +5,7 @@ import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.post.service.ImageService;
 import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
-import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
 import com.pawever.server.common.response.ApiResponse;
-import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.reservation.service.ReservationService;
-import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.UserService;
@@ -19,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,14 +56,14 @@ public class UserController {
         // 2. 회원정보 삭제
         userService.softDeleteUserByUuid(request);
 
-        return ResponseEntity.noContent().build(); // 204 No Content 반환
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS)); // 200 SUCCESS 반환
     }
 
 
     @GetMapping("/profiles")
-    public ResponseEntity<UserProfileResponseDto> getUserProfiles(HttpServletRequest request){
+    public ResponseEntity<ApiResponse> getUserProfiles(HttpServletRequest request){
         return ResponseEntity
-            .ok(userService.getUserProfiles(request));  // 200(ok) + UserResponseDto 반환
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getUserProfiles(request)));
     }
 
     @GetMapping("/upload/defaultimages")
@@ -83,14 +78,15 @@ public class UserController {
     }
 
     @PatchMapping(value="/profiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateUserProfile(
+    public ResponseEntity<ApiResponse> updateUserProfile(
         @RequestPart(value = "data", required = false) UserProfileUpdateRequestDto userProfileUpdateRequestDto,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImageFile,
         HttpServletRequest request
     ) {
         userService.updateUserProfile(userProfileUpdateRequestDto, profileImageFile, request);
 
-        return ResponseEntity.noContent().build(); // 성공시 204 코드 반환(Response body 없음)
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
     }
 
     @GetMapping("/staffs")
