@@ -5,8 +5,8 @@ import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.user.dto.request.AuthRequestDto;
 import com.pawever.server.domain.user.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,17 +21,19 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/tokens")
-    public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto) {
-        return ResponseEntity.status(ResponseCodeEnum.NO_CONTENT.getStatus())
+    public ResponseEntity<ApiResponse> login(@RequestBody AuthRequestDto authRequestDto) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
             .headers(authService.login(authRequestDto))
-            .build();
+            .body(ApiResponse.success(ResponseCodeEnum.SUCCESS));
     }
 
     @PostMapping("/refreshedtokens")
     public ResponseEntity<?> refreshTokens(HttpServletRequest request) {
-        return ResponseEntity.status(ResponseCodeEnum.NO_CONTENT.getStatus())
+        return ResponseEntity
+            .status(HttpStatus.OK)
             .headers(authService.refreshTokens(request))
-            .build();
+            .body(ApiResponse.success(ResponseCodeEnum.SUCCESS));
     }
 
 }
