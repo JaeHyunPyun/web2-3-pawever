@@ -69,6 +69,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/community/posts/**").permitAll()  // 게시글 단건 조회
                 .requestMatchers(HttpMethod.GET, "/api/animals").permitAll()  // 유기동물 조회(메인)
                 .requestMatchers(HttpMethod.GET,"/api/animals/search").permitAll()  // 유기동물 조회(입양 동물 정보)
+                .requestMatchers(HttpMethod.GET,"/api/animals/search/shelters").permitAll()  // 유기동물 조회(입양 동물 정보)
                 .requestMatchers("/admin/**").hasRole("ADMIN") // 권한 설정
                 .requestMatchers("/api/users/staff/**","/api/reservations/staff").hasRole("STAFF") // 권한 설정
                 .anyRequest().authenticated()
