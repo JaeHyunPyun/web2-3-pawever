@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 method.equalsIgnoreCase("GET");
         boolean isGetPetMainRequest = path.equals("/api/animals") &&
                 (method.equalsIgnoreCase("GET"));
-        boolean isGetPetRequest = path.equals("/api/animals/search") &&
+        boolean isGetPetRequest = path.startsWith("/api/animals/search") &&
                 (method.equalsIgnoreCase("GET"));
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
 //        return allRequestAllowance;
