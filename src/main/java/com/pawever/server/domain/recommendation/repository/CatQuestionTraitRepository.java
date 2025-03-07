@@ -1,6 +1,6 @@
 package com.pawever.server.domain.recommendation.repository;
 
-import com.pawever.server.domain.recommendation.entity.CatQuestionTrait;
+import com.pawever.server.domain.recommendation.entity.cat.CatQuestionTrait;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

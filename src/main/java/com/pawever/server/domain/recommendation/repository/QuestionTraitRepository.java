@@ -1,6 +1,6 @@
 package com.pawever.server.domain.recommendation.repository;
 
-import com.pawever.server.domain.recommendation.entity.QuestionTrait;
+import com.pawever.server.domain.recommendation.entity.dog.QuestionTrait;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

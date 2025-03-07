@@ -4,8 +4,8 @@ import com.pawever.server.domain.recommendation.dto.recommendation.BreedMatchRes
 import com.pawever.server.domain.recommendation.dto.recommendation.RecommendationResponse;
 import com.pawever.server.domain.recommendation.dto.recommendation.TraitImpact;
 import com.pawever.server.domain.recommendation.dto.recommendation.UserTraitPreference;
-import com.pawever.server.domain.recommendation.entity.CatTraitType;
-import com.pawever.server.domain.recommendation.entity.CatTraits;
+import com.pawever.server.domain.recommendation.entity.cat.CatTraitType;
+import com.pawever.server.domain.recommendation.entity.cat.CatTraits;
 import com.pawever.server.domain.recommendation.entity.RecommendPet;
 import com.pawever.server.domain.recommendation.entity.Species;
 import com.pawever.server.domain.recommendation.repository.CatTraitsRepository;

@@ -1,4 +1,4 @@
-package com.pawever.server.domain.recommendation.entity;
+package com.pawever.server.domain.recommendation.entity.cat;
 
 import java.util.function.Function;
 

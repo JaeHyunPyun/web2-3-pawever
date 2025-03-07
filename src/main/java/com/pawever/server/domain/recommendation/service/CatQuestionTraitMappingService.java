@@ -1,7 +1,7 @@
 package com.pawever.server.domain.recommendation.service;
 
 import com.pawever.server.domain.recommendation.dto.recommendation.TraitImpact;
-import com.pawever.server.domain.recommendation.entity.CatQuestionTrait;
+import com.pawever.server.domain.recommendation.entity.cat.CatQuestionTrait;
 import com.pawever.server.domain.recommendation.repository.CatQuestionTraitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
