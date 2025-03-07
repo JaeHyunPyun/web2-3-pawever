@@ -38,26 +38,6 @@ public class UserController {
     private final ImageService imageService;
     private final AccessTokenService accessTokenService;
 
-    @GetMapping("/admin")
-    @Operation(summary = "admin 권한 확인용 테스트 API")
-    public String admin(HttpServletRequest request) {
-        // admin 권한 확인용 테스트 컨트롤러입니다.
-
-        String accessTokenWithBearer= request.getHeader("Authorization");
-        log.info("accessTokenWithBearer: " + accessTokenWithBearer);
-
-        String accessToken = accessTokenWithBearer.split(" ")[1];
-        String category = jwtUtil.getCategory(accessToken);
-        String socialLoginUuid = jwtUtil.getSocialLoginUuid(accessToken);
-        Role role = jwtUtil.getRole(accessToken);
-
-        log.info("category: "+category);
-        log.info("socialLoginUuid: "+socialLoginUuid);
-        log.info("role: "+role.name());
-
-        return "admin authority confirmed";
-    }
-
     @DeleteMapping("/profiles")
     @Operation(summary = "회원 탈퇴 API")
     public ResponseEntity<?> withdraw(HttpServletRequest request, HttpServletResponse response){
@@ -68,7 +48,7 @@ public class UserController {
         // 2. 회원정보 삭제
         userService.softDeleteUserByUuid(request);
 
-        return ResponseEntity.noContent().build(); // 204 No Content 반환
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS)); // 200 SUCCESS 반환
     }
 
     @GetMapping("/profiles")
@@ -79,7 +59,7 @@ public class UserController {
     }
 
     @GetMapping("/upload/defaultimages")
-    @Operation(summary = "기본 프로필 이미지 조회 API")
+    @Operation(summary = "기본 프로필 이미지 S3 업로드 API", hidden = true)
     public ResponseEntity<String> uploadDefaultUserImage(@RequestParam("file") MultipartFile file){
         // user 디폴트 이미지를 s3에 올리고 링크를 반환받는 api
         // 반환되는 객체 uri를 회원가입시 이미지가 없는 유저 profile image url에 매핑
@@ -104,13 +84,14 @@ public class UserController {
     }
 
     @GetMapping("/staffs")
-    @Operation(summary = "스태프 목록 조회")
+    @Operation(summary = "스태프 목록 조회 API")
     public ResponseEntity<ApiResponse> getStaffProfiles(HttpServletRequest request){
         return ResponseEntity
             .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getStaffProfiles(request)));
     }
 
     @GetMapping("/roles")
+    @Operation(summary = "특정 사용자 권한 조회 API")
     public ResponseEntity<ApiResponse> getUserRoles(HttpServletRequest request){
         String accessToken = accessTokenService.getRequestAccessToken(request);
         Role userRole = jwtUtil.getRole(accessToken);
@@ -119,6 +100,7 @@ public class UserController {
     }
 
     @PatchMapping("/roles")
+    @Operation(summary = "특정 사용자 권한 변경 API")
     public ResponseEntity<ApiResponse> updateUserRoles(@RequestParam("role") String inputRole, HttpServletRequest request){
 
         userService.updateUserRoles(inputRole, request);

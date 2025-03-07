@@ -19,12 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Tag(name = "인증 API", description = "JWT 토큰 발급(로그인) 및 재발급 API")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/tokens")
-    @Operation(summary = "로그인 및 액세스 토큰 발급")
+    @Operation(summary = "로그인 및 JWT 토큰(액세스/리프레시) 발급 API")
     public ResponseEntity<ApiResponse> login(@RequestBody AuthRequestDto authRequestDto) {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -33,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/refreshedtokens")
-    @Operation(summary = "리프레시 토큰으로 액세스 토큰 발급")
+    @Operation(summary = "JWT 토큰(액세스/리프레시) 재발급 API")
     public ResponseEntity<?> refreshTokens(HttpServletRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
