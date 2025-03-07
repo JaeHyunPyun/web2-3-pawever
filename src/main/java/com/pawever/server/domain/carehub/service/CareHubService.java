@@ -88,9 +88,6 @@ public class CareHubService {
         //4. 보호소 조회
         }
         if (shelterId != null) {
-            if (cityName == null || districtName == null) {
-                throw new CustomException(ResponseCodeEnum.DISTRICT_NOT_FOUND);
-            }
             try {
                 spec = spec.and((root, query, cb) -> cb.equal(root.get("providerShelterId"), shelterId));
             } catch (IllegalArgumentException e) {
@@ -154,9 +151,6 @@ public class CareHubService {
         }
         //4. 보호소 조회
         if (shelterId != null) {
-            if (cityName == null || districtName == null) {
-                throw new CustomException(ResponseCodeEnum.DISTRICT_NOT_FOUND);
-            }
             try {
                 spec = spec.and((root, query, cb) -> cb.equal(root.get("providerShelterId"), shelterId));
             } catch (IllegalArgumentException e) {
