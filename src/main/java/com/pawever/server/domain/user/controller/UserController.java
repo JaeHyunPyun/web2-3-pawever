@@ -38,26 +38,6 @@ public class UserController {
     private final ImageService imageService;
     private final AccessTokenService accessTokenService;
 
-    @GetMapping("/admin")
-    @Operation(summary = "admin 권한 확인용 테스트 API")
-    public String admin(HttpServletRequest request) {
-        // admin 권한 확인용 테스트 컨트롤러입니다.
-
-        String accessTokenWithBearer= request.getHeader("Authorization");
-        log.info("accessTokenWithBearer: " + accessTokenWithBearer);
-
-        String accessToken = accessTokenWithBearer.split(" ")[1];
-        String category = jwtUtil.getCategory(accessToken);
-        String socialLoginUuid = jwtUtil.getSocialLoginUuid(accessToken);
-        Role role = jwtUtil.getRole(accessToken);
-
-        log.info("category: "+category);
-        log.info("socialLoginUuid: "+socialLoginUuid);
-        log.info("role: "+role.name());
-
-        return "admin authority confirmed";
-    }
-
     @DeleteMapping("/profiles")
     @Operation(summary = "회원 탈퇴 API")
     public ResponseEntity<?> withdraw(HttpServletRequest request, HttpServletResponse response){
