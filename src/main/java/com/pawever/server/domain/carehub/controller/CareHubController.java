@@ -4,6 +4,7 @@ import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.dto.request.SearchShelterRequestDTO;
 import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
+import com.pawever.server.domain.carehub.dto.response.ShelterResponseDTO;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.carehub.service.CareHubService;
@@ -40,9 +41,10 @@ public class CareHubController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "species", required = false) String species,
             @RequestParam(name = "cityName", required = false) String cityName,
-            @RequestParam(name = "districtName", required = false) String districtName
+            @RequestParam(name = "districtName", required = false) String districtName,
+            @RequestParam(name = "shelterId", required = false) Long shelterId
     ) {
-        Page<CareHubResponseDTO> abandonedPets = careHubService.getAbandonedPets(page, 5, species, cityName, districtName);
+        Page<CareHubResponseDTO> abandonedPets = careHubService.getAbandonedPets(page, 5, species, cityName, districtName, shelterId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", abandonedPets.getContent());
@@ -55,9 +57,16 @@ public class CareHubController {
     @Operation(summary = "입양동물찾기 화면 유기동물 조회 API")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse> getSearchAbandonedPets(
-            @RequestParam(name = "page", defaultValue = "0") int page
-    ) {
-        Page<CareHubResponseDTO> abandonedPets = careHubService.searchAbandonedPets(page, 30);
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "species", required = false) String species,
+            @RequestParam(name = "cityName", required = false) String cityName,
+            @RequestParam(name = "districtName", required = false) String districtName,
+            @RequestParam(name = "shelterId", required = false) Long shelterId,
+            @RequestParam(name = "sex", required = false) String sex,
+            @RequestParam(name = "age", required = false) String age,
+            @RequestParam(name = "q", required = false) String q
+    )  {
+        Page<CareHubResponseDTO> abandonedPets = careHubService.searchAbandonedPets(page, 30, species, cityName, districtName, shelterId, sex, age, q);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", abandonedPets.getContent());
@@ -71,7 +80,7 @@ public class CareHubController {
     @Operation(summary = "시도, 시군구 명으로 보호소 조회 API(필터링 토글)")
     public ResponseEntity<ApiResponse> searchShelter(@RequestBody SearchShelterRequestDTO.SearchShelterRequest request) {
         // 유기동물 조회
-        List<String> response = careHubService.searchShelter(request);
+        List<ShelterResponseDTO> response = careHubService.searchShelter(request);
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, response));
     }

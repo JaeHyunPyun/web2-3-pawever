@@ -23,9 +23,6 @@ public interface AbandonedPetRepository extends JpaRepository<AbandonedPet, Long
                                                   Pageable pageable);
 
 
-    @Query("SELECT s.name FROM Shelter s WHERE s.sido IS NOT NULL AND s.cityCode = :cityCodeId AND s.districtCode = :districtCodeId")
-    List<String> findByCityCodeAndDistrictCode(@Param("cityCodeId") Long cityCodeId,
-                                                @Param("districtCodeId") Long districtCodeId);
 
     List<AbandonedPet> findAllByProviderShelterId(Long providerShelterId);
 }

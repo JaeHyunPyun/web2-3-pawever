@@ -58,8 +58,9 @@ public enum ResponseCodeEnum {
 
     // 메인 기능 에러
     SHELTER_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_0","등록된 보호소 정보를 찾을 수 없음."),
-    DISTRICT_NOT_FOUND(HttpStatus.NOT_FOUND,"MAIN_1","시도 정보와 시군구 정보가 일치하지 않습니다."),
-    INVALID_SPECIES(HttpStatus.NOT_FOUND,"MAIN_2","품종 입력값에 오류가 있습니다. DOG, CAT, OTHER 중에 선택해주세요."),
+    DISTRICT_NOT_FOUND(HttpStatus.BAD_REQUEST,"MAIN_1","시도 정보와 시군구 정보가 일치하지 않거나, 시도 정보가 누락됐습니다."),
+    INVALID_SPECIES(HttpStatus.BAD_REQUEST,"MAIN_2","품종 입력값에 오류가 있습니다. DOG, CAT, OTHER 중에 선택해주세요."),
+    INVALID_SEX(HttpStatus.BAD_REQUEST,"MAIN_3","성별 입력값에 오류가 있습니다. M, F, Q 중에 선택해주세요."),
 
     //유기동물 관련 에러
     PET_NOT_FOUND(HttpStatus.NOT_FOUND, "PET_0", "유기동물을 찾을 수 없습니다."),

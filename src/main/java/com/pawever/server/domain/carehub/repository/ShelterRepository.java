@@ -35,4 +35,14 @@ public interface ShelterRepository extends JpaRepository<Shelter, Long> {
     @Query(value = "SELECT s.providerShelterId FROM Shelter s WHERE s.user.userId = :userId")
     Optional<Long> findShelterIdByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT s FROM Shelter s WHERE s.sido IS NOT NULL AND s.cityCode = :cityCodeId AND s.districtCode = :districtCodeId")
+    List<Shelter> findByCityCodeAndDistrictCode(@Param("cityCodeId") Long cityCodeId,
+                                                @Param("districtCodeId") Long districtCodeId);
+
+    @Query("SELECT s FROM Shelter s WHERE s.sido IS NOT NULL")
+    List<Shelter> findIsNotNull();
+
+    @Query("SELECT s FROM Shelter s WHERE s.sido IS NOT NULL AND s.cityCode = :cityCodeId")
+    List<Shelter> findByCityCode(@Param("cityCodeId") Long cityCodeId);
+
 }
