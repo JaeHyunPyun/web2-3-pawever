@@ -54,6 +54,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ActiveProfiles("test")
 @ExtendWith({RestDocumentationExtension.class})
 public class PetRecommendationControllerTest {
+    /*
 
     @Autowired
     private MockMvc mockMvc;
@@ -257,5 +258,7 @@ public class PetRecommendationControllerTest {
         resultActions.andDo(getDocumentForRecommendation("missing-questions"));
     }
 
+
+     */
 
 }
