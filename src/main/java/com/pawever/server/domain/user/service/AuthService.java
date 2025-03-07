@@ -103,7 +103,7 @@ public class AuthService {
 
     private String createCookieHeader(String name, String value) {
         // 프론트 로컬에서 임시로 접근 가능하도록 설정
-        return name + "=" + value + "; Path=/; HttpOnly; SameSite=None;  Max-Age=" + (refreshTokenExpiredMs);
+        return name + "=" + value + "; Path=/; HttpOnly; Secure; SameSite=None;  Max-Age=" + (refreshTokenExpiredMs);
 
         // 프론트 배포시 적용할 설정(https에서만 쿠키 전달 + 크로스 사이트 요청에 대해 쿠키 전송 허용)
         //return name + "=" + value + "; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=" + (refreshTokenExpiredMs);
