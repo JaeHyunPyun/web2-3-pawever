@@ -2,6 +2,7 @@ package com.pawever.server.domain.post.controller;
 
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
 import com.pawever.server.domain.post.dto.request.PostRequestDTO;
 import com.pawever.server.domain.post.dto.response.PostResponseDTO;
 import com.pawever.server.domain.post.service.PostService;
@@ -14,13 +15,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -122,6 +126,17 @@ public class PostController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(ResponseCodeEnum.SUCCESS, response));
+    }
+
+    //게시판 검색 기능 구현
+    @GetMapping("/posts/search")
+    @Operation(summary = "제목으로 게시글 검색")
+    public ResponseEntity<ApiResponse> getSearchPosts(
+            @RequestParam(name = "q", required = false) String q
+    ) {
+        List<PostResponseDTO.PostResponse> searchedPosts = postService.searchPosts(q);
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, searchedPosts));
     }
 
 }

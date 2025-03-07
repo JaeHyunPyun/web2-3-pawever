@@ -3,6 +3,11 @@ package com.pawever.server.domain.post.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
+import com.pawever.server.domain.carehub.entity.AbandonedPet;
+import com.pawever.server.domain.carehub.entity.Shelter;
+import com.pawever.server.domain.carehub.enums.Sex;
+import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.post.dto.request.PostRequestDTO;
 import com.pawever.server.domain.post.dto.response.PostResponseDTO;
 import com.pawever.server.domain.post.entity.Post;
@@ -11,13 +16,21 @@ import com.pawever.server.domain.post.repository.PostImagesRepository;
 import com.pawever.server.domain.post.repository.PostRepository;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Year;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -294,5 +307,44 @@ public class PostService {
             return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
+
+
+    //게시글 검색 기능 추가
+    public List<PostResponseDTO.PostResponse> searchPosts(String q) {
+
+        Specification<Post> spec = (root, query, cb) -> cb.conjunction();
+
+        if (q != null && !q.isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("title"), "%" + q + "%")); // 제목으로 검색
+        }
+
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Post> posts = postRepository.findAll(spec, pageable);
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+        // 한 번의 쿼리로 여러 게시글의 이미지 URL 조회
+        Map<Long, List<String>> postImageMap = new HashMap<>();
+        List<Object[]> imageResults = postImagesRepository.findImageUrlsByPostIds(postIds);
+
+        for (Object[] result : imageResults) {
+            Long postId = (Long) result[0];
+            String imageUrl = (String) result[1];
+
+            postImageMap.computeIfAbsent(postId, k -> new ArrayList<>()).add(imageUrl);
+        }
+
+        // 엔티티 → DTO 변환
+        return posts.stream().map(post -> {
+            User user = post.getUser();
+
+            // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
+            List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
+
+            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+        }).toList();
+    }
+
+
 
 }
