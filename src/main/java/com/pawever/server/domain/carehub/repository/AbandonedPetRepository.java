@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface AbandonedPetRepository extends JpaRepository<AbandonedPet, Long>, JpaSpecificationExecutor<AbandonedPet> {
@@ -21,6 +22,10 @@ public interface AbandonedPetRepository extends JpaRepository<AbandonedPet, Long
     Page<AbandonedPet> findByProviderShelterIdsAndSpecies(@Param("providerShelterId") List<Long> providerShelterId,
                                                   @Param("species") Species species,
                                                   Pageable pageable);
+
+    List<AbandonedPet> findByBreedContaining(String breed);
+
+
 
 
     @Query("SELECT a.id FROM AbandonedPet a")
