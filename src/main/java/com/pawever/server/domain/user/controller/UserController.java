@@ -48,7 +48,7 @@ public class UserController {
         // 2. 회원정보 삭제
         userService.softDeleteUserByUuid(request);
 
-        return ResponseEntity.noContent().build(); // 204 No Content 반환
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS)); // 200 SUCCESS 반환
     }
 
     @GetMapping("/profiles")
