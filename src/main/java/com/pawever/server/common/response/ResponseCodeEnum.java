@@ -52,6 +52,8 @@ public enum ResponseCodeEnum {
     REPLY_ACCESS_DENIED(HttpStatus.FORBIDDEN, "Reply403_0", "댓글에 대한 권한이 없습니다."),
     REPLY_POST_MISMATCH(HttpStatus.BAD_REQUEST, "Reply400_0", "해당 게시글에 속한 댓글이 아닙니다."),
 
+    LOCATION_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "LOC_1", "위도, 경도 정보가 없습니다."),
+
     // 로그인/회원가입 에러
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "LOGIN_0", "입력된 회원정보에 오류가 있습니다."),
     DATA_PERSISTENCE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "LOGIN_1", "데이터 저장 중 오류가 발생했습니다."),
@@ -64,6 +66,9 @@ public enum ResponseCodeEnum {
 
     //유기동물 관련 에러
     PET_NOT_FOUND(HttpStatus.NOT_FOUND, "PET_0", "유기동물을 찾을 수 없습니다."),
+
+    //매칭 관련 에러
+    QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QHESTION_0", "질문을 찾을 수 없습니다."),
 
     // 결제 관련 에러
     PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),

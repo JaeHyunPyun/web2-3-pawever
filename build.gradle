@@ -92,6 +92,9 @@ dependencies {
     // ConfigurationProperties 관련 의존성
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
+    //env 관련 의존성
+    implementation 'me.paulschwarz:spring-dotenv:2.5.4'
+
 }
 
 

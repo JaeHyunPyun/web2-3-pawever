@@ -12,6 +12,7 @@ import com.pawever.server.domain.reservation.service.ReservationService;
 import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import com.pawever.server.domain.user.enums.Role;
 import com.pawever.server.domain.user.jwt.JwtUtil;
+import com.pawever.server.domain.user.service.AccessTokenService;
 import com.pawever.server.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,7 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final ImageService imageService;
+    private final AccessTokenService accessTokenService;
 
     @GetMapping("/admin")
     @Operation(summary = "admin 권한 확인용 테스트 API")
@@ -68,7 +70,6 @@ public class UserController {
 
         return ResponseEntity.noContent().build(); // 204 No Content 반환
     }
-
 
     @GetMapping("/profiles")
     @Operation(summary = "사용자 프로필 조회 API")
@@ -108,4 +109,22 @@ public class UserController {
         return ResponseEntity
             .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userService.getStaffProfiles(request)));
     }
+
+    @GetMapping("/roles")
+    public ResponseEntity<ApiResponse> getUserRoles(HttpServletRequest request){
+        String accessToken = accessTokenService.getRequestAccessToken(request);
+        Role userRole = jwtUtil.getRole(accessToken);
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, userRole));
+    }
+
+    @PatchMapping("/roles")
+    public ResponseEntity<ApiResponse> updateUserRoles(@RequestParam("role") String inputRole, HttpServletRequest request){
+
+        userService.updateUserRoles(inputRole, request);
+
+        return ResponseEntity
+            .ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+    }
+
 }
