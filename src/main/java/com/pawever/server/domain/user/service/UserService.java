@@ -1,6 +1,8 @@
 package com.pawever.server.domain.user.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawever.server.common.exception.CustomException;
+import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
 import com.pawever.server.domain.carehub.service.ShelterService;
 import com.pawever.server.domain.carehub.entity.Shelter;
@@ -17,6 +19,7 @@ import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final ImageService imageService;
     private final UserImageService userImageService;
+    private final ObjectMapper objectMapper;
 
     public UserResponseDto getUserInfoByUuid(String socialLoginUuid){
 
@@ -138,8 +142,16 @@ public class UserService {
         cookie.setSecure(false);   // (HTTP 환경에서는 `Secure` 설정을 false로 해주세요)
 
         response.addCookie(cookie);
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);  // 204 응답코드 전송
+    }
 
+    public void createLogoutResponse(HttpServletResponse response){
+        try {
+            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.success(ResponseCodeEnum.SUCCESS)));
+        } catch (IOException e) {
+            // 응답생성실패시 500 INTERNAL SERVER ERROR 반환
+            throw new CustomException(ResponseCodeEnum.API_RESPONSE_WRITE_FAILED);
+        }
+        response.setStatus(HttpServletResponse.SC_OK);  // 200 응답코드 전송
     }
 
     public UserProfileResponseDto getUserProfiles(HttpServletRequest request) {
@@ -220,4 +232,26 @@ public class UserService {
 
         return staffProfiles;
     }
+
+
+    @Transactional
+    public void updateUserRoles(String inputRole, HttpServletRequest request){
+        String userUuid = accessTokenService.getRequestSocialLoginUuid(request);
+        // 1. 유저 조회
+        User user = userRepository.findBySocialLoginUuid(userUuid)
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+        // 2. ROLE UPDATE
+        List<Role> roleList = Role.getRoles();
+        Role targetRole = roleList.stream()
+            .filter(role -> role.name().replace("ROLE_", "").equalsIgnoreCase(inputRole))
+            .findFirst()
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.INVALID_REQUEST_ARGUMENT));
+
+        user.updateUserRole(targetRole);
+
+        // 3. 변경된 user 정보 저장
+        userRepository.save(user);
+    }
+
 }

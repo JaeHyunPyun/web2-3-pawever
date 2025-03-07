@@ -2,7 +2,9 @@ package com.pawever.server.domain.donation.service;
 
 import com.pawever.server.domain.donation.dto.DonationTO;
 import com.pawever.server.domain.donation.entity.Donation;
+import com.pawever.server.domain.donation.entity.Payment;
 import com.pawever.server.domain.donation.repository.DonationRepository;
+import com.pawever.server.domain.donation.repository.PaymentRepository;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class DonationService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Transactional
     public Long createDonation(Map<String, Object> request, String uuid) {
@@ -70,6 +75,12 @@ public class DonationService {
             donationTO.setDonorMessage(donation.getDonorMessage());
             donationTO.setDonationAmount(donation.getDonationAmount());
             donationTO.setCreatedAt(donation.getCreatedAt());
+            Payment.PaymentStatus paymentStatus = paymentRepository
+                    .findByDonationId(donation.getDonationId()) // donationId로 Payment 조회
+                    .map(Payment::getPaymentStatus)
+                    .orElse(null);
+
+            donationTO.setPaymentStatus(paymentStatus);
             return donationTO;
         }).collect(Collectors.toList());
     }

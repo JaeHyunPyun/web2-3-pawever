@@ -10,6 +10,8 @@ import com.pawever.server.domain.user.jwt.JwtUtil;
 import com.pawever.server.domain.user.service.AccessTokenService;
 import com.pawever.server.domain.user.service.RefreshTokenService;
 import com.pawever.server.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/community")
+@Tag(name = "게시글 API")
 public class PostController {
     private final PostService postService;
     private final AccessTokenService accessTokenService;
@@ -30,6 +33,7 @@ public class PostController {
 
     //게시글 작성
     @PostMapping("/posts")
+    @Operation(summary = "게시글 작성")
     public ResponseEntity<ApiResponse> createPost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @RequestPart(value = "request", required = true) PostRequestDTO.CreatePostRequest request,
@@ -48,6 +52,7 @@ public class PostController {
 
     //게시글 단건 조회
     @GetMapping("/posts/{postId}")
+    @Operation(summary = "게시글 단건 조회")
     public ResponseEntity<ApiResponse> getPost(
             @PathVariable Long postId) {
 
@@ -60,6 +65,7 @@ public class PostController {
 
 
     //게시글 전체 조회
+    @Operation(summary = "게시글 전체 조회")
     @GetMapping("/posts")
     public ResponseEntity<ApiResponse> getAllPost() {
         // 서비스 호출하여 게시글 전체 조회
@@ -71,6 +77,7 @@ public class PostController {
 
     //게시글 수정
     @PatchMapping("/posts/{postId}")
+    @Operation(summary = "게시글 수정")
     public ResponseEntity<ApiResponse> updatePost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @PathVariable Long postId,
@@ -88,6 +95,7 @@ public class PostController {
 
 
     //게시글 삭제
+    @Operation(summary = "게시글 삭제")
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, HttpServletRequest httpServletRequest) {
 
@@ -104,6 +112,7 @@ public class PostController {
 
     //로그인 한 회원이 작성한 게시글 전체 조회
     @GetMapping("/my-posts")
+    @Operation(summary = "내가 작성한 게시글 조회")
     public ResponseEntity<ApiResponse> getAllUsersPost(HttpServletRequest httpServletRequest) {
 
         String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);

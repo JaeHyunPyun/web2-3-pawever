@@ -31,9 +31,9 @@ public enum ResponseCodeEnum {
     // 사용자 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_0", "user 정보를 찾을 수 없음."),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_1", "staff 정보를 찾을 수 없음"),
-
-
+    USER_LOCATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER_2", "사용자의 위치 정보가 존재하지 않습니다."),
     ANIMAL_NOT_FOUND(HttpStatus.NOT_FOUND, "ANIMAL_1", "animal 정보를 찾을 수 없음."),
+
 
     // S3 이미지 관련 에러
     UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Image500_0", "이미지 업로드 중 오류가 발생했습니다."),
@@ -70,6 +70,9 @@ public enum ResponseCodeEnum {
     //예약 관련
     INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST,"RES_0","방문 예약이 불가능한 시간으로 예약을 요청함."),
     SHELTER_NOT_REGISTERED(HttpStatus.BAD_REQUEST,"RES_1","방문 예약이 불가능한 보호소를 대상으로 예약을 요청함."),
+
+    //응답 생성 관련
+    API_RESPONSE_WRITE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESPONSE_0", "응답생성 중 에러가 발생했습니다."),
 
     //서버 에러
     UNKNOWN_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SERVER_0","처리하지 못한 서버 내부 error 발생");

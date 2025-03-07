@@ -32,4 +32,7 @@ public interface ShelterRepository extends JpaRepository<Shelter, Long> {
 
     List<Shelter> findByProviderShelterIdIn(Set<Long> providerShelterIds);
 
+    @Query(value = "SELECT s.providerShelterId FROM Shelter s WHERE s.user.userId = :userId")
+    Optional<Long> findShelterIdByUserId(@Param("userId") Long userId);
+
 }

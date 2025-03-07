@@ -2,7 +2,9 @@ package com.pawever.server.domain.carehub.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.carehub.dto.request.SearchShelterRequestDTO;
 import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
+import com.pawever.server.domain.carehub.dto.response.ShelterPetsResponseDTO;
 import com.pawever.server.domain.carehub.entity.AbandonedPet;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.carehub.enums.Species;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -36,13 +39,9 @@ public class CareHubService {
 
     //(메인) 유기동물 정보 페이지네이션해서 가져오기 + 필터링 3가지 적용 - 개/고양이 & 시도 & 시군구
     public Page<CareHubResponseDTO> getAbandonedPets(int page, int size, String species, String cityName, String districtName) {
-
-
         Pageable pageable = PageRequest.of(page, size);
-
         // 필터링
         Specification<AbandonedPet> spec = (root, query, cb) -> cb.conjunction();
-
         if (species != null) {
             log.info("품종 : " + species);
             try {
@@ -74,18 +73,18 @@ public class CareHubService {
             }
 
         }
-
         Page<AbandonedPet> abandonedPets = abandonedPetRepository.findAll(spec, pageable);
-
 
         if (page < 0 || page >= abandonedPets.getTotalPages()) {
             pageable = PageRequest.of(0, size);
             abandonedPets = abandonedPetRepository.findAll(spec, pageable);
         }
-
         // DTO 변환 후 반환
-        return abandonedPets.map(this::convertToDTO);
+        return abandonedPets.map(this::convertToCareHubDTO);
     }
+
+
+
 
     //유기동물 정보 페이지네이션해서 가져오기 (아직은 필터링 X)
     public Page<CareHubResponseDTO> searchAbandonedPets(int page, int size) {
@@ -101,7 +100,7 @@ public class CareHubService {
         }
 
         // DTO 변환 후 반환
-        return abandonedPets.map(this::convertToDTO);
+        return abandonedPets.map(this::convertToCareHubDTO);
     }
 
 
@@ -111,6 +110,13 @@ public class CareHubService {
         // 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+
+        // 위치 정보가 없는 경우 예외 처리
+        if (user.getLatitude() == null || user.getLongitude() == null) {
+            throw new CustomException(ResponseCodeEnum.USER_LOCATION_NOT_FOUND);
+        }
+
 
         // 반경 distance km 내 보호소 찾기
         List<Shelter> nearbyShelters = shelterRepository.findNearbyShelters(user.getLatitude(), user.getLongitude(), distance);
@@ -131,11 +137,39 @@ public class CareHubService {
             abandonedPets = abandonedPetRepository.findAll(pageable);
         }
         // DTO 변환
-        return abandonedPets.map(this::convertToDTO);
+        return abandonedPets.map(this::convertToCareHubDTO);
     }
 
 
-    private CareHubResponseDTO convertToDTO(AbandonedPet pet) {
+    //시도, 시군구 정보로 보호소 조회
+    public List<String> searchShelter(SearchShelterRequestDTO.SearchShelterRequest request) {
+
+        //dto 값 에서 코드 조회
+        Long cityCodeId = cityCodeRepository.findCodeByName(request.cityName());
+        Long districtCodeId = districtCodeRepository.findCodeByName(request.districtName(), cityCodeId);
+        Long uprCityCodeId = districtCodeRepository.findUprCodeByName(request.districtName(), cityCodeId);
+
+        if (!cityCodeId.equals(uprCityCodeId)) {
+            throw new CustomException(ResponseCodeEnum.DISTRICT_NOT_FOUND);
+        }
+        List<String> shelters = abandonedPetRepository.findByCityCodeAndDistrictCode(cityCodeId, districtCodeId);
+        return shelters;
+    }
+
+    // 보호소 번호로 해당 보호소의 유기동물들 조회
+    public List<ShelterPetsResponseDTO> getShelterPets(Long providerShelterId) {
+        List<AbandonedPet> abandonedPets = abandonedPetRepository.findAllByProviderShelterId(providerShelterId);
+
+        List<ShelterPetsResponseDTO> shelters = abandonedPets.stream()
+                .map(this::convertToShelterPetDTO)
+                .collect(Collectors.toList());
+        return shelters;
+    }
+
+
+
+    //DTO로 변경
+    private CareHubResponseDTO convertToCareHubDTO(AbandonedPet pet) {
         Shelter shelter = shelterRepository.findByProviderShelterId(pet.getProviderShelterId());
         return new CareHubResponseDTO(
                 pet.getId(),
@@ -148,7 +182,31 @@ public class CareHubService {
         );
     }
 
+    private ShelterPetsResponseDTO convertToShelterPetDTO(AbandonedPet pet) {
+        return ShelterPetsResponseDTO.builder()
+                .id(pet.getId())
+                .providerShelterId(pet.getProviderShelterId())
+                .providerShelterName(null)  // 보호소 이름을 추가하려면 별도 조회 필요
+                .imageUrl(pet.getImageUrl())
+                .name(pet.getName())
+                .species(pet.getSpecies().name())  // Enum → String 변환
+                .breed(pet.getBreed())
+                .neuteredStatus(pet.getNeuteredStatus().name())  // Enum → String 변환
+                .sex(pet.getSex().name())  // Enum → String 변환
+                .age(pet.getAge())
+                .foundLocation(pet.getFoundLocation())
+                .weight(pet.getWeight())
+                .color(pet.getColor())
+                .characteristics(pet.getCharacteristics())
+                .noticeNumber(pet.getNoticeNumber())
+                .cityCode(pet.getCityCode())
+                .districtCode(pet.getDistrictCode())
+                .build();
+    }
 
+
+
+    //특징 추가
     private String[] addCharacteristics(AbandonedPet pet) {
         List<String> characteristicsList = new ArrayList<>();
         characteristicsList.add(pet.getSex().name().equals("M") ? "남" : "여");
