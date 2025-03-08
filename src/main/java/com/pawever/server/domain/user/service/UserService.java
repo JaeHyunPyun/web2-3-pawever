@@ -197,7 +197,8 @@ public class UserService {
         }
 
         // 5. 변경된 user 정보 저장
-        userRepository.save(user);
+//        userRepository.save(user);
+        userRepository.flush();
     }
 
     public User findUserByUuid(String socialLoginUuid){
