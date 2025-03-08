@@ -12,6 +12,7 @@ public class ReplyResponseDto {
     private Long replyId;
     private Long userId;
     private String username;
+    private String profileImageUrl;
     private Long postId;
     private String content;
     private LocalDateTime createdAt;
@@ -22,6 +23,7 @@ public class ReplyResponseDto {
         this.replyId = reply.getReplyId();
         this.userId = reply.getUser().getUserId();
         this.username = reply.getUser().getName();
+        this.profileImageUrl = reply.getUser().getProfileImageUrl();
         this.postId = reply.getPost().getId();
         this.content = reply.getContent();
         this.createdAt = reply.getCreatedAt();
