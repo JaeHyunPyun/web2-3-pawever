@@ -101,8 +101,8 @@ public class SecurityConfig {
 //    // 프론트엔드 도메인 명시적으로 지정
 //        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app")); // 프론트 도메인
 //        configuration.setAllowedOriginPatterns(List.of("*"));  // 프론트 도메인 받으면 수정예정
-        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app", "http://localhost:5175", "http://localhost:5173", "https://localhost:5175"));    // 특정 요청에 대해서 CORS 허용
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of("https://pawever.netlify.app", "http://localhost:5175", "http://localhost:5173", "https://localhost:5175", "https://yellowdog.p-e.kr"));    // 특정 요청에 대해서 CORS 허용
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // 프론트 도메인 받으면 수정예정
 //        configuration.setAllowCredentials(false);  // 프론트 도메인 받으면 수정예정
