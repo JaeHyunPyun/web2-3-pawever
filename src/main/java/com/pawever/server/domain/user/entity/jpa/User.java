@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@Slf4j
 @Table(name = "user")
 public class User extends BaseEntity {
 
@@ -81,17 +82,23 @@ public class User extends BaseEntity {
 
     public void updateUserProfile(String name, String introduction){
         if(name != null){
+            log.info("이름 업데이트 시작 : " + name);
             this.name = name;
+            log.info("이름 업데이트 완료");
         }
 
         if(introduction != null){
+            log.info("자기소개 업데이트 시작 : " + introduction);
             this.introduction = introduction;
+            log.info("자기소개 업데이트 완료");
         }
     }
 
     public void updateProfileImageUrl(String profileImageUrl){
         if(profileImageUrl != null){
+            log.info("프로필이미지 업데이트 시작 : " + profileImageUrl);
             this.profileImageUrl = profileImageUrl;
+            log.info("프로필이미지 업데이트 완료");
         }
     }
 
