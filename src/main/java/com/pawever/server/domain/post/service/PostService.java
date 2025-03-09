@@ -95,7 +95,7 @@ public class PostService {
                 }
             }
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getUserId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
 
     } catch (CustomException e) {
         throw e; // 이미 처리된 예외는 그대로 던짐
@@ -126,7 +126,7 @@ public class PostService {
             throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
         }
 
-        return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+        return new PostResponseDTO.PostResponse(post.getId(), user.getUserId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
     }
 
     //게시글 전체 조회
@@ -154,7 +154,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getUserId() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
@@ -232,7 +232,7 @@ public class PostService {
             }
         }
         User user = updatedPost.getUser();
-        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getName(), user.getProfileImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
+        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getUserId(), user.getName(), user.getProfileImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
     }
 
     @Transactional
@@ -304,7 +304,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getUserId() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
@@ -341,7 +341,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getUserId() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
