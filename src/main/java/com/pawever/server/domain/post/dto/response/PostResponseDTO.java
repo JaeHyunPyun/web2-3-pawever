@@ -8,7 +8,7 @@ import java.util.List;
 public class PostResponseDTO {
     public record PostResponse(
             Long id,
-            Long userId,
+            String userUuid,
             String author,
             String profileImage,
             String title,
