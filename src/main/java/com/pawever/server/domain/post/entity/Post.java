@@ -31,6 +31,9 @@ public class Post extends BaseEntity {
     @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Reply> replies;
+
 
 
 
