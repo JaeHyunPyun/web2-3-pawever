@@ -173,10 +173,18 @@ public class UserService {
         MultipartFile profileImageFile,
         HttpServletRequest request){
 
-        log.info("닉네임: " + userProfileUpdateRequestDto.getName());
-        log.info("자기소개: " + userProfileUpdateRequestDto.getIntroduction());
-        log.info("프로필 이미지: " + profileImageFile.getOriginalFilename());
+        if(userProfileUpdateRequestDto!=null ){
+            log.info("닉네임: {}" , userProfileUpdateRequestDto.getName());
+            log.info("자기소개: {}", userProfileUpdateRequestDto.getIntroduction());
+        }else{
+            log.info("userProfileUpdateRequestDto == null");
+        }
 
+        if(profileImageFile!=null){
+            log.info("프로필 이미지: {}", profileImageFile.getOriginalFilename());
+        }else{
+            log.info("profileImageFile == null");
+        }
         // 1. request로부터 Uuid 추출
         String socialLoginUuid = accessTokenService.getRequestSocialLoginUuid(request);
 
