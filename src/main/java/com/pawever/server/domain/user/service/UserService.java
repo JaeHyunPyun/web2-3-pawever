@@ -208,11 +208,6 @@ public class UserService {
             user.updateProfileImageUrl(newProfileImageUrl);
         }
 
-        // 5. 변경된 user 정보 저장
-//        userRepository.save(user);
-//        log.info("flush 작업 시작");
-//        userRepository.flush();
-//        log.info("flush 작업 완료");
     }
 
     public User findUserByUuid(String socialLoginUuid){
