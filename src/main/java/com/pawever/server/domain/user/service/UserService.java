@@ -164,6 +164,7 @@ public class UserService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
+                .introduction(user.getIntroduction())
                 .build())
             .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
