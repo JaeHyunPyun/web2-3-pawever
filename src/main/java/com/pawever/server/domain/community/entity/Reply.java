@@ -47,9 +47,6 @@ public class Reply {
     private LocalDateTime updatedAt;
 
     public void updateContent(String content, Long userId) {
-        if (!this.user.getUserId().equals(userId)) {
-            throw new CustomException(ResponseCodeEnum.REPLY_ACCESS_DENIED);
-        }
         this.content = content;
     }
 

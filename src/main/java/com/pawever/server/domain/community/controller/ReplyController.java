@@ -6,15 +6,14 @@ import com.pawever.server.domain.community.dto.ReplyListResponseDto;
 import com.pawever.server.domain.community.dto.ReplyRequestDto;
 import com.pawever.server.domain.community.dto.ReplyResponseDto;
 import com.pawever.server.domain.community.service.ReplyService;
-import com.pawever.server.domain.user.jwt.JwtUtil;
-import com.pawever.server.domain.user.service.AccessTokenService;
+import com.pawever.server.domain.user.dto.response.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,19 +22,16 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "커뮤니티 게시글 댓글 API")
 public class ReplyController {
     private final ReplyService replyService;
-    private final AccessTokenService accessTokenService;
-    private final JwtUtil jwtUtil;
 
     @PostMapping("/{postId}/replies")
     @Operation(summary = "댓글 작성 API")
     public ResponseEntity<ApiResponse> createReply(
             @PathVariable Long postId,
-            HttpServletRequest httpServletRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @RequestBody ReplyRequestDto requestDto) {
 
-        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
-        Long userId = jwtUtil.getUserId(accessToken);
-        ReplyResponseDto responseDto = replyService.createReply(postId, userId, requestDto);
+        String userUuid = customUserDetails.getUsername();
+        ReplyResponseDto responseDto = replyService.createReply(postId, userUuid, requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(ResponseCodeEnum.CREATED, responseDto));
@@ -56,12 +52,12 @@ public class ReplyController {
     public ResponseEntity<ApiResponse> updateReply(
             @PathVariable Long postId,
             @PathVariable Long replyId,
-            HttpServletRequest httpServletRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @RequestBody ReplyRequestDto requestDto) {
 
-        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
-        Long userId = jwtUtil.getUserId(accessToken);
-        ReplyResponseDto responseDto = replyService.updateReply(postId, replyId, userId, requestDto);
+        String userUuid = customUserDetails.getUsername();
+        ReplyResponseDto responseDto = replyService.updateReply(postId, replyId, userUuid, requestDto);
+
 
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, responseDto));
     }
@@ -71,13 +67,11 @@ public class ReplyController {
     public ResponseEntity<ApiResponse> deleteReply(
             @PathVariable Long postId,
             @PathVariable Long replyId,
-            HttpServletRequest httpServletRequest) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
-        Long userId = jwtUtil.getUserId(accessToken);
-        replyService.deleteReply(postId, replyId, userId);
+        String userUuid = customUserDetails.getUsername();
+        replyService.deleteReply(postId, replyId, userUuid);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(ApiResponse.success(ResponseCodeEnum.NO_CONTENT));
+        return ResponseEntity.noContent().build();
     }
 }
