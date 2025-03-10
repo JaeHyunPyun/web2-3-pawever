@@ -35,8 +35,18 @@ public class AuthService {
     @Transactional
     public HttpHeaders login(AuthRequestDto authRequestDto) {
 
-        // 1. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
-        UserResponseDto userResponseDto = userService.getUserInfoByUuid(authRequestDto.getSocialLoginUuid());
+        UserResponseDto userResponseDto = null;
+
+        if(authRequestDto == null){
+            log.error("회원가입실패 : AuthRequestDto null");
+            throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
+        }
+
+        if(authRequestDto.getSocialLoginUuid() != null) {
+            log.info("로그인 시도 - 소셜로그인uuid: {}", authRequestDto.getSocialLoginUuid());
+            // 1. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
+            userResponseDto = userService.getUserInfoByUuid(authRequestDto.getSocialLoginUuid());
+        }
 
         // 2. userResponseDto 값이 null이면 회원가입 진행
         if(userResponseDto == null){
