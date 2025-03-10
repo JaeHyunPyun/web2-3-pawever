@@ -28,6 +28,11 @@ public class Post extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "thumbnail_image_url")
+    private String thumbnailImageUrl;
+
+
+
 
 
     //제목 변경 메서드
@@ -38,5 +43,10 @@ public class Post extends BaseEntity {
     //내용 변경 메서드
     public void setContent(String content) {
         this.content = content;
+    }
+
+    //썸네일 변경 메서드
+    public void setThumbnailImageUrl(String thumbnailImageUrl) {
+        this.thumbnailImageUrl = thumbnailImageUrl;
     }
 }

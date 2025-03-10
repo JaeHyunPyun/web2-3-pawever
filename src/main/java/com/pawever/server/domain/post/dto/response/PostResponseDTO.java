@@ -11,6 +11,7 @@ public class PostResponseDTO {
             String userUuid,
             String author,
             String profileImage,
+            String thumbnailImage,
             String title,
             String content,
             List<String> images,

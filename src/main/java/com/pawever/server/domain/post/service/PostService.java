@@ -44,7 +44,7 @@ public class PostService {
 
 
     @Transactional
-    public PostResponseDTO.PostResponse createPost(PostRequestDTO.CreatePostRequest request, Long userId, List<MultipartFile> images) {
+    public PostResponseDTO.PostResponse createPost(PostRequestDTO.CreatePostRequest request, Long userId, List<MultipartFile> images, MultipartFile thumbnail) {
 
         // 요청값 검증
         if (request == null) {
@@ -58,6 +58,25 @@ public class PostService {
         }
 
         try {
+            // 이미지가 있는 경우 업로드
+            List<String> imageUrls = null;
+            String thumbnailUrl = null;
+            if (images != null && !images.isEmpty()) {
+                try {
+                    imageUrls = imageService.uploadImages(images);
+                } catch (Exception e) {
+                    throw new CustomException(ResponseCodeEnum.UPLOAD_FAILED);
+                }
+            }
+            // 썸네일 이미지 업로드
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                try {
+                    thumbnailUrl = imageService.uploadImageToS3(thumbnail);
+                } catch (Exception e) {
+                    throw new CustomException(ResponseCodeEnum.UPLOAD_FAILED);
+                }
+            }
+
             //User 찾아오기
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
@@ -66,19 +85,11 @@ public class PostService {
                     .user(user)
                     .title(request.title())
                     .content(request.content())
+                    .thumbnailImageUrl(thumbnailUrl)
                     .build();
 
             // 저장
             postRepository.save(post);
-            // 이미지가 있는 경우 업로드
-            List<String> imageUrls = null;
-            if (images != null && !images.isEmpty()) {
-                try {
-                    imageUrls = imageService.uploadImages(images);
-                } catch (Exception e) {
-                    throw new CustomException(ResponseCodeEnum.UPLOAD_FAILED);
-                }
-            }
 
             // 이미지 저장
             if (imageUrls != null && !imageUrls.isEmpty()) {
@@ -95,7 +106,7 @@ public class PostService {
                 }
             }
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), thumbnailUrl, post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
 
     } catch (CustomException e) {
         throw e; // 이미 처리된 예외는 그대로 던짐
@@ -126,7 +137,7 @@ public class PostService {
             throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
         }
 
-        return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+        return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
     }
 
     //게시글 전체 조회
@@ -154,13 +165,13 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
     //게시글 수정
     @Transactional
-    public PostResponseDTO.PostResponse updatePost(Long postId, Long userId, PostRequestDTO.UpdatePostRequest request, List<MultipartFile> images) {
+    public PostResponseDTO.PostResponse updatePost(Long postId, Long userId, PostRequestDTO.UpdatePostRequest request, List<MultipartFile> images, MultipartFile thumbnail) {
         // 게시글 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.POST_NOT_FOUND));
@@ -178,7 +189,24 @@ public class PostService {
             post.setContent(request.content());
         }
 
+        //thumbnail 이미지 수정
+        String thumbnailUrl = null;
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            try {
+                thumbnailUrl = imageService.uploadImageToS3(thumbnail);
+            } catch (Exception e) {
+                throw new CustomException(ResponseCodeEnum.UPLOAD_FAILED);
+            }
+        }
+        // s3에서 이미지 삭제
+        if (post.getThumbnailImageUrl() != null && !post.getThumbnailImageUrl().isEmpty()) {
+            imageService.deleteImageFromS3(post.getThumbnailImageUrl());
+        }
+        post.setThumbnailImageUrl(thumbnailUrl);
+
+
         Post updatedPost = postRepository.save(post);
+
 
         //이미지 처리 1. 기존 이미지가 있는 경우 삭제 / 2. 새로운 이미지 업로드
         // 1.
@@ -232,7 +260,7 @@ public class PostService {
             }
         }
         User user = updatedPost.getUser();
-        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
+        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), updatedPost.getThumbnailImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
     }
 
     @Transactional
@@ -273,6 +301,11 @@ public class PostService {
             throw new CustomException(ResponseCodeEnum.IMAGE_DELETE_FAILED);
         }
 
+        //s3에서 썸네일 이미지 삭제
+        if (post.getThumbnailImageUrl() != null && !post.getThumbnailImageUrl().isEmpty()) {
+            imageService.deleteImageFromS3(post.getThumbnailImageUrl());
+        }
+
         // 게시글 삭제
         postRepository.delete(post);
     }
@@ -304,7 +337,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
@@ -341,7 +374,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
         }).toList();
     }
 
