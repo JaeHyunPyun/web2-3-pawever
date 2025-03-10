@@ -41,13 +41,14 @@ public class PostController {
     public ResponseEntity<ApiResponse> createPost(
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @RequestPart(value = "request", required = true) PostRequestDTO.CreatePostRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             HttpServletRequest httpServletRequest) {
 
         String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
         Long userId = jwtUtil.getUserId(accessToken);
 
         // 게시글 생성
-        PostResponseDTO.PostResponse response = postService.createPost(request, userId, images);
+        PostResponseDTO.PostResponse response = postService.createPost(request, userId, images, thumbnail);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -86,12 +87,13 @@ public class PostController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @PathVariable Long postId,
             @RequestPart PostRequestDTO.UpdatePostRequest request,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             HttpServletRequest httpServletRequest) {
 
         String accessToken = accessTokenService.getRequestAccessToken(httpServletRequest);
         Long userId = jwtUtil.getUserId(accessToken);
 
-        PostResponseDTO.PostResponse response = postService.updatePost(postId, userId, request, images);
+        PostResponseDTO.PostResponse response = postService.updatePost(postId, userId, request, images, thumbnail);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(ResponseCodeEnum.SUCCESS, response));
