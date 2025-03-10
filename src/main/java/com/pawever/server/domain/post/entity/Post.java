@@ -3,6 +3,8 @@ package com.pawever.server.domain.post.entity;
 import com.pawever.server.common.entity.BaseEntity;
 import com.pawever.server.domain.user.entity.jpa.User;
 import jakarta.persistence.*;
+import com.pawever.server.domain.community.entity.Reply;
+import java.util.List;
 import lombok.*;
 
 @Entity
