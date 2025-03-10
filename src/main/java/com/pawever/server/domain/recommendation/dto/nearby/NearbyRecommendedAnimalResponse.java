@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NearbyRecommendedAnimalResponse {
+    private Long id;            // 유기동물 ID
     private String imageUrl;      // 이미지 URL
     private String name;          // 이름
     private String age;           // 나이
