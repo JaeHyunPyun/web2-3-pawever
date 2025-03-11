@@ -93,6 +93,7 @@ public class NearbyRecommendedAnimalsService {
                 .sorted(Comparator.comparingDouble(AnimalWithDistance::getDistance))
                 .limit(MAX_ANIMALS_TO_RETURN)
                 .map(animalWithDistance -> NearbyRecommendedAnimalResponse.builder()
+                        .id(animalWithDistance.getPet().getId()) // 유기동물 ID 추가
                         .imageUrl(animalWithDistance.getPet().getImageUrl())
                         .name(animalWithDistance.getPet().getName())
                         .age(animalWithDistance.getPet().getAge())
