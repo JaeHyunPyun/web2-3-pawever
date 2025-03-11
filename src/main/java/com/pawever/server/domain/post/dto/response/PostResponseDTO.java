@@ -15,6 +15,7 @@ public class PostResponseDTO {
             String title,
             String content,
             List<String> images,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {}
 }

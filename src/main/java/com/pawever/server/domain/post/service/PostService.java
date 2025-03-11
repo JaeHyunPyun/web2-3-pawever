@@ -3,11 +3,6 @@ package com.pawever.server.domain.post.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.carehub.dto.response.CareHubResponseDTO;
-import com.pawever.server.domain.carehub.entity.AbandonedPet;
-import com.pawever.server.domain.carehub.entity.Shelter;
-import com.pawever.server.domain.carehub.enums.Sex;
-import com.pawever.server.domain.carehub.enums.Species;
 import com.pawever.server.domain.post.dto.request.PostRequestDTO;
 import com.pawever.server.domain.post.dto.response.PostResponseDTO;
 import com.pawever.server.domain.post.entity.Post;
@@ -16,9 +11,6 @@ import com.pawever.server.domain.post.repository.PostImagesRepository;
 import com.pawever.server.domain.post.repository.PostRepository;
 import com.pawever.server.domain.user.entity.jpa.User;
 import com.pawever.server.domain.user.repository.jpa.UserRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -29,8 +21,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.Year;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -106,7 +96,7 @@ public class PostService {
                 }
             }
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), thumbnailUrl, post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), thumbnailUrl, post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt(), post.getUpdatedAt());
 
     } catch (CustomException e) {
         throw e; // 이미 처리된 예외는 그대로 던짐
@@ -137,7 +127,7 @@ public class PostService {
             throw new CustomException(ResponseCodeEnum.FILE_READ_ERROR);
         }
 
-        return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+        return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt(), post.getUpdatedAt());
     }
 
     //게시글 전체 조회
@@ -165,7 +155,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt(), post.getUpdatedAt());
         }).toList();
     }
 
@@ -260,7 +250,7 @@ public class PostService {
             }
         }
         User user = updatedPost.getUser();
-        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), updatedPost.getThumbnailImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt());
+        return new PostResponseDTO.PostResponse(updatedPost.getId(), user.getSocialLoginUuid(), user.getName(), user.getProfileImageUrl(), updatedPost.getThumbnailImageUrl(), updatedPost.getTitle(), updatedPost.getContent(), imageUrls, updatedPost.getCreatedAt(), post.getUpdatedAt());
     }
 
     @Transactional
@@ -337,7 +327,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt(), post.getUpdatedAt());
         }).toList();
     }
 
@@ -374,7 +364,7 @@ public class PostService {
             // 게시글 ID에 해당하는 이미지 리스트 가져오기 (없으면 빈 리스트)
             List<String> imageUrls = postImageMap.getOrDefault(post.getId(), Collections.emptyList());
 
-            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt());
+            return new PostResponseDTO.PostResponse(post.getId(), user.getSocialLoginUuid() ,user.getName(), user.getProfileImageUrl(), post.getThumbnailImageUrl(), post.getTitle(), post.getContent(), imageUrls, post.getCreatedAt(), post.getUpdatedAt());
         }).toList();
     }
 
