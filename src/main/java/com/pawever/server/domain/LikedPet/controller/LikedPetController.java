@@ -61,6 +61,19 @@ public class LikedPetController {
         return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS, likedAnimals));
     }
 
+    @DeleteMapping("/animals/{animalId}/like")
+    @Operation(summary = "좋아요 삭제 API")
+    public ResponseEntity<ApiResponse> deleteLike(
+            @PathVariable Long animalId,
+            HttpServletRequest httpServletRequest) {
+
+        Long userId = getUserIdFromToken(httpServletRequest);
+        likedPetService.deleteLikedPet(userId, animalId);
+
+        return ResponseEntity.ok(ApiResponse.success(ResponseCodeEnum.SUCCESS));
+    }
+
+
     private Long getUserIdFromToken(HttpServletRequest request) {
         String accessToken = accessTokenService.getRequestAccessToken(request);
         return jwtUtil.getUserId(accessToken);
