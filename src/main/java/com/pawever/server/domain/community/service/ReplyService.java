@@ -26,9 +26,8 @@ public class ReplyService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ReplyResponseDto createReply(Long postId, Long userId,ReplyRequestDto requestDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+    public ReplyResponseDto createReply(Long postId, String userUuid,ReplyRequestDto requestDto) {
+        User user = getUserByUuid(userUuid);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.POST_NOT_FOUND));
@@ -57,16 +56,24 @@ public class ReplyService {
     }
 
     @Transactional
-    public ReplyResponseDto updateReply(Long postId, Long replyId, Long userId, ReplyRequestDto requestDto) {
+    public ReplyResponseDto updateReply(Long postId, Long replyId, String userUuid, ReplyRequestDto requestDto) {
         Reply reply = findReplyByPostIdAndReplyId(postId, replyId);
-        reply.updateContent(requestDto.getContent(), userId);
+
+        User user = getUserByUuid(userUuid);
+
+        reply.validateOwner(user.getUserId());
+        reply.updateContent(requestDto.getContent(), user.getUserId());
         return new ReplyResponseDto(reply);
     }
 
     @Transactional
-    public void deleteReply(Long postId, Long replyId, Long userId) {
+    public void deleteReply(Long postId, Long replyId, String userUuid) {
         Reply reply = findReplyByPostIdAndReplyId(postId, replyId);
-        reply.validateOwner(userId);
+
+        User user = getUserByUuid(userUuid);
+
+        reply.validateOwner(user.getUserId());
+
         replyRepository.delete(reply);
     }
 
@@ -81,5 +88,10 @@ public class ReplyService {
         }
 
         return reply;
+    }
+
+    private User getUserByUuid(String uuid) {
+        return userRepository.findBySocialLoginUuid(uuid)
+                .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
     }
 }

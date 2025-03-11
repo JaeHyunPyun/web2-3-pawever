@@ -2,15 +2,14 @@ package com.pawever.server.domain.community.dto;
 
 import com.pawever.server.domain.community.entity.Reply;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 public class ReplyResponseDto {
     private Long replyId;
     private Long userId;
+    private String userUuid;
     private String username;
     private String profileImageUrl;
     private Long postId;
@@ -22,6 +21,7 @@ public class ReplyResponseDto {
     public ReplyResponseDto(Reply reply) {
         this.replyId = reply.getReplyId();
         this.userId = reply.getUser().getUserId();
+        this.userUuid = reply.getUser().getSocialLoginUuid();
         this.username = reply.getUser().getName();
         this.profileImageUrl = reply.getUser().getProfileImageUrl();
         this.postId = reply.getPost().getId();
