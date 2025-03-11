@@ -78,6 +78,17 @@ public class LikedPetService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void deleteLikedPet(Long userId, Long animalId) {
+        LikedPetId id = new LikedPetId(userId, animalId);
+
+        if (!likedPetRepository.existsById(id)) {
+            throw new CustomException(ResponseCodeEnum.LIKED_PET_NOT_FOUND);
+        }
+
+        likedPetRepository.deleteById(id);
+    }
+
     private User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));

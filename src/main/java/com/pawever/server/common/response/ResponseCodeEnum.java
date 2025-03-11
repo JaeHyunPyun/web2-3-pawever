@@ -70,6 +70,9 @@ public enum ResponseCodeEnum {
     //매칭 관련 에러
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QHESTION_0", "질문을 찾을 수 없습니다."),
 
+    //유기동물 좋아요 관련 에러
+    LIKED_PET_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE_0", "유기동물 좋아요를 찾을 수 없습니다."),
+
     // 결제 관련 에러
     PAYMENT_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PAYMENT_0", "결제 승인 요청에 실패하였습니다."),
 
