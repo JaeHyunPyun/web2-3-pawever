@@ -42,6 +42,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         // 🔹 기존 인증 제외 조건: POST, PUT /api/auth/tokens
+        boolean isPreLoginRequest = path.equals("/api/auth/tokens/attempts") &&
+            (method.equalsIgnoreCase("GET"));
         boolean isLoginRequest = path.equals("/api/auth/tokens") &&
             (method.equalsIgnoreCase("POST"));
         boolean isTokenRefreshRequest = path.equals("/api/auth/refreshedtokens") &&
@@ -72,7 +74,7 @@ public class JwtFilter extends OncePerRequestFilter {
         boolean swaggerRequest6 = path.startsWith("/docs");
         boolean allRequestAllowance = path.startsWith("/");  // 로그인 기능 완전히 구현할때까지 우선 모두 허용
 //        return allRequestAllowance;
-        return isLoginRequest || isTokenRefreshRequest ||isLogoutRequest || isWithdrawRequest || isGetAllPostRequest || isGetSearchPostRequest || isGetPostRequest || isGetPetMainRequest || isGetPetRequest || swaggerRequest1 || swaggerRequest2 || swaggerRequest3 || swaggerRequest4 || swaggerRequest5 || swaggerRequest6 ||isGetRepliesRequest;
+        return isPreLoginRequest || isLoginRequest || isTokenRefreshRequest ||isLogoutRequest || isWithdrawRequest || isGetAllPostRequest || isGetSearchPostRequest || isGetPostRequest || isGetPetMainRequest || isGetPetRequest || swaggerRequest1 || swaggerRequest2 || swaggerRequest3 || swaggerRequest4 || swaggerRequest5 || swaggerRequest6 ||isGetRepliesRequest;
     }
 
     // JWTUtil 클래스에 정의해두었던 Jwt토큰 검증에 사용되는 메서드들을 사용해야하므로
