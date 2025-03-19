@@ -2,14 +2,17 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.user.dto.request.AuthRequestDto;
+import com.pawever.server.domain.user.dto.request.AuthLoginRequestDto;
+import com.pawever.server.domain.user.dto.request.AuthPreLoginRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,49 +36,58 @@ public class AuthService {
     private Long refreshTokenExpiredMs;
 
     @Transactional
-    public HttpHeaders login(AuthRequestDto authRequestDto) {
+    public HttpHeaders login(AuthLoginRequestDto authLoginRequestDto) {
 
-        UserResponseDto userResponseDto = null;
-
-        if(authRequestDto == null){
-            log.error("회원가입실패 : AuthRequestDto null");
+        // refactor : null 처리 코드 줄이기
+        if(authLoginRequestDto == null){
+            log.error("회원가입/로그인실패 : AuthRequestDto null");
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
         }
+        UserResponseDto userResponseDto = null;
 
-        if(authRequestDto.getSocialLoginUuid() != null) {
-            log.info("로그인 시도 - 소셜로그인uuid: {}", authRequestDto.getSocialLoginUuid());
-            // 1. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
-            userResponseDto = userService.getUserInfoByUuid(authRequestDto.getSocialLoginUuid());
+        // 1. 클라이언트 검증
+        verifyClient(authLoginRequestDto);
+
+        if(authLoginRequestDto.getSocialLoginUuid() != null) {
+            log.info("로그인 시도 - 소셜로그인uuid: {}", authLoginRequestDto.getSocialLoginUuid());
+            // 2. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
+            userResponseDto = userService.getUserInfoByUuid(authLoginRequestDto.getSocialLoginUuid());
         }
 
-        // 2. userResponseDto 값이 null이면 회원가입 진행
+        // 3. userResponseDto 값이 null이면 회원가입 진행
         if(userResponseDto == null){
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authRequestDto)
+                userService.createNewUser(authLoginRequestDto)
             );
         }else if(Boolean.TRUE.equals(userResponseDto.getIsDeleted())){
-            // 3. userResponseDto 에서 isdeleted가 true면 기존 회원정보 hardDelete 후 재가입
+            // 4. userResponseDto 에서 isdeleted가 true면 기존 회원정보 hardDelete 후 재가입
             // 기존 회원정보 삭제
             userService.hardDeleteUserByUuid(userResponseDto);
 
             // 재가입
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authRequestDto)
+                userService.createNewUser(authLoginRequestDto)
             );
         }
 
-        // 4. 사용자 로그인시 위도/경도 변경시 db에 반영
-        userService.updateLocationIfChanged(userResponseDto.getUserId(), authRequestDto);
+        // 5. 사용자 로그인시 위도/경도 변경시 db에 반영
+        userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
 
-        // 5. Access/Refresh Token 생성
+        // 6. Access/Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", userResponseDto, accessTokenExpiredMs);
         String refreshToken = jwtUtil.createJwt("refresh", userResponseDto, refreshTokenExpiredMs);
 
-        // 6. Refresh토큰 Redis에 저장
+        // 7. Refresh토큰 Redis에 저장
         refreshTokenService.saveRefreshToken(refreshToken, userResponseDto.getName());
 
-        // 7. 컨트롤러로 반환
+        // 8. 컨트롤러로 반환
         return createHttpHeader(accessToken, refreshToken);
+    }
+
+    public String preLogin(AuthPreLoginRequestDto authPreLoginRequestDto){
+        // 만료시간 테스트용으로 10시간 설정
+        // todo 10분으로 변경
+        return jwtUtil.createJwt("preLogin", authPreLoginRequestDto, 10*60*60*1000L);
     }
 
     public HttpHeaders refreshTokens(HttpServletRequest request){
@@ -117,10 +129,58 @@ public class AuthService {
 
         // 프론트 배포시 적용할 설정(https에서만 쿠키 전달 + 크로스 사이트 요청에 대해 쿠키 전송 허용)
         //return name + "=" + value + "; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=" + (refreshTokenExpiredMs);
+    }
+    private void verifyClient(AuthLoginRequestDto authLoginRequestDto){
 
+        String codeVerifier = authLoginRequestDto.getCodeVerifier();
+        String preLoginJwt = authLoginRequestDto.getPreLoginJwt();
 
+        // 클라이언트 검증 절차 진행
+        if(codeVerifier == null || preLoginJwt == null) {
+            log.error("회원가입/로그인 실패 : codeVerifier or preLoginJwt null");
+            throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
+        }
+
+        String codeChallenge = jwtUtil.getCodeChallenge(preLoginJwt);
+        String codeChallengeMethod = jwtUtil.getCodeChallengeMethod(preLoginJwt);
+
+        if(codeChallenge == null || codeChallengeMethod == null) {
+            log.error("회원가입/로그인 실패 : codeChallenge or codeChallengeMethod null");
+            throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
+        }
+
+        if(codeChallengeMethod.equals("plain")){
+            if(!codeChallenge.equals(codeVerifier)){
+                throw new CustomException(ResponseCodeEnum.UNIDENTIFIED_CLIENT);
+            }
+        }else if(codeChallengeMethod.equals("S256")){
+            if(!generateCodeChallenge(codeVerifier).equals(codeChallenge)){
+                throw new CustomException(ResponseCodeEnum.UNIDENTIFIED_CLIENT);
+            }
+        }else{
+            throw new CustomException(ResponseCodeEnum.UNSUPPORTED_HASH_ALGORITHM);
+        }
     }
 
+    private String generateCodeChallenge(String codeVerifier) {
 
+        // 1. ASCII 인코딩
+        byte[] codeVerifierBytes = codeVerifier.getBytes(StandardCharsets.US_ASCII);
 
+        // 2. SHA-256 해시 계산
+        MessageDigest messageDigest = null;
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new CustomException(ResponseCodeEnum.UNSUPPORTED_HASH_ALGORITHM);
+        }
+
+        byte[] codeVerifierHash = messageDigest.digest(codeVerifierBytes);
+
+        // 3. BASE64URL 인코딩
+        Encoder base64URLEncoder = Base64.getUrlEncoder().withoutPadding();
+
+        // 4. CodeChallenge 변환 결과 반환
+        return base64URLEncoder.encodeToString(codeVerifierHash);
+    }
 }

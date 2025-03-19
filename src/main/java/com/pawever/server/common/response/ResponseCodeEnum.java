@@ -20,12 +20,15 @@ public enum ResponseCodeEnum {
     JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "AUTH_1", "JWT 토큰이 유효하지 않습니다."),
     INSUFFICIENT_PERMISSIONS(HttpStatus.FORBIDDEN, "AUTH_2", "권한이 부족합니다."),
 
-
     COOKIE_NULL(HttpStatus.BAD_REQUEST, "AUTH_3", "Cookie가 존재하지 않습니다."),
     REFRESH_TOKEN_NULL(HttpStatus.BAD_REQUEST, "AUTH_4", "Refresh Token이 존재하지 않습니다."),
     TOKEN_CATEGORY_MISMATCH(HttpStatus.BAD_REQUEST, "AUTH_5", "Token 카테고리가 Refresh와 일치하지 않습니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH_6", "서버에 존재하지 않는 Refresh Token입니다."),
     ACCESS_TOKEN_NULL(HttpStatus.BAD_REQUEST, "AUTH_7", "Access Token이 존재하지 않습니다."),
+
+    CODE_CHALLENGE_NULL(HttpStatus.BAD_REQUEST, "AUTH_8", "Code Challenge가 존재하지 않습니다."),
+    UNIDENTIFIED_CLIENT(HttpStatus.UNAUTHORIZED, "AUTH_9", "클라이언트 정보를 확인할 수 없습니다."),
+    UNSUPPORTED_HASH_ALGORITHM(HttpStatus.BAD_REQUEST, "AUTH_10", "지원되지 않는 Hash 알고리즘입니다."),
 
 
     // 사용자 관련 에러
