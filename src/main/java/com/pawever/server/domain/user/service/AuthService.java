@@ -49,7 +49,6 @@ public class AuthService {
         verifyClient(authLoginRequestDto);
 
         if(authLoginRequestDto.getSocialLoginUuid() != null) {
-            log.info("로그인 시도 - 소셜로그인uuid: {}", authLoginRequestDto.getSocialLoginUuid());
             // 2. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
             userResponseDto = userService.getUserInfoByUuid(authLoginRequestDto.getSocialLoginUuid());
         }
