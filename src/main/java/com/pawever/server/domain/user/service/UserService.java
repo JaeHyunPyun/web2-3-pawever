@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ApiResponse;
 import com.pawever.server.common.response.ResponseCodeEnum;
-import com.pawever.server.domain.carehub.service.ShelterService;
 import com.pawever.server.domain.carehub.entity.Shelter;
 import com.pawever.server.domain.post.service.ImageService;
-import com.pawever.server.domain.user.dto.request.AuthRequestDto;
+import com.pawever.server.domain.user.dto.request.AuthLoginRequestDto;
 import com.pawever.server.domain.user.dto.request.UserProfileUpdateRequestDto;
 import com.pawever.server.domain.user.dto.response.StaffProfileResponseDto;
 import com.pawever.server.domain.user.dto.response.UserProfileResponseDto;
@@ -54,15 +53,15 @@ public class UserService {
             .build()).orElse(null);
     }
 
-    public User createNewUser(AuthRequestDto authRequestDto) {
+    public User createNewUser(AuthLoginRequestDto authLoginRequestDto) {
         return User.builder()
-            .name(authRequestDto.getName())
-            .email(authRequestDto.getEmail())
-            .profileImageUrl(authRequestDto.getProfileImageUrl())
-            .socialLoginUuid(authRequestDto.getSocialLoginUuid())
-            .socialLoginProvider(authRequestDto.getSocialLoginProvider())
-            .latitude(authRequestDto.getLatitude())
-            .longitude(authRequestDto.getLongitude())
+            .name(authLoginRequestDto.getName())
+            .email(authLoginRequestDto.getEmail())
+            .profileImageUrl(authLoginRequestDto.getProfileImageUrl())
+            .socialLoginUuid(authLoginRequestDto.getSocialLoginUuid())
+            .socialLoginProvider(authLoginRequestDto.getSocialLoginProvider())
+            .latitude(authLoginRequestDto.getLatitude())
+            .longitude(authLoginRequestDto.getLongitude())
             .role(Role.ROLE_USER)
             .isDeleted(false)
             .build();
@@ -216,16 +215,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updateLocationIfChanged(Long userId, AuthRequestDto authRequestDto) {
+    public void updateLocationIfChanged(Long userId, AuthLoginRequestDto authLoginRequestDto) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
         // 입력된 위도, 경도 값이 존재하고, 기존 DB 값과 다를 경우 업데이트
-        if (authRequestDto.getLatitude() != null && authRequestDto.getLongitude() != null) {
-            if (!authRequestDto.getLatitude().equals(user.getLatitude()) ||
-                !authRequestDto.getLongitude().equals(user.getLongitude())) {
+        if (authLoginRequestDto.getLatitude() != null && authLoginRequestDto.getLongitude() != null) {
+            if (!authLoginRequestDto.getLatitude().equals(user.getLatitude()) ||
+                !authLoginRequestDto.getLongitude().equals(user.getLongitude())) {
 
-                user.setLatitude(authRequestDto.getLatitude());
-                user.setLongitude(authRequestDto.getLongitude());
+                user.setLatitude(authLoginRequestDto.getLatitude());
+                user.setLongitude(authLoginRequestDto.getLongitude());
                 userRepository.save(user);
             }
         }

@@ -57,6 +57,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/tokens").permitAll()  // 로그인 요청시 허용
+                .requestMatchers(HttpMethod.GET, "/api/auth/tokens/attempts").permitAll()  // PreLogin 요청시 허용
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 .requestMatchers("/docs/**").permitAll()
