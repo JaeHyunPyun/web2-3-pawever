@@ -60,7 +60,7 @@ public class MailSendService {
             context.setVariable("clientBrowser", clientInfoResolver.getClientBrowser(request));  // 로그인 browser
 
             // todo : login-security-mail html에서 userType을 userName로 변경해주기
-            context.setVariable("userName", loginSecurityMailSendDto.getUserName());  // 사용자 User 아이디
+            context.setVariable("userName", maskUserName(loginSecurityMailSendDto.getUserName()));  // 사용자 User 아이디(masking 추가)
 
             // 3. "email-template.html"을 Thymeleaf 엔진을 통해 렌더링
             String htmlContent = templateEngine.process("login-security-mail", context);
@@ -77,6 +77,17 @@ public class MailSendService {
         } catch (MessagingException e) {
             log.info("[메일 전송 실패] userId : {}, errorMessage : {}", loginSecurityMailSendDto.getUserName(), e.getMessage());
         }
+    }
+
+    private String maskUserName(String originalUserName) {
+        int visibleUserNameLength = (int)Math.ceil(originalUserName.length()/2.0f);  // 전체 글자의 50%만 노출
+        int invisibleUserNameLength = originalUserName.length()-visibleUserNameLength;
+
+        StringBuilder maskedUserName = new StringBuilder();
+        maskedUserName.append(originalUserName, 0, visibleUserNameLength);
+        maskedUserName.append("*".repeat(Math.max(0, invisibleUserNameLength)));
+
+        return maskedUserName.toString();
     }
 
 }
