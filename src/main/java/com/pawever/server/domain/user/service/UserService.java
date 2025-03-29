@@ -52,6 +52,7 @@ public class UserService {
             .role(user.getRole())
             .isDeleted(user.getIsDeleted())
             .email(user.getEmail())
+            .lastLoginIp(user.getLastLoginIp())
             .build()).orElse(null);
     }
 
@@ -271,10 +272,9 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserIp(String currentLoginIp, HttpServletRequest request){
-        String userUuid = accessTokenService.getRequestSocialLoginUuid(request);
+    public void updateUserIp(String currentLoginIp, Long userId){
         // 1. 유저 조회
-        User user = userRepository.findBySocialLoginUuid(userUuid)
+        User user = userRepository.findById(userId)
             .orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
 
         // 2. IP UPDATE
