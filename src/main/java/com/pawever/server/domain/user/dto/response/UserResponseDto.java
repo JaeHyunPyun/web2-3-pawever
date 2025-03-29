@@ -17,4 +17,5 @@ public class UserResponseDto {
     private Role role;                      //유저 권한
     private Boolean isDeleted;              //삭제 여부
     private String email;                   // 유저 email
+    private String lastLoginIp;            // 유저 최근 로그인 ip
 }

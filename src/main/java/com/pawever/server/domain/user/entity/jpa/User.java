@@ -69,6 +69,9 @@ public class User extends BaseEntity {
     @Column(name="introduction", length=255)
     private String introduction;        // 유저 자기소개
 
+    @Column(name="lastLoginIp", nullable= false, length=40)
+    private String lastLoginIp;        // 유저 최근 로그인 ip
+
     @Column(name="deleted_at")
     private LocalDateTime deleted_at; // 삭제시각(수동 업데이트)
 

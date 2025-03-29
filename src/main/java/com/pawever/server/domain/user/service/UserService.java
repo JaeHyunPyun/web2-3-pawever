@@ -40,6 +40,7 @@ public class UserService {
     private final ImageService imageService;
     private final UserImageService userImageService;
     private final ObjectMapper objectMapper;
+    private final ClientInfoResolver clientInfoResolver;
 
     public UserResponseDto getUserInfoByUuid(String socialLoginUuid){
 
@@ -54,7 +55,10 @@ public class UserService {
             .build()).orElse(null);
     }
 
-    public User createNewUser(AuthLoginRequestDto authLoginRequestDto) {
+    public User createNewUser(AuthLoginRequestDto authLoginRequestDto, HttpServletRequest request) {
+
+        String currentLoginIp = clientInfoResolver.getClientIp(request);
+
         return User.builder()
             .name(authLoginRequestDto.getName())
             .email(authLoginRequestDto.getEmail())
@@ -65,6 +69,7 @@ public class UserService {
             .longitude(authLoginRequestDto.getLongitude())
             .role(Role.ROLE_USER)
             .isDeleted(false)
+            .lastLoginIp(currentLoginIp)
             .build();
     }
 
@@ -82,6 +87,7 @@ public class UserService {
                 .name(savedUser.getName())
                 .role(savedUser.getRole())
                 .email(savedUser.getEmail())
+                .lastLoginIp(savedUser.getLastLoginIp())
                 .build();
         } catch (DataIntegrityViolationException e) {
             log.error("회원가입실패 : 회원ID - {}, 이유 - {}", user.getUserId(), e.getMessage());
