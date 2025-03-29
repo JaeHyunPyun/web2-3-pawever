@@ -59,7 +59,6 @@ public class MailSendService {
             context.setVariable("clientOs", clientInfoResolver.getClientOs(request));   // 로그인 os
             context.setVariable("clientBrowser", clientInfoResolver.getClientBrowser(request));  // 로그인 browser
 
-            // todo : login-security-mail html에서 userType을 userName로 변경해주기
             context.setVariable("userName", maskUserName(loginSecurityMailSendDto.getUserName()));  // 사용자 User 아이디(masking 추가)
 
             // 3. "email-template.html"을 Thymeleaf 엔진을 통해 렌더링
