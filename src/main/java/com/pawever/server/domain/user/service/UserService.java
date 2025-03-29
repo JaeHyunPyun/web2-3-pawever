@@ -268,8 +268,18 @@ public class UserService {
 
         user.updateUserRole(targetRole);
 
-        // 3. 변경된 user 정보 저장
-        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUserIp(String currentLoginIp, HttpServletRequest request){
+        String userUuid = accessTokenService.getRequestSocialLoginUuid(request);
+        // 1. 유저 조회
+        User user = userRepository.findBySocialLoginUuid(userUuid)
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+        // 2. IP UPDATE
+        user.updateUserIp(currentLoginIp);
+
     }
 
 }

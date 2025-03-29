@@ -109,4 +109,8 @@ public class User extends BaseEntity {
         this.role =role;
     }
 
+    public void updateUserIp(String currentLoginIp){
+        this.lastLoginIp = currentLoginIp;
+    }
+
 }
