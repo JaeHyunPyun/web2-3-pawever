@@ -72,6 +72,8 @@ public class AccessTokenService {
        return accessToken;
     }
 
+    // todo : 다른 파트에서 SocialLoginUuid로 조회하는 것 전부 UserId로 조회하는 것으로 변경하고 삭제
+    // todo : 보안상 AccessToken에 SocialLoginUuid 넣는게 부적절
     public String getRequestSocialLoginUuid(HttpServletRequest request) {
         String accessToken = getRequestAccessToken(request);
         return jwtUtil.getSocialLoginUuid(accessToken);
