@@ -17,6 +17,18 @@ spring:
     secret: ${JWT_SECRET_KEY}
     accessTokenExpirationTime: ${ACCESSTOKEN_EXPIRATION_TIME}   #테스트용 : 3분(180000)
     refreshTokenExpirationTime: ${REFRESHTOKEN_EXPIRATION_TIME} #테스트용 : 5분(300000)
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 logging:
   config: classpath:logback-spring.xml
 springdoc:
