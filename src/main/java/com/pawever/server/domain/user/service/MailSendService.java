@@ -42,18 +42,17 @@ public class MailSendService {
             Context context = new Context();
             context.setVariable("subject", loginSecurityMailSendDto.getSubject());   // 메일 제목
             context.setVariable("loginTime", ZonedDateTime.now(ZoneId.of("Asia/Seoul"))); // 로그인 시간(한국 시간 적용)
-            InetAddress clientInetAdderess = clientInfoResolver.getClientIp(request);
 
-            // todo : 사용자 ip를 확인할 수 없는 경우 메일 전송 x -> 좀 더 세련되게 처리할 수 있는 방법이 있는지 체크
-            if(clientInetAdderess == null) {
-                return;
+            InetAddress clientInetAdderess = clientInfoResolver.getClientIp(request);
+            String clientIp = "IP: N/A";
+            if(clientInetAdderess != null) {
+                clientIp = clientInetAdderess.getHostAddress();
             }
-            String clientIp = clientInetAdderess.getHostAddress();
             context.setVariable("clientIp", clientIp); // 로그인 ip
 
             String countryName = ipGeoLocationService.getGeoLocationByIp(clientInetAdderess)
                 .map(IpGeoLocationDto::getCountryName)
-                .orElse("국가명 조회 불가");
+                .orElse("Location : Unknown");
 
             context.setVariable("clientLocation",   countryName);  // 로그인 지역
             context.setVariable("clientOs", clientInfoResolver.getClientOs(request));   // 로그인 os

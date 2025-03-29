@@ -90,7 +90,7 @@ public class ClientInfoResolver {
             clientBrowser = "Firefox";
         }
         else {
-            clientBrowser ="Other";
+            clientBrowser ="Browser : Unknown";
         }
 
         return clientBrowser;
@@ -127,7 +127,7 @@ public class ClientInfoResolver {
         }else if (lowerCasedClientAgent.contains("linux")) {
             clientOs = "Linux";
         }else{
-            clientOs = "Other";
+            clientOs = "OS : Unknown";
         }
         return clientOs;
     }
