@@ -83,7 +83,9 @@ public class AuthService {
             String lastLoginIp = userResponseDto.getLastLoginIp();
             String currentLoginIp = clientInfoResolver.getClientIp(request);
 
-            if(userEmail!=null){
+            if(!currentLoginIp.equals(lastLoginIp) && userEmail!=null){
+                log.info("lastLoginIp : {}", lastLoginIp );
+                log.info("currentLoginIp : {}", currentLoginIp );
                 LoginSecurityMailSendDto loginSecurityMailSendDto = LoginSecurityMailSendDto
                     .builder()
                     .emailAddr(userEmail)
@@ -93,10 +95,10 @@ public class AuthService {
                 mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
             }
 
-            // todo 5. 사용자 현재 접속 IP로 DB 정보 업데이트
-            // 접속 ip 알 수 없는 경우 또는 기존 IP와 동일한 경우가 아닌 경우 업데이트
-            if(!currentLoginIp.equalsIgnoreCase("UNKNOWN") || !currentLoginIp.equals(lastLoginIp)){
-                userService.updateUserIp(currentLoginIp, request);
+            // 5. 사용자 현재 접속 IP로 DB 정보 업데이트
+            // 접속 ip 알 수 없는 경우이면서 기존 IP와 동일한 경우가 아닌 경우 업데이트
+            if(!currentLoginIp.equalsIgnoreCase("UNKNOWN") && !currentLoginIp.equals(lastLoginIp)){
+                userService.updateUserIp(currentLoginIp, userResponseDto.getUserId());
             }
 
             // 6. 사용자 로그인시 이전 로그인 대비 위도/경도 변경시 db에 반영
