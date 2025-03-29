@@ -30,6 +30,7 @@ public class AuthService {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final MailSendService mailSendService;
+    private final ClientInfoResolver clientInfoResolver;
 
     @Value("${spring.jwt.accessTokenExpirationTime}")
     private Long accessTokenExpiredMs;
@@ -60,39 +61,47 @@ public class AuthService {
         if(userResponseDto == null){
             isNewUser = true;
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authLoginRequestDto)
+                userService.createNewUser(authLoginRequestDto, request)
             );
         }else if(Boolean.TRUE.equals(userResponseDto.getIsDeleted())){
             // 4. userResponseDto 에서 isdeleted가 true면 기존 회원정보 hardDelete 후 재가입
+            isNewUser = true;
+
             // 기존 회원정보 삭제
             userService.hardDeleteUserByUuid(userResponseDto);
 
             // 재가입
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authLoginRequestDto)
+                userService.createNewUser(authLoginRequestDto, request)
             );
         }
 
-        LoginSecurityMailSendDto loginSecurityMailSendDto = LoginSecurityMailSendDto
-            .builder()
-            .emailAddr(userResponseDto.getEmail())
-            .userName(userResponseDto.getName())
-            .build();
-
-        mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
-
-
-        // todo : 만약 사용자 메일 값이 null 이면 이메일 전송 pass
-        // todo : 사용자에게 ip 다를 경우 메일 보내기(사용자 이메일, 사용자 id를 parameter로 전달
+        // 회원가입후 최초 로그인이 아닌 경우
         if(!isNewUser){
             // 4. 사용자 로그인시 이전 로그인 대비 IP 변경시 메일 전송
+            String userEmail = userResponseDto.getEmail();
+            String lastLoginIp = userResponseDto.getLastLoginIp();
+            String currentLoginIp = clientInfoResolver.getClientIp(request);
 
+            if(userEmail!=null){
+                LoginSecurityMailSendDto loginSecurityMailSendDto = LoginSecurityMailSendDto
+                    .builder()
+                    .emailAddr(userEmail)
+                    .userName(userResponseDto.getName())
+                    .build();
 
-            // 5. 사용자 로그인시 이전 로그인 대비 위도/경도 변경시 db에 반영
+                mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
+            }
+
+            // todo 5. 사용자 현재 접속 IP로 DB 정보 업데이트
+            // 접속 ip 알 수 없는 경우 또는 기존 IP와 동일한 경우가 아닌 경우 업데이트
+            if(!currentLoginIp.equalsIgnoreCase("UNKNOWN") || !currentLoginIp.equals(lastLoginIp)){
+                userService.updateUserIp(currentLoginIp, request);
+            }
+
+            // 6. 사용자 로그인시 이전 로그인 대비 위도/경도 변경시 db에 반영
             userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
         }
-
-        // todo 6. 사용자 현재 접속 IP로 DB 정보 업데이트
 
 
         // 7. Access/Refresh Token 생성
