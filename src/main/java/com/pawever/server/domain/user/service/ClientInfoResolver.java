@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class ClientInfoResolver {
 
-    public InetAddress getClientIp(HttpServletRequest request) {
+    public InetAddress getClientInetAddress(HttpServletRequest request) {
         String clientIp = null;
         InetAddress inetAddress = null;
         boolean isIpInHeader = false;
@@ -133,6 +133,17 @@ public class ClientInfoResolver {
     }
     public String getLowerCasedClientAgent(HttpServletRequest request) {
         return request.getHeader("User-Agent").toLowerCase();
+    }
+    public String getClientIp(HttpServletRequest request) {
+        InetAddress clientInetAddress = this.getClientInetAddress(request);
+
+        String clientIp = "UNKNOWN";
+
+        if(clientInetAddress != null){
+            clientIp = clientInetAddress.getHostAddress();
+        }
+
+        return clientIp;
     }
 
 }

@@ -43,12 +43,10 @@ public class MailSendService {
             context.setVariable("subject", loginSecurityMailSendDto.getSubject());   // 메일 제목
             context.setVariable("loginTime", ZonedDateTime.now(ZoneId.of("Asia/Seoul"))); // 로그인 시간(한국 시간 적용)
 
-            InetAddress clientInetAdderess = clientInfoResolver.getClientIp(request);
-            String clientIp = "IP: N/A";
-            if(clientInetAdderess != null) {
-                clientIp = clientInetAdderess.getHostAddress();
-            }
-            context.setVariable("clientIp", clientIp); // 로그인 ip
+            InetAddress clientInetAdderess = clientInfoResolver.getClientInetAddress(request);
+
+            String clientIp = clientInfoResolver.getClientIp(request);
+            context.setVariable("clientIp", formatClientIp(clientIp)); // 로그인 ip
 
             String countryName = ipGeoLocationService.getGeoLocationByIp(clientInetAdderess)
                 .map(IpGeoLocationDto::getCountryName)
@@ -86,6 +84,10 @@ public class MailSendService {
         maskedUserName.append("*".repeat(Math.max(0, invisibleUserNameLength)));
 
         return maskedUserName.toString();
+    }
+
+    private String formatClientIp(String clientIp) {
+        return "UNKNOWN".equalsIgnoreCase(clientIp) ? "IP: N/A" : clientIp;
     }
 
 }
