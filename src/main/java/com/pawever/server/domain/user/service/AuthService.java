@@ -2,6 +2,7 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.user.dto.internal.LoginSecurityMailSendDto;
 import com.pawever.server.domain.user.dto.request.AuthLoginRequestDto;
 import com.pawever.server.domain.user.dto.request.AuthPreLoginRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
@@ -28,6 +29,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final MailSendService mailSendService;
 
     @Value("${spring.jwt.accessTokenExpirationTime}")
     private Long accessTokenExpiredMs;
@@ -36,7 +38,7 @@ public class AuthService {
     private Long refreshTokenExpiredMs;
 
     @Transactional
-    public HttpHeaders login(AuthLoginRequestDto authLoginRequestDto) {
+    public HttpHeaders login(AuthLoginRequestDto authLoginRequestDto, HttpServletRequest request) {
 
         // refactor : null 처리 코드 줄이기
         if(authLoginRequestDto == null){
@@ -44,6 +46,7 @@ public class AuthService {
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
         }
         UserResponseDto userResponseDto = null;
+        boolean isNewUser = false;
 
         // 1. 클라이언트 검증
         verifyClient(authLoginRequestDto);
@@ -55,6 +58,7 @@ public class AuthService {
 
         // 3. userResponseDto 값이 null이면 회원가입 진행
         if(userResponseDto == null){
+            isNewUser = true;
             userResponseDto = userService.saveNewUser(
                 userService.createNewUser(authLoginRequestDto)
             );
@@ -69,17 +73,35 @@ public class AuthService {
             );
         }
 
-        // 5. 사용자 로그인시 위도/경도 변경시 db에 반영
-        userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
+        LoginSecurityMailSendDto loginSecurityMailSendDto = LoginSecurityMailSendDto
+            .builder()
+            .emailAddr(userResponseDto.getEmail())
+            .userName(userResponseDto.getName())
+            .build();
 
-        // 6. Access/Refresh Token 생성
+        mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
+
+
+        // todo : 만약 사용자 메일 값이 null 이면 이메일 전송 pass
+        // todo : 사용자에게 ip 다를 경우 메일 보내기(사용자 이메일, 사용자 id를 parameter로 전달
+        if(!isNewUser){
+            // 4. 사용자 로그인시 이전 로그인 대비 IP 변경시 메일 전송
+
+
+            // 5. 사용자 로그인시 이전 로그인 대비 위도/경도 변경시 db에 반영
+            userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
+        }
+
+        // todo 6. 사용자 현재 접속 IP로 DB 정보 업데이트
+
+
+        // 7. Access/Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", userResponseDto, accessTokenExpiredMs);
         String refreshToken = jwtUtil.createJwt("refresh", userResponseDto, refreshTokenExpiredMs);
 
-        // 7. Refresh토큰 Redis에 저장
+        // 8. Refresh토큰 Redis에 저장
         refreshTokenService.saveRefreshToken(refreshToken, userResponseDto.getName());
 
-        // 8. 컨트롤러로 반환
         return createHttpHeader(accessToken, refreshToken);
     }
 

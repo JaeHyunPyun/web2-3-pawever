@@ -50,6 +50,7 @@ public class UserService {
             .name(user.getName())
             .role(user.getRole())
             .isDeleted(user.getIsDeleted())
+            .email(user.getEmail())
             .build()).orElse(null);
     }
 
@@ -80,6 +81,7 @@ public class UserService {
                 .socialLoginUuid(savedUser.getSocialLoginUuid())
                 .name(savedUser.getName())
                 .role(savedUser.getRole())
+                .email(savedUser.getEmail())
                 .build();
         } catch (DataIntegrityViolationException e) {
             log.error("회원가입실패 : 회원ID - {}, 이유 - {}", user.getUserId(), e.getMessage());

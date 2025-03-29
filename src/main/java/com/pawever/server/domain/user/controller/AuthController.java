@@ -31,10 +31,10 @@ public class AuthController {
 
     @PostMapping("/tokens")
     @Operation(summary = "로그인 및 JWT 토큰(액세스/리프레시) 발급 API")
-    public ResponseEntity<ApiResponse> login(@RequestBody AuthLoginRequestDto authLoginRequestDto) {
+    public ResponseEntity<ApiResponse> login(@RequestBody AuthLoginRequestDto authLoginRequestDto, HttpServletRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .headers(authService.login(authLoginRequestDto))
+            .headers(authService.login(authLoginRequestDto, request))
             .body(ApiResponse.success(ResponseCodeEnum.SUCCESS));
     }
 
