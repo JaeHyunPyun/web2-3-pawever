@@ -19,9 +19,8 @@ public class IpGeoLocationProvider {
     public IpGeoLocationProvider() throws IOException {
         // 클래스패스에서 파일을 읽는다
         ClassPathResource classPathResource = new ClassPathResource("data/GeoLite2-City.mmdb");
-        try (InputStream dbStream = classPathResource.getInputStream()) {
-            ipGeoDatabaseReader = new DatabaseReader.Builder(dbStream).build();
-        }
+        InputStream dbStream = classPathResource.getInputStream();
+        this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbStream).build();
     }
 
     public CityResponse getGeoLocationByIp(InetAddress inetAddress) {
