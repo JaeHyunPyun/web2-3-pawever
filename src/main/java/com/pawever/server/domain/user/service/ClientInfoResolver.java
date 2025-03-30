@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -66,31 +68,27 @@ public class ClientInfoResolver {
     }
     public String getClientBrowser(HttpServletRequest request) {
         String lowerCasedClientAgent = getLowerCasedClientAgent(request);
-        String clientBrowser = "";
+        String clientBrowser = "Browser : Unknown";
 
-        if (lowerCasedClientAgent.contains("trident")) {        //IE
-            clientBrowser = "IE";
-        }
-        else if (lowerCasedClientAgent.contains("edge")) {      //Edge
-            clientBrowser = "Edge";
-        }
-        else if (lowerCasedClientAgent.contains("whale")) {      //Naver Whale
-            clientBrowser = "Naver Whale";
-        }
-        else if (lowerCasedClientAgent.contains("opera")||lowerCasedClientAgent.contains("opr")) {      //Opera
-            clientBrowser = "Opera";
-        }
-        else if (lowerCasedClientAgent.contains("chrome")) {       //Chrome
-            clientBrowser = "Chrome";
-        }
-        else if (!lowerCasedClientAgent.contains("chrome") && lowerCasedClientAgent.contains("safari")) {     //Safari
-            clientBrowser = "Safari";
-        }
-        else if (lowerCasedClientAgent.contains("firefox")) {              //Firefox
-            clientBrowser = "Firefox";
-        }
-        else {
-            clientBrowser ="Browser : Unknown";
+        Map<String, String> browserMap = new ConcurrentHashMap<>();
+
+        browserMap.put("trident", "IE");
+        browserMap.put("edge", "Edge");
+        browserMap.put("whale", "Naver Whale");
+        browserMap.put("opera", "Opera");
+        browserMap.put("opr", "Opera");
+        browserMap.put("chrome", "Chrome");
+        browserMap.put("safari", "Safari");
+        browserMap.put("firefox", "Firefox");
+
+        for (Map.Entry<String, String> entry : browserMap.entrySet()) {
+            if (lowerCasedClientAgent.contains(entry.getKey())) {
+                // Safari는 chrome이 포함 안되어 있을 때만 처리
+                if (entry.getKey().equals("safari") && lowerCasedClientAgent.contains("chrome")) {
+                    continue;
+                }
+                clientBrowser = entry.getValue();
+            }
         }
 
         return clientBrowser;
