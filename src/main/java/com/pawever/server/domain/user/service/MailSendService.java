@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -32,6 +33,7 @@ public class MailSendService {
         this.clientInfoResolver = clientInfoResolver;
     }
 
+    @Async
     public void sendLoginSecurityMail(LoginSecurityMailSendDto loginSecurityMailSendDto, HttpServletRequest request) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
