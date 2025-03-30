@@ -95,6 +95,16 @@ dependencies {
     //env 관련 의존성
     implementation 'me.paulschwarz:spring-dotenv:2.5.4'
 
+    // 이메일 관련 의존성
+    implementation "org.springframework.boot:spring-boot-starter-mail"
+
+    // 이메일 작성을 위한 thymeleaf 의존성
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation group: 'ognl', name: 'ognl', version: '3.3.4'
+
+    // IP Geo Location 변환을 위한 MaxMind 의존성 추가
+    implementation 'com.maxmind.geoip2:geoip2:2.15.0'
+
 }
 
 

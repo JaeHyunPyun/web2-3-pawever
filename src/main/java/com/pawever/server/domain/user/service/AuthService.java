@@ -2,11 +2,13 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.user.dto.internal.LoginSecurityMailSendDto;
 import com.pawever.server.domain.user.dto.request.AuthLoginRequestDto;
 import com.pawever.server.domain.user.dto.request.AuthPreLoginRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -28,6 +30,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final MailSendService mailSendService;
+    private final ClientInfoResolver clientInfoResolver;
 
     @Value("${spring.jwt.accessTokenExpirationTime}")
     private Long accessTokenExpiredMs;
@@ -36,7 +40,7 @@ public class AuthService {
     private Long refreshTokenExpiredMs;
 
     @Transactional
-    public HttpHeaders login(AuthLoginRequestDto authLoginRequestDto) {
+    public HttpHeaders login(AuthLoginRequestDto authLoginRequestDto, HttpServletRequest request) {
 
         // refactor : null 처리 코드 줄이기
         if(authLoginRequestDto == null){
@@ -44,43 +48,72 @@ public class AuthService {
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
         }
         UserResponseDto userResponseDto = null;
+        boolean isNewUser = false;
 
         // 1. 클라이언트 검증
         verifyClient(authLoginRequestDto);
 
         if(authLoginRequestDto.getSocialLoginUuid() != null) {
-            log.info("로그인 시도 - 소셜로그인uuid: {}", authLoginRequestDto.getSocialLoginUuid());
             // 2. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
             userResponseDto = userService.getUserInfoByUuid(authLoginRequestDto.getSocialLoginUuid());
         }
 
         // 3. userResponseDto 값이 null이면 회원가입 진행
         if(userResponseDto == null){
+            isNewUser = true;
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authLoginRequestDto)
+                userService.createNewUser(authLoginRequestDto, request)
             );
         }else if(Boolean.TRUE.equals(userResponseDto.getIsDeleted())){
             // 4. userResponseDto 에서 isdeleted가 true면 기존 회원정보 hardDelete 후 재가입
+            isNewUser = true;
+
             // 기존 회원정보 삭제
             userService.hardDeleteUserByUuid(userResponseDto);
 
             // 재가입
             userResponseDto = userService.saveNewUser(
-                userService.createNewUser(authLoginRequestDto)
+                userService.createNewUser(authLoginRequestDto, request)
             );
         }
 
-        // 5. 사용자 로그인시 위도/경도 변경시 db에 반영
-        userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
+        // 회원가입후 최초 로그인이 아닌 경우
+        if(!isNewUser){
+            // 4. 사용자 로그인시 이전 로그인 대비 IP 변경시 메일 전송
+            String userEmail = userResponseDto.getEmail();
+            String lastLoginIp = userResponseDto.getLastLoginIp();
+            String currentLoginIp = clientInfoResolver.getClientIp(request);
 
-        // 6. Access/Refresh Token 생성
+            if(!currentLoginIp.equals(lastLoginIp) && userEmail!=null){
+                log.info("lastLoginIp : {}", lastLoginIp );
+                log.info("currentLoginIp : {}", currentLoginIp );
+                LoginSecurityMailSendDto loginSecurityMailSendDto = LoginSecurityMailSendDto
+                    .builder()
+                    .emailAddr(userEmail)
+                    .userName(userResponseDto.getName())
+                    .build();
+
+                mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
+            }
+
+            // 5. 사용자 현재 접속 IP로 DB 정보 업데이트
+            // 접속 ip 알 수 없는 경우이면서 기존 IP와 동일한 경우가 아닌 경우 업데이트
+            if(!currentLoginIp.equalsIgnoreCase("UNKNOWN") && !currentLoginIp.equals(lastLoginIp)){
+                userService.updateUserIp(currentLoginIp, userResponseDto.getUserId());
+            }
+
+            // 6. 사용자 로그인시 이전 로그인 대비 위도/경도 변경시 db에 반영
+            userService.updateLocationIfChanged(userResponseDto.getUserId(), authLoginRequestDto);
+        }
+
+
+        // 7. Access/Refresh Token 생성
         String accessToken = jwtUtil.createJwt("access", userResponseDto, accessTokenExpiredMs);
         String refreshToken = jwtUtil.createJwt("refresh", userResponseDto, refreshTokenExpiredMs);
 
-        // 7. Refresh토큰 Redis에 저장
+        // 8. Refresh토큰 Redis에 저장
         refreshTokenService.saveRefreshToken(refreshToken, userResponseDto.getName());
 
-        // 8. 컨트롤러로 반환
         return createHttpHeader(accessToken, refreshToken);
     }
 
@@ -141,8 +174,14 @@ public class AuthService {
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
         }
 
-        String codeChallenge = jwtUtil.getCodeChallenge(preLoginJwt);
-        String codeChallengeMethod = jwtUtil.getCodeChallengeMethod(preLoginJwt);
+        String codeChallenge = null;
+        String codeChallengeMethod = null;
+        try {
+            codeChallenge = jwtUtil.getCodeChallenge(preLoginJwt);
+            codeChallengeMethod = jwtUtil.getCodeChallengeMethod(preLoginJwt);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ResponseCodeEnum.JWT_TOKEN_EXPIRED);
+        }
 
         if(codeChallenge == null || codeChallengeMethod == null) {
             log.error("회원가입/로그인 실패 : codeChallenge or codeChallengeMethod null");

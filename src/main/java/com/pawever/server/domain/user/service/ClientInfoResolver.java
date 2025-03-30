@@ -1,0 +1,141 @@
+package com.pawever.server.domain.user.service;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+@Service
+@Slf4j
+public class ClientInfoResolver {
+
+    public InetAddress getClientInetAddress(HttpServletRequest request) {
+        String clientIp = null;
+        InetAddress inetAddress = null;
+        boolean isIpInHeader = false;
+
+        // 1. 프록시/로드밸러서 사용시 클라이언트의 ip 주소 반환
+        List<String> headerList = new ArrayList<>();
+        headerList.add("X-Forwarded-For");
+        headerList.add("HTTP_CLIENT_IP");
+        headerList.add("HTTP_X_FORWARDED_FOR");
+        headerList.add("HTTP_X_FORWARDED");
+        headerList.add("HTTP_FORWARDED_FOR");
+        headerList.add("HTTP_FORWARDED");
+        headerList.add("Proxy-Client-IP");
+        headerList.add("WL-Proxy-Client-IP");
+        headerList.add("HTTP_VIA");
+        headerList.add("IPV6_ADR");
+
+        for (String header : headerList) {
+            clientIp = request.getHeader(header);
+            if (StringUtils.hasText(clientIp) && !"unknown".equalsIgnoreCase(clientIp)) {
+                isIpInHeader = true;
+                break;
+            }
+        }
+
+        // 2. 프록시/로드밸런서 없이 클라이언트->서버 직접 접속시 클라이언트 ip 주소 반환
+        if (!isIpInHeader) {
+            clientIp = request.getRemoteAddr();
+        }
+
+//         3. 로컬호스트에서 접근시 정확한 ip 추출을 위한 코드
+        if ("0:0:0:0:0:0:0:1".equals(clientIp) || "127.0.0.1".equals(clientIp)) {
+            InetAddress localHostInetAddress = null;
+            try {
+                localHostInetAddress = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) {
+                log.error("[UnknownHostException] 클라이언트의 Ip주소를 확인할 수 없습니다 : {}",clientIp, e);
+            }
+            clientIp = localHostInetAddress.getHostAddress();
+        }
+
+        // 4. String ip -> InetAddress 변환
+        try {
+            inetAddress = InetAddress.getByName(clientIp);
+        } catch (UnknownHostException e) {
+            log.error("[UnknownHostException] 클라이언트의 Ip주소를 확인할 수 없습니다 : {}",clientIp, e);
+        }
+
+        return inetAddress;
+    }
+    public String getClientBrowser(HttpServletRequest request) {
+        String lowerCasedClientAgent = getLowerCasedClientAgent(request);
+        String clientBrowser = "Browser : Unknown";
+
+        Map<String, String> browserMap = new ConcurrentHashMap<>();
+
+        browserMap.put("trident", "IE");
+        browserMap.put("edge", "Edge");
+        browserMap.put("whale", "Naver Whale");
+        browserMap.put("opera", "Opera");
+        browserMap.put("opr", "Opera");
+        browserMap.put("chrome", "Chrome");
+        browserMap.put("safari", "Safari");
+        browserMap.put("firefox", "Firefox");
+
+        for (Map.Entry<String, String> entry : browserMap.entrySet()) {
+            if (lowerCasedClientAgent.contains(entry.getKey())) {
+                // Safari는 chrome이 포함 안되어 있을 때만 처리
+                if (entry.getKey().equals("safari") && lowerCasedClientAgent.contains("chrome")) {
+                    continue;
+                }
+                clientBrowser = entry.getValue();
+            }
+        }
+
+        return clientBrowser;
+    }
+    public String getClientOs(HttpServletRequest request) {
+        String lowerCasedClientAgent = getLowerCasedClientAgent(request);
+        String clientOs = "OS : Unknown";
+
+        Map<String, String> osMap = new ConcurrentHashMap<>();
+
+        osMap.put("windows nt 10.0", "Windows10");
+        osMap.put("windows nt 6.1", "Windows7");
+        osMap.put("windows nt 6.2", "Windows8");
+        osMap.put("windows nt 6.3", "Windows8");
+        osMap.put("windows nt 6.0", "WindowsVista");
+        osMap.put("windows nt 5.1", "WindowsXP");
+        osMap.put("windows nt 5.0", "Windows2000");
+        osMap.put("windows nt 4.0", "WindowsNT");
+        osMap.put("windows 98", "Windows98");
+        osMap.put("windows 95", "Windows95");
+        osMap.put("iphone", "iPhone");
+        osMap.put("ipad", "iPad");
+        osMap.put("android", "android");
+        osMap.put("mac", "mac");
+        osMap.put("linux", "Linux");
+
+        for (Map.Entry<String, String> entry : osMap.entrySet()) {
+            if (lowerCasedClientAgent.contains(entry.getKey())) {
+                clientOs = entry.getValue();
+            }
+        }
+
+        return clientOs;
+    }
+    public String getLowerCasedClientAgent(HttpServletRequest request) {
+        return request.getHeader("User-Agent").toLowerCase();
+    }
+    public String getClientIp(HttpServletRequest request) {
+        InetAddress clientInetAddress = this.getClientInetAddress(request);
+
+        String clientIp = "UNKNOWN";
+
+        if(clientInetAddress != null){
+            clientIp = clientInetAddress.getHostAddress();
+        }
+
+        return clientIp;
+    }
+
+}

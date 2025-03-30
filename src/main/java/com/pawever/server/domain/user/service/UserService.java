@@ -40,6 +40,7 @@ public class UserService {
     private final ImageService imageService;
     private final UserImageService userImageService;
     private final ObjectMapper objectMapper;
+    private final ClientInfoResolver clientInfoResolver;
 
     public UserResponseDto getUserInfoByUuid(String socialLoginUuid){
 
@@ -50,10 +51,15 @@ public class UserService {
             .name(user.getName())
             .role(user.getRole())
             .isDeleted(user.getIsDeleted())
+            .email(user.getEmail())
+            .lastLoginIp(user.getLastLoginIp())
             .build()).orElse(null);
     }
 
-    public User createNewUser(AuthLoginRequestDto authLoginRequestDto) {
+    public User createNewUser(AuthLoginRequestDto authLoginRequestDto, HttpServletRequest request) {
+
+        String currentLoginIp = clientInfoResolver.getClientIp(request);
+
         return User.builder()
             .name(authLoginRequestDto.getName())
             .email(authLoginRequestDto.getEmail())
@@ -64,6 +70,7 @@ public class UserService {
             .longitude(authLoginRequestDto.getLongitude())
             .role(Role.ROLE_USER)
             .isDeleted(false)
+            .lastLoginIp(currentLoginIp)
             .build();
     }
 
@@ -80,6 +87,8 @@ public class UserService {
                 .socialLoginUuid(savedUser.getSocialLoginUuid())
                 .name(savedUser.getName())
                 .role(savedUser.getRole())
+                .email(savedUser.getEmail())
+                .lastLoginIp(savedUser.getLastLoginIp())
                 .build();
         } catch (DataIntegrityViolationException e) {
             log.error("회원가입실패 : 회원ID - {}, 이유 - {}", user.getUserId(), e.getMessage());
@@ -260,8 +269,17 @@ public class UserService {
 
         user.updateUserRole(targetRole);
 
-        // 3. 변경된 user 정보 저장
-        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUserIp(String currentLoginIp, Long userId){
+        // 1. 유저 조회
+        User user = userRepository.findById(userId)
+            .orElseThrow(()-> new CustomException(ResponseCodeEnum.USER_NOT_FOUND));
+
+        // 2. IP UPDATE
+        user.updateUserIp(currentLoginIp);
+
     }
 
 }
