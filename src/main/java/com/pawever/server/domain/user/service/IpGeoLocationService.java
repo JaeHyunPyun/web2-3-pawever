@@ -20,16 +20,16 @@ public class IpGeoLocationService {
 
     public Optional<IpGeoLocationDto> getGeoLocationByIp(InetAddress inetAddress) {
         // 실제 코드
-//        CityResponse ipBasedGeoLocation = ipGeoLocationProvider.getGeoLocationByIp(inetAddress);
+        CityResponse ipBasedGeoLocation = ipGeoLocationProvider.getGeoLocationByIp(inetAddress);
 
         // 테스트시 활성화 코드
-        InetAddress testInetAddress = null;
-        try {
-            testInetAddress = InetAddress.getByName("128.101.101.101");
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        CityResponse ipBasedGeoLocation = ipGeoLocationProvider.getGeoLocationByIp(testInetAddress);
+//        InetAddress testInetAddress = null;
+//        try {
+//            testInetAddress = InetAddress.getByName("128.101.101.101");
+//        } catch (UnknownHostException e) {
+//            throw new RuntimeException(e);
+//        }
+//        CityResponse ipBasedGeoLocation = ipGeoLocationProvider.getGeoLocationByIp(testInetAddress);
         ////////////////////////////////////////////////////
 
         if(ipBasedGeoLocation == null) {
