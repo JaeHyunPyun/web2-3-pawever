@@ -8,6 +8,7 @@ import com.pawever.server.domain.user.dto.request.AuthPreLoginRequestDto;
 import com.pawever.server.domain.user.dto.response.UserResponseDto;
 import com.pawever.server.domain.user.jwt.JwtUtil;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -173,8 +174,14 @@ public class AuthService {
             throw new CustomException(ResponseCodeEnum.MISSING_REQUIRED_FIELDS);
         }
 
-        String codeChallenge = jwtUtil.getCodeChallenge(preLoginJwt);
-        String codeChallengeMethod = jwtUtil.getCodeChallengeMethod(preLoginJwt);
+        String codeChallenge = null;
+        String codeChallengeMethod = null;
+        try {
+            codeChallenge = jwtUtil.getCodeChallenge(preLoginJwt);
+            codeChallengeMethod = jwtUtil.getCodeChallengeMethod(preLoginJwt);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ResponseCodeEnum.JWT_TOKEN_EXPIRED);
+        }
 
         if(codeChallenge == null || codeChallengeMethod == null) {
             log.error("회원가입/로그인 실패 : codeChallenge or codeChallengeMethod null");
