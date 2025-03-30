@@ -95,38 +95,32 @@ public class ClientInfoResolver {
     }
     public String getClientOs(HttpServletRequest request) {
         String lowerCasedClientAgent = getLowerCasedClientAgent(request);
-        String clientOs = "";
-        if (lowerCasedClientAgent.contains("windows nt 10.0")) {
-            clientOs = "Windows10";
-        }else if (lowerCasedClientAgent.contains("windows nt 6.1")) {
-            clientOs = "Windows7";
-        }else if (lowerCasedClientAgent.contains("windows nt 6.2") || lowerCasedClientAgent.contains("windows nt 6.3")) {
-            clientOs = "Windows8";
-        }else if (lowerCasedClientAgent.contains("windows nt 6.0")) {
-            clientOs = "WindowsVista";
-        }else if (lowerCasedClientAgent.contains("windows nt 5.1")) {
-            clientOs = "WindowsXP";
-        }else if (lowerCasedClientAgent.contains("windows nt 5.0")) {
-            clientOs = "Windows2000";
-        }else if (lowerCasedClientAgent.contains("windows nt 4.0")) {
-            clientOs = "WindowsNT";
-        }else if (lowerCasedClientAgent.contains("windows 98")) {
-            clientOs = "Windows98";
-        }else if (lowerCasedClientAgent.contains("windows 95")) {
-            clientOs = "Windows95";
-        }else if (lowerCasedClientAgent.contains("iphone")) {
-            clientOs = "iPhone";
-        }else if (lowerCasedClientAgent.contains("ipad")) {
-            clientOs = "iPad";
-        }else if (lowerCasedClientAgent.contains("android")) {
-            clientOs = "android";
-        }else if (lowerCasedClientAgent.contains("mac")) {
-            clientOs = "mac";
-        }else if (lowerCasedClientAgent.contains("linux")) {
-            clientOs = "Linux";
-        }else{
-            clientOs = "OS : Unknown";
+        String clientOs = "OS : Unknown";
+
+        Map<String, String> osMap = new ConcurrentHashMap<>();
+
+        osMap.put("windows nt 10.0", "Windows10");
+        osMap.put("windows nt 6.1", "Windows7");
+        osMap.put("windows nt 6.2", "Windows8");
+        osMap.put("windows nt 6.3", "Windows8");
+        osMap.put("windows nt 6.0", "WindowsVista");
+        osMap.put("windows nt 5.1", "WindowsXP");
+        osMap.put("windows nt 5.0", "Windows2000");
+        osMap.put("windows nt 4.0", "WindowsNT");
+        osMap.put("windows 98", "Windows98");
+        osMap.put("windows 95", "Windows95");
+        osMap.put("iphone", "iPhone");
+        osMap.put("ipad", "iPad");
+        osMap.put("android", "android");
+        osMap.put("mac", "mac");
+        osMap.put("linux", "Linux");
+
+        for (Map.Entry<String, String> entry : osMap.entrySet()) {
+            if (lowerCasedClientAgent.contains(entry.getKey())) {
+                clientOs = entry.getValue();
+            }
         }
+
         return clientOs;
     }
     public String getLowerCasedClientAgent(HttpServletRequest request) {
