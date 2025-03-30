@@ -107,11 +107,9 @@ dependencies {
 
 }
 
-tasks.named('processResources') {
-    exclude '**/*.mmdb'
-    from('src/main/resources/data') {
-        include '**/*.mmdb'
-        into 'data'
+tasks.withType(ProcessResources).configureEach {
+    filesMatching('**/*.mmdb') {
+
     }
 }
 
