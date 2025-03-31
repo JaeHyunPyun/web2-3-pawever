@@ -22,19 +22,19 @@ public class IpGeoLocationProvider {
 
     public IpGeoLocationProvider() throws IOException {
         // 클래스패스에서 .mmdb 파일을 InputStream으로 읽음
-//        ClassPathResource classPathResource = new ClassPathResource("data/GeoLite2-City.mmdb");
-//        try (InputStream dbStream = classPathResource.getInputStream()) {
-//            this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbStream).build();
-//        }
-
-        // Docker 이미지에 포함된 실제 파일 경로 (Dockerfile에 같이 복사 필요)
-        File dbFile = new File("/app/data/GeoLite2-City.mmdb");
-
-        if (!dbFile.exists()) {
-            throw new FileNotFoundException("GeoLite2 DB file not found at: " + dbFile.getAbsolutePath());
+        ClassPathResource classPathResource = new ClassPathResource("data/GeoLite2-City.mmdb");
+        try (InputStream dbStream = classPathResource.getInputStream()) {
+            this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbStream).build();
         }
 
-        this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbFile).build();
+        // Docker 이미지에 포함된 실제 파일 경로 (Dockerfile에 같이 복사 필요)
+//        File dbFile = new File("/app/data/GeoLite2-City.mmdb");
+//
+//        if (!dbFile.exists()) {
+//            throw new FileNotFoundException("GeoLite2 DB file not found at: " + dbFile.getAbsolutePath());
+//        }
+//
+//        this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbFile).build();
     }
 
     public CityResponse getGeoLocationByIp(InetAddress inetAddress) {
