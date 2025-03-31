@@ -2,6 +2,7 @@ package com.pawever.server.domain.user.service;
 
 import com.pawever.server.common.exception.CustomException;
 import com.pawever.server.common.response.ResponseCodeEnum;
+import com.pawever.server.domain.user.dto.internal.LoginClientEnvironmentDto;
 import com.pawever.server.domain.user.dto.internal.LoginSecurityMailSendDto;
 import com.pawever.server.domain.user.dto.request.AuthLoginRequestDto;
 import com.pawever.server.domain.user.dto.request.AuthPreLoginRequestDto;
@@ -93,7 +94,9 @@ public class AuthService {
                     .userName(userResponseDto.getName())
                     .build();
 
-                mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, request);
+                LoginClientEnvironmentDto loginClientEnvironmentDto = clientInfoResolver.createLoginClientEnvironmentDto(request);
+
+                mailSendService.sendLoginSecurityMail(loginSecurityMailSendDto, loginClientEnvironmentDto);
             }
 
             // 5. 사용자 현재 접속 IP로 DB 정보 업데이트

@@ -1,5 +1,6 @@
 package com.pawever.server.domain.user.service;
 
+import com.pawever.server.domain.user.dto.internal.LoginClientEnvironmentDto;
 import com.pawever.server.domain.user.dto.internal.LoginSecurityMailSendDto;
 import com.pawever.server.domain.user.dto.response.IpGeoLocationDto;
 import jakarta.mail.MessagingException;
@@ -34,7 +35,7 @@ public class MailSendService {
     }
 
     @Async
-    public void sendLoginSecurityMail(LoginSecurityMailSendDto loginSecurityMailSendDto, HttpServletRequest request) {
+    public void sendLoginSecurityMail(LoginSecurityMailSendDto loginSecurityMailSendDto, LoginClientEnvironmentDto loginClientEnvironmentDto) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             // 1. MimeMessage 객체 생성을 돕는 MimeMessageHelper객체 생성
@@ -45,9 +46,10 @@ public class MailSendService {
             context.setVariable("subject", loginSecurityMailSendDto.getSubject());   // 메일 제목
             context.setVariable("loginTime", ZonedDateTime.now(ZoneId.of("Asia/Seoul"))); // 로그인 시간(한국 시간 적용)
 
-            InetAddress clientInetAdderess = clientInfoResolver.getClientInetAddress(request);
+            String clientIp = loginClientEnvironmentDto.getClientIp();
 
-            String clientIp = clientInfoResolver.getClientIp(request);
+            InetAddress clientInetAdderess = clientInfoResolver.getClientInetAddress(clientIp);
+
             context.setVariable("clientIp", formatClientIp(clientIp)); // 로그인 ip
 
             String countryName = ipGeoLocationService.getGeoLocationByIp(clientInetAdderess)
@@ -55,8 +57,8 @@ public class MailSendService {
                 .orElse("Location : Unknown");
 
             context.setVariable("clientLocation",   countryName);  // 로그인 지역
-            context.setVariable("clientOs", clientInfoResolver.getClientOs(request));   // 로그인 os
-            context.setVariable("clientBrowser", clientInfoResolver.getClientBrowser(request));  // 로그인 browser
+            context.setVariable("clientOs", loginClientEnvironmentDto.getClientOs());   // 로그인 os
+            context.setVariable("clientBrowser", loginClientEnvironmentDto.getClientBrowser());  // 로그인 browser
 
             context.setVariable("userName", maskUserName(loginSecurityMailSendDto.getUserName()));  // 사용자 User 아이디(masking 추가)
 

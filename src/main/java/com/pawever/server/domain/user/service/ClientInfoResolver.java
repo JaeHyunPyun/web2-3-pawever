@@ -1,5 +1,6 @@
 package com.pawever.server.domain.user.service;
 
+import com.pawever.server.domain.user.dto.internal.LoginClientEnvironmentDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -15,49 +16,9 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class ClientInfoResolver {
 
-    public InetAddress getClientInetAddress(HttpServletRequest request) {
-        String clientIp = null;
+    public InetAddress getClientInetAddress(String clientIp) {
         InetAddress inetAddress = null;
-        boolean isIpInHeader = false;
-
-        // 1. 프록시/로드밸러서 사용시 클라이언트의 ip 주소 반환
-        List<String> headerList = new ArrayList<>();
-        headerList.add("X-Forwarded-For");
-        headerList.add("HTTP_CLIENT_IP");
-        headerList.add("HTTP_X_FORWARDED_FOR");
-        headerList.add("HTTP_X_FORWARDED");
-        headerList.add("HTTP_FORWARDED_FOR");
-        headerList.add("HTTP_FORWARDED");
-        headerList.add("Proxy-Client-IP");
-        headerList.add("WL-Proxy-Client-IP");
-        headerList.add("HTTP_VIA");
-        headerList.add("IPV6_ADR");
-
-        for (String header : headerList) {
-            clientIp = request.getHeader(header);
-            if (StringUtils.hasText(clientIp) && !"unknown".equalsIgnoreCase(clientIp)) {
-                isIpInHeader = true;
-                break;
-            }
-        }
-
-        // 2. 프록시/로드밸런서 없이 클라이언트->서버 직접 접속시 클라이언트 ip 주소 반환
-        if (!isIpInHeader) {
-            clientIp = request.getRemoteAddr();
-        }
-
-//         3. 로컬호스트에서 접근시 정확한 ip 추출을 위한 코드
-        if ("0:0:0:0:0:0:0:1".equals(clientIp) || "127.0.0.1".equals(clientIp)) {
-            InetAddress localHostInetAddress = null;
-            try {
-                localHostInetAddress = InetAddress.getLocalHost();
-            } catch (UnknownHostException e) {
-                log.error("[UnknownHostException] 클라이언트의 Ip주소를 확인할 수 없습니다 : {}",clientIp, e);
-            }
-            clientIp = localHostInetAddress.getHostAddress();
-        }
-
-        // 4. String ip -> InetAddress 변환
+        // String ip -> InetAddress 변환
         try {
             inetAddress = InetAddress.getByName(clientIp);
         } catch (UnknownHostException e) {
@@ -127,15 +88,55 @@ public class ClientInfoResolver {
         return request.getHeader("User-Agent").toLowerCase();
     }
     public String getClientIp(HttpServletRequest request) {
-        InetAddress clientInetAddress = this.getClientInetAddress(request);
 
         String clientIp = "UNKNOWN";
+        boolean isIpInHeader = false;
 
-        if(clientInetAddress != null){
-            clientIp = clientInetAddress.getHostAddress();
+        // 1. 프록시/로드밸러서 사용시 클라이언트의 ip 주소 반환
+        List<String> headerList = new ArrayList<>();
+        headerList.add("X-Forwarded-For");
+        headerList.add("HTTP_CLIENT_IP");
+        headerList.add("HTTP_X_FORWARDED_FOR");
+        headerList.add("HTTP_X_FORWARDED");
+        headerList.add("HTTP_FORWARDED_FOR");
+        headerList.add("HTTP_FORWARDED");
+        headerList.add("Proxy-Client-IP");
+        headerList.add("WL-Proxy-Client-IP");
+        headerList.add("HTTP_VIA");
+        headerList.add("IPV6_ADR");
+
+        for (String header : headerList) {
+            clientIp = request.getHeader(header);
+            if (StringUtils.hasText(clientIp) && !"unknown".equalsIgnoreCase(clientIp)) {
+                isIpInHeader = true;
+                break;
+            }
+        }
+
+        // 2. 프록시/로드밸런서 없이 클라이언트->서버 직접 접속시 클라이언트 ip 주소 반환
+        if (!isIpInHeader) {
+            clientIp = request.getRemoteAddr();
+        }
+
+        // 3. 로컬호스트에서 접근시 정확한 ip 추출을 위한 코드
+        if ("0:0:0:0:0:0:0:1".equals(clientIp) || "127.0.0.1".equals(clientIp)) {
+            InetAddress localHostInetAddress = null;
+            try {
+                localHostInetAddress = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) {
+                log.error("[UnknownHostException] 클라이언트의 Ip주소를 확인할 수 없습니다 : {}",clientIp, e);
+            }
+            clientIp = localHostInetAddress.getHostAddress();
         }
 
         return clientIp;
     }
+    public LoginClientEnvironmentDto createLoginClientEnvironmentDto(HttpServletRequest request) {
 
+        return LoginClientEnvironmentDto.builder()
+            .clientIp(getClientIp(request))
+            .clientOs(getClientOs(request))
+            .clientBrowser(getClientBrowser(request))
+            .build();
+    }
 }
