@@ -4,6 +4,7 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -20,17 +21,20 @@ public class IpGeoLocationProvider {
     private final DatabaseReader ipGeoDatabaseReader;
 
     public IpGeoLocationProvider() throws IOException {
-        // 클래스패스에서 파일을 읽는다
-        ClassPathResource classPathResource = new ClassPathResource("data/GeoLite2-City.mmdb");
-        InputStream dbStream = classPathResource.getInputStream();
+        // 클래스패스에서 .mmdb 파일을 InputStream으로 읽음
+//        ClassPathResource classPathResource = new ClassPathResource("data/GeoLite2-City.mmdb");
+//        try (InputStream dbStream = classPathResource.getInputStream()) {
+//            this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbStream).build();
+//        }
 
-        // 임시 파일 생성 (앱 종료 시 자동 삭제)
-        File tempFile = File.createTempFile("GeoLite2-City", ".mmdb");
-        tempFile.deleteOnExit();
-        Files.copy(dbStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        // Docker 이미지에 포함된 실제 파일 경로 (Dockerfile에 같이 복사 필요)
+        File dbFile = new File("/app/data/GeoLite2-City.mmdb");
 
-        // 임시 파일을 DatabaseReader에 넘김
-        this.ipGeoDatabaseReader = new DatabaseReader.Builder(tempFile).build();
+        if (!dbFile.exists()) {
+            throw new FileNotFoundException("GeoLite2 DB file not found at: " + dbFile.getAbsolutePath());
+        }
+
+        this.ipGeoDatabaseReader = new DatabaseReader.Builder(dbFile).build();
     }
 
     public CityResponse getGeoLocationByIp(InetAddress inetAddress) {
