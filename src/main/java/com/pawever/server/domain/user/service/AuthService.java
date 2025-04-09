@@ -58,10 +58,8 @@ public class AuthService {
             // 2. authRequestDto의 uuid를 기준으로 User 테이블에서 사용자 조회
             userResponseDto = userService.getUserInfoByUuid(authLoginRequestDto.getSocialLoginUuid());
         }
-
         // 카카오 로그인시 이메일 받아오지 못하는 현상 해결을 위해 로그 추가
-        log.info("user email : " + userResponseDto.getEmail());
-
+        log.info(authLoginRequestDto.toString());
 
         // 3. userResponseDto 값이 null이면 회원가입 진행
         if(userResponseDto == null){
