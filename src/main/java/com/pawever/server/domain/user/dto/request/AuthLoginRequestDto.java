@@ -23,4 +23,19 @@ public class AuthLoginRequestDto {
     private BigDecimal longitude;           //사용자 위치 - 경도
     private String codeVerifier;            // 클라이언트 검증용 codeVerifier
     private String preLoginJwt;             // 클라이언트 검증용 jwt(pre-login단계에서 클라이언트에게 전달한 jwt)
+
+    @Override
+    public String toString() {
+        return "AuthLoginRequestDto{" +
+            "socialLoginUuid='" + socialLoginUuid + '\'' +
+            ", name='" + name + '\'' +
+            ", profileImageUrl='" + profileImageUrl + '\'' +
+            ", email='" + email + '\'' +
+            ", socialLoginProvider='" + socialLoginProvider + '\'' +
+            ", latitude=" + latitude +
+            ", longitude=" + longitude +
+            ", codeVerifier='" + codeVerifier + '\'' +
+            ", preLoginJwt='" + preLoginJwt + '\'' +
+            '}';
+    }
 }
