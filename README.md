@@ -1,5 +1,5 @@
 # Project : PAWEVER
-> **프로그래머스 데브코스 2기 - 최종 프로젝트 Team10** <br/> **개발기간: 2025.2.10 ~ 2025.3.12**
+> **프로그래머스 데브코스 2기 - 최종 프로젝트 Team10** <br/> **개발기간: 2025.2.10 - 2025.3.12**
 
 <div align="center">
 <img width="700" alt="image" src="https://github.com/user-attachments/assets/bd5696ff-ede9-4814-8cd3-26f0f87e838b">
@@ -8,7 +8,7 @@
 <br/>
 
 ## 📢 배포 주소
-> **PAWEVER 배포 버전** : <a href="https://pawever.netlify.app/"> PAWEVER </a> </br>
+> **PAWEVER 배포 버전** : <a href="https://pawever.netlify.app/" target="_blank" rel="noopener noreferrer > PAWEVER </a> </br>
 > - 소셜 로그인(Google/Kakao) 후 사용 가능
 
 <br/>
@@ -27,6 +27,7 @@
 | <a href="https://github.com/Quokka3764"><img src="https://avatars.githubusercontent.com/u/179582796?v=4" width="150px;" alt=""/></a> | <a href="https://github.com/SeungHyeon-web"><img src="https://avatars.githubusercontent.com/u/187251777?v=4" width="150px;" alt=""/></a> | <a href="https://github.com/WJoungWan"><img src="https://avatars.githubusercontent.com/u/57696567?v=4" width="150px;" alt=""/> | <a href="https://github.com/yoongjeonging"><img src="https://avatars.githubusercontent.com/u/187367747?v=4" width="150px;" alt=""/></a> |
 | PO(Project Owner)  | 팀장  | 팀원 | 팀원  |
 | 아키텍처 및 기술 스택 선정, </br> 소셜로그인, </br> 입양동물찾기, </br> 필터링, </br> 후원 , </br> 유저페이지 , </br> 좋아요 , </br> 동물카드 제작  | 로그인 모달,</br> 애니멀보드 페이지,</br> 홈화면 퍼블리싱,</br> 매칭페이지 기능 구현  |사이트 디자인/퍼블리싱, </br> Header, Sidebar, Footer, </br> 공용 컴포넌트 제작 , </br> 모바일 환경 퍼블리싱 , </br> 동물 상세 페이지   | 카드 컴포넌트, </br> 매칭페이지, </br> 마이페이지 퍼블리싱, </br> 커뮤니티 페이지 기능 | 
+
 
 <br/>
 
