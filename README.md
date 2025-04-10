@@ -40,14 +40,11 @@
 ### ✨ Front-End ✨
 ***
 #### Framework/Library
-<img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=white"/>
-<img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white"/>
-<img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
-<img src="https://img.shields.io/badge/Toast_UI-007ACC?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=white"/> <img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white"/> 
+<img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/> <img src="https://img.shields.io/badge/Toast_UI-007ACC?style=for-the-badge"/>
 
 #### State Management
-<img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white"/>
-<img src="https://img.shields.io/badge/Zustand-333333?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white"/> <img src="https://img.shields.io/badge/Zustand-333333?style=for-the-badge"/>
 
 #### Build & Package Management
 <img src="https://img.shields.io/badge/PNPM-F69220?style=for-the-badge&logo=pnpm&logoColor=white"/>
@@ -61,42 +58,34 @@
 ### ✨ Back-End ✨
 ***
 #### Framework
-<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> 
-<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"> <br/>
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"> <br/> 
 <img src="https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F.svg?&style=for-the-badge&logo=Hibernate&logoColor=white">
 
 #### Infrastructure/Cloud
- <img src="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">
- <img src="https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
- <img src="https://img.shields.io/badge/amazonrds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white">
- <img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
- <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
- <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
+<img src="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"> <img src="https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white"> 
+<img src="https://img.shields.io/badge/amazonrds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white"> <img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"> 
+<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
 
 #### Database/Cache
- <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white">
- <img src="https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white">
+ <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> <img src="https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white">
 
 ### ✨ Communication ✨
 ***
- <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
- <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/> 
- <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>
- <img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"/>
- <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/>
+ <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white"> <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/> <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/> 
+<img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"/> <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/>
 <br/>
 
 ## 🛠️ 화면구성
-| 페이지명                      | 주요 기능                                                                     | 화면                                                                                                     |
-|---------------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| 메인 </br> 페이지              | 입양동물 매칭,</br> 후원하기,</br> 보호중인 동물 ,</br> 근처 동물   | <img width="550" src="https://github.com/user-attachments/assets/d6712833-2e72-4545-9df5-a5b9adedf362"/> |
-| 관리자 </br> 페이지             | 웹사이트 통계 조회, </br> 사용자 계정 정보 검색, </br> 관리자 권한 댓글 검색 및 삭제                   | <img width="550" src=""/> |
-| 사용자 </br> 인증              | ID 및 PW 기반 로그인, </br> 로그아웃, </br> 회원탈퇴, </br> 비밀번호 수정, </br> Kakao 소셜 로그인 | <img width="550" src=""/> |
-| 마이 </br> 페이지              | 사용자 계정 및 </br> 즐겨찾기 정보 조회                                                 | <img width="550" src=""/> |
-| 인기 칵테일 </br> 추천           | 좋아요 기반 </br> 인기 칵테일 조회                                                    | <img width="550" src=""/> |
-| 칵테일 </br> 추천              | Open-AI API를 활용한 </br> 지식 기반 추천                                           | <img width="550" src=""/> |
-| 칵테일 </br> 검색              | 칵테일명 또는 </br> 재료 기반 검색, <br/> 조회수 또는 좋아요수 기반 </br> 인기 검색어 추천              | <img width="550" src=""/> |
-| 좋아요, </br> 즐겨찾기, </br> 댓글 | 좋아요, 즐겨찾기, 댓글 </br> 조회, 등록, 삭제                                            | <img width="550" src=""/> |
+| 페이지명                      | 주요 기능                                                                     | 화면                                                                                                       |
+|---------------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| 메인 </br> 페이지              | 입양동물 매칭,</br> 후원하기,</br> 보호중인 동물 ,</br> 근처 동물   | <img width="600" src="https://github.com/user-attachments/assets/d6712833-2e72-4545-9df5-a5b9adedf362"/> |
+| 관리자 </br> 페이지             | 웹사이트 통계 조회, </br> 사용자 계정 정보 검색, </br> 관리자 권한 댓글 검색 및 삭제                   | <img width="550" src=""/>                                                                                |
+| 사용자 </br> 인증              | ID 및 PW 기반 로그인, </br> 로그아웃, </br> 회원탈퇴, </br> 비밀번호 수정, </br> Kakao 소셜 로그인 | <img width="550" src=""/>                                                                                |
+| 마이 </br> 페이지              | 사용자 계정 및 </br> 즐겨찾기 정보 조회                                                 | <img width="550" src=""/>                                                                                |
+| 인기 칵테일 </br> 추천           | 좋아요 기반 </br> 인기 칵테일 조회                                                    | <img width="550" src=""/>                                                                                |
+| 칵테일 </br> 추천              | Open-AI API를 활용한 </br> 지식 기반 추천                                           | <img width="550" src=""/>                                                                                |
+| 칵테일 </br> 검색              | 칵테일명 또는 </br> 재료 기반 검색, <br/> 조회수 또는 좋아요수 기반 </br> 인기 검색어 추천              | <img width="550" src=""/>                                                                                |
+| 좋아요, </br> 즐겨찾기, </br> 댓글 | 좋아요, 즐겨찾기, 댓글 </br> 조회, 등록, 삭제                                            | <img width="550" src=""/>                                                                                |
 
 
 ## 📦 주요 기능
