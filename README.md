@@ -11,6 +11,8 @@
 > **PAWEVER 배포 버전** : <a href="https://pawever.netlify.app/"> PAWEVER </a> </br>
 > - 소셜 로그인(Google/Kakao) 후 사용 가능
 
+<br/>
+
 ## 🎀 프로젝트 소개
 - 유기동물 입양 문화 확산과 인식 개선을 목표로, 입양 희망자와 보호소를 효과적으로 연결하는 플랫폼 서비스를 기획하였습니다.
 - 전국 각지에 분산된 유기동물 보호소 정보를 통합 제공하고, 유기 동물 매칭 및 후원 등 편의 기능을 지원하여 입양 과정의 접근성과 편리성을 높였습니다.
@@ -26,6 +28,7 @@
 | PO(Project Owner)  | 팀장  | 팀원 | 팀원  |
 | 아키텍처 및 기술 스택 선정, </br> 소셜로그인, </br> 입양동물찾기, </br> 필터링, </br> 후원 , </br> 유저페이지 , </br> 좋아요 , </br> 동물카드 제작  | 로그인 모달,</br> 애니멀보드 페이지,</br> 홈화면 퍼블리싱,</br> 매칭페이지 기능 구현  |사이트 디자인/퍼블리싱, </br> Header, Sidebar, Footer, </br> 공용 컴포넌트 제작 , </br> 모바일 환경 퍼블리싱 , </br> 동물 상세 페이지   | 카드 컴포넌트, </br> 매칭페이지, </br> 마이페이지 퍼블리싱, </br> 커뮤니티 페이지 기능 | 
 
+<br/>
 
 ### Back-End
 | [남주연](https://github.com/juyeon6069) | [강바다](https://github.com/202111255) | [김민영](https://github.com/myqewr) | [편재현](https://github.com/JaeHyunPyun) | [황규리](https://github.com/gyuri127) |
@@ -38,7 +41,6 @@
 
 ## 🛠️ 기술스택
 ### ✨ Front-End ✨
-***
 #### Framework/Library
 <div>
 <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=white"/> 
@@ -67,8 +69,9 @@
 <img src="https://img.shields.io/badge/Lottie-1A2C50?style=for-the-badge&logo=lottiefiles&logoColor=white"/>
 </div>
 
+<br/>
+
 ### ✨ Back-End ✨
-***
 #### Framework
 <div>
 <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"> 
@@ -86,8 +89,9 @@
 <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"> <img src="https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white">
 </div>
 
+<br/>
+
 ### ✨ Communication ✨
-***
 <div>
 <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white"> <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white"/> 
 <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>  </br>
@@ -106,6 +110,8 @@
 | 후원 </br> 페이지     | 후원 정보 입력, </br> 후원 결제                                        | <img width="700" src="https://github.com/user-attachments/assets/6b5f56cc-55da-4610-b8f8-a8dc26c549fc"/>                                                                                |
 | 마이 </br> 페이지     | 프로필 수정, </br> 좋아요 동물 조회, </br> 작성글 조회, </br> 후원내역 조회         | <img width="700" src="https://github.com/user-attachments/assets/83847541-49a6-4792-8bbc-d07ed9c3b94b"/>                                                                                |
 | 매칭 </br> 페이지     | 매칭 동물 선택, </br> 질문 페이지, </br> 매칭 결과 페이지                      | <img width="700" src="https://github.com/user-attachments/assets/4ac84f1d-6b49-4a70-b804-0228d918f049"/>                                                                                |
+
+<br/>
 
 ## 📦 주요 기능
 ### 입양 동물 매칭
@@ -142,6 +148,8 @@
 - 사용자 프로필 이미지, 이름, 소개글 등 개인정보 수정 기능 제공
 - 사용자가 좋아요 표시한 입양 동물, 작성한 게시글, 후원 내역 조회 기능 제공
 
+<br/>
+
 ## 🏗️ 아키텍처
 ### Infrastructure
 <div align="center">
@@ -170,6 +178,8 @@ src/main/java/com/pawever/server/
 │   └── user/              # 사용자 인증, 인가, 정보 조회
 └── PawEverApplication.java
 ```
+
+<br/>
 
 ### ERD
 <div align="center">
