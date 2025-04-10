@@ -158,6 +158,8 @@
 
 ### Project Structure
 
+외부 라이브러리, 인증, 인프라, 공통 엔티티 등은 common 패키지로 통합 관리하고, 핵심 도메인 비즈니스 로직은 domain 패키지 내부에서 독립적으로 구성
+
 ```
 src/main/java/com/pawever/server/
 ├── common/
