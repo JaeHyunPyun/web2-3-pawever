@@ -8,7 +8,7 @@
 <br/>
 
 ## 📢 배포 주소
-> **PAWEVER 배포 버전** : <a href="https://pawever.netlify.app/" target="_blank" rel="noopener noreferrer > PAWEVER </a> </br>
+> **PAWEVER 배포 버전** : <a href="https://pawever.netlify.app/" target="_blank" rel="noopener noreferrer"> PAWEVER </a> </br>
 > - 소셜 로그인(Google/Kakao) 후 사용 가능
 
 <br/>
